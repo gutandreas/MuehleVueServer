@@ -16,7 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8080") // auf Klassenebene
+@CrossOrigin(origins = "http://localhost:8080")
 public class SetupController {
 
 
@@ -29,20 +29,45 @@ public class SetupController {
         System.out.println("Neuer Request an " + path);
         jsonRequest.forEach((key, value) -> System.out.println(key + ": " + value));
 
-        Player player = new HumanPlayer((String) jsonRequest.get("name"), STONECOLOR.BLACK);
-        Pairing pairing = new Pairing(player, 1);
-
-        Game game = new Game(jsonRequest.get("gameCode").toString(), new Board(), pairing, 0);
-
-
-
+        if (jsonRequest.get("modus").equals("c")){
+            Game game = setupComputerGame(jsonRequest);
+            System.out.println("Computerspiel gestartet");
+            return ResponseEntity.status(HttpStatus.OK).body(game);
+        }
 
 
-
-        return ResponseEntity.status(HttpStatus.OK).body(game);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
 
 
 
+
+
+
+
+    }
+
+    private Game setupComputerGame(Map<String, Object> jsonRequest){
+        String gameCode = jsonRequest.get("gameCode").toString();
+        STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
+
+        int level = Integer.parseInt(jsonRequest.get("level").toString());
+        String computerName;
+        if (level == 0){
+            computerName = "Schwacher Computer";
+        } else if (level == 1) {
+            computerName = "Mittelstarker Computer";
+        } else if (level == 2) {
+            computerName = "Starker Computer";
+        } else {
+            computerName = "Computer (ungültiges Level)";
+        }
+        STONECOLOR computerStonecolor = playerStonecolor == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
+
+        Player humanPlayer = new HumanPlayer((String) jsonRequest.get("name"), playerStonecolor);
+        Player computerPlayer = new StandardComputerPlayer(computerName, computerStonecolor, level);
+        Pairing pairing = new Pairing(humanPlayer, computerPlayer, 1);
+
+        return new Game(gameCode, new Board(), pairing, 0);
     }
 
 
