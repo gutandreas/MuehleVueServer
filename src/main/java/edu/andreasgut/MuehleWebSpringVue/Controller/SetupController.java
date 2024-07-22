@@ -1,5 +1,6 @@
 package edu.andreasgut.MuehleWebSpringVue.Controller;
 
+import edu.andreasgut.MuehleWebSpringVue.DTO.GameDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameServices;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,56 +20,65 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:8080")
 public class SetupController {
 
+    @Autowired GameServices gameServices;
+
 
     @PostMapping(
-            path = "/setup",
+            path = "/setup/c",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Game> setup(@RequestBody Map<String, Object> jsonRequest, HttpServletRequest request) {
+    public ResponseEntity<Object> setupComputer(@RequestBody Map<String, Object> jsonRequest) {
 
-        String path = request.getRequestURI();
-        System.out.println("Neuer Request an " + path);
+        System.out.println("Neuer Request: Setup Computerspiel");
         jsonRequest.forEach((key, value) -> System.out.println(key + ": " + value));
 
+
         if (jsonRequest.get("modus").equals("c")){
-            Game game = setupComputerGame(jsonRequest);
+            GameDto gameDto = gameServices.setupComputerGame(jsonRequest);
             System.out.println("Computerspiel gestartet");
-            return ResponseEntity.status(HttpStatus.OK).body(game);
+            return ResponseEntity.status(HttpStatus.OK).body(gameDto);
+        }
+
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Das Game konnte nicht erstellt werden.");
+    }
+
+    @PostMapping(
+            path = "/setup/l",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Game> setupLoginspiel(@RequestBody Map<String, Object> jsonRequest) {
+
+        System.out.println("Neuer Request: Setup Loginspiel");
+        jsonRequest.forEach((key, value) -> System.out.println(key + ": " + value));
+
+        if (jsonRequest.get("modus").equals("l")){
+
+            System.out.println("Computerspiel gestartet");
+
         }
 
 
         return ResponseEntity.status(HttpStatus.OK).body(null);
-
-
-
-
-
-
-
     }
 
-    private Game setupComputerGame(Map<String, Object> jsonRequest){
-        String gameCode = jsonRequest.get("gameCode").toString();
-        STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
+    @PostMapping(
+            path = "/setup/b",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Game> setupBeobachten(@RequestBody Map<String, Object> jsonRequest) {
 
-        int level = Integer.parseInt(jsonRequest.get("level").toString());
-        String computerName;
-        if (level == 0){
-            computerName = "Schwacher Computer";
-        } else if (level == 1) {
-            computerName = "Mittelstarker Computer";
-        } else if (level == 2) {
-            computerName = "Starker Computer";
-        } else {
-            computerName = "Computer (ungültiges Level)";
+        System.out.println("Neuer Request: Setup Beobachten");
+        jsonRequest.forEach((key, value) -> System.out.println(key + ": " + value));
+
+        if (jsonRequest.get("modus").equals("b")){
+
+            System.out.println("Computerspiel gestartet");
+
         }
-        STONECOLOR computerStonecolor = playerStonecolor == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
 
-        Player humanPlayer = new HumanPlayer((String) jsonRequest.get("name"), playerStonecolor);
-        Player computerPlayer = new StandardComputerPlayer(computerName, computerStonecolor, level);
-        Pairing pairing = new Pairing(humanPlayer, computerPlayer, 1);
 
-        return new Game(gameCode, new Board(), pairing, 0);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
+
+
 
 
 

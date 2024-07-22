@@ -1,10 +1,15 @@
 package edu.andreasgut.MuehleWebSpringVue.Repositories;
 
 
-import edu.andreasgut.MuehleWebSpringVue.Models.Game;
+import edu.andreasgut.MuehleWebSpringVue.Models.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GameRepository {
+import java.util.Map;
+
+public class
+GameRepository {
+
+
 
 
 }
