@@ -25,6 +25,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation group: 'org.json', name: 'json', version: '20201115'
 }
 
 tasks.named('test') {
