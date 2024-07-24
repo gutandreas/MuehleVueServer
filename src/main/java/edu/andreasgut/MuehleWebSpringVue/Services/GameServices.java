@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import com.google.gson.JsonObject;
 
 
 
@@ -16,13 +17,13 @@ public class GameServices {
 
     Map<String, Game> gameMap = new HashMap<>();
 
-    public GameDto setupComputerGame(Map<String, Object> jsonRequest){
+    public GameDto setupComputerGame(JsonObject jsonRequest){
         STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").toString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
 
 
-        int level = Integer.parseInt(jsonRequest.get("level").toString());
+        int level = jsonRequest.get("level").getAsInt();
         String computerName;
         if (level == 0){
             computerName = "Schwacher Computer";
@@ -35,7 +36,7 @@ public class GameServices {
         }
         STONECOLOR computerStonecolor = playerStonecolor == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
 
-        Player humanPlayer = new HumanPlayer((String) jsonRequest.get("name"), playerStonecolor);
+        Player humanPlayer = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor);
         Player computerPlayer = new StandardComputerPlayer(computerName, computerStonecolor, level);
         Pairing pairing = new Pairing(humanPlayer, computerPlayer, startPlayerIndex);
         String gameCode = generateRandomFreeGameCode();
