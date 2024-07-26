@@ -3,6 +3,8 @@ package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import edu.andreasgut.MuehleWebSpringVue.DTO.*;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
+import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -14,6 +16,9 @@ import com.google.gson.JsonObject;
 
 @Service
 public class GameServices {
+
+    @Autowired
+    GameRepository gameRepository;
 
     Map<String, Game> gameMap = new HashMap<>();
 
@@ -48,6 +53,9 @@ public class GameServices {
             PlayerEnemyDto enemyPlayerDto = new PlayerEnemyDto(computerPlayer.getName(), computerPlayer.getStonecolor());
             PairingDto pairingDto = new PairingDto(ownPlayerDto, enemyPlayerDto, startPlayerIndex);
             GameDto gameDto = new GameDto(pairingDto, new BoardDto());
+            addGameToDatabase(game);
+            getGameFromDatabase(gameCode);
+
             return gameDto;
         };
 
@@ -89,6 +97,14 @@ public class GameServices {
             System.out.println("Game mit Gamecode " + game.getGameCode() + " existiert nicht und kann nicht gelöscht werden");
             return false;
         }
+    }
+
+    private void addGameToDatabase(Game game){
+        gameRepository.save(game);
+    }
+
+    private void getGameFromDatabase(String gameCode){
+        System.out.println("Game aus Datenbank: " + gameRepository.findByGameCode(gameCode));
     }
 
     private String generateRandomFreeGameCode(){

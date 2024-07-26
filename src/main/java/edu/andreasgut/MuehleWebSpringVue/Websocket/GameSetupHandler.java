@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class SetupHandler {
+public class GameSetupHandler {
 
     @Autowired
     GameServices gameServices;

@@ -1,20 +1,34 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 import java.util.LinkedList;
 
 
 import java.util.List;
 
+@Entity
 public class Game {
 
+    @Id
     private String gameCode;
-    private Board board;
-    private Pairing pairing;
     private int round;
     private PHASE phase;
-    private List<Spectator> spectators = new LinkedList<>();
     private boolean finished;
+
+    @Transient
+    private Board board;
+
+    @Transient
+    private Pairing pairing;
+
+    @Transient
+    private List<Spectator> spectators = new LinkedList<>();
+
+
 
     public Game(String gameCode, Board board, Pairing pairing, int round) {
         this.gameCode = gameCode;
@@ -24,6 +38,10 @@ public class Game {
         updatePhase();
 
         this.finished = false;
+    }
+
+    public Game() {
+        // Leerer Konstruktor für Spring Repository
     }
 
     public void updatePhase(){

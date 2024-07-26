@@ -11,10 +11,11 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebsocketConfiguration implements WebSocketConfigurer {
 
     @Autowired
-    WebsocketHandler websocketHandler;
+    GameWebsocketHandler gameWebsocketHandler;
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
-        webSocketHandlerRegistry.addHandler(websocketHandler, "/websocket").setAllowedOrigins("*");
+        webSocketHandlerRegistry.addHandler(gameWebsocketHandler, "/websocket/game").setAllowedOrigins("*");
+        webSocketHandlerRegistry.addHandler(gameWebsocketHandler, "/websocket/admin").setAllowedOrigins("*");
     }
 
 }
