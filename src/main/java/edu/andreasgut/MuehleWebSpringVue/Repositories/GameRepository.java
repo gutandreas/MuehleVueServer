@@ -13,6 +13,7 @@ import java.util.Map;
 public interface GameRepository extends JpaRepository<Game, Long>{
 
     LinkedList<Game> findByGameCode(String gameCode);
+    LinkedList<Game> findAll();
 
 
 

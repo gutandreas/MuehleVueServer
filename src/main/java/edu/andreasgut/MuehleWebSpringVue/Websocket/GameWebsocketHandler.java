@@ -34,23 +34,24 @@ public class GameWebsocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
         webSocketSessions.add(session);
-        logger.info("WebSocket connection established: {}", session.getId());
+        logger.info("GameWebSocket connection established: {}", session.getId());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
         webSocketSessions.remove(session);
-        logger.info("WebSocket connection removed: {}", session.getId());
+        logger.info("GameWebSocket connection removed: {}", session.getId());
     }
 
     @Override
     synchronized public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
-        // Extrahiere die Payload der Nachricht
+        System.out.println("Neuer Game Request");
         String payload = message.getPayload();
         System.out.println(payload + " from " + session.getRemoteAddress());
 
-        System.out.println("Neuer Request: Setup Computerspiel");
+
+
 
         // Parst die Payload in ein JsonObject
         JsonObject jsonObject = JsonParser.parseString(payload).getAsJsonObject();

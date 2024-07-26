@@ -12,10 +12,14 @@ public class WebsocketConfiguration implements WebSocketConfigurer {
 
     @Autowired
     GameWebsocketHandler gameWebsocketHandler;
+
+    @Autowired
+    AdminWebsocketHandler adminDatabaseHandler;
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
         webSocketHandlerRegistry.addHandler(gameWebsocketHandler, "/websocket/game").setAllowedOrigins("*");
-        webSocketHandlerRegistry.addHandler(gameWebsocketHandler, "/websocket/admin").setAllowedOrigins("*");
+        webSocketHandlerRegistry.addHandler(adminDatabaseHandler, "/websocket/admin").setAllowedOrigins("*");
     }
 
 }

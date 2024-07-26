@@ -23,6 +23,9 @@ public class AdminWebsocketHandler extends TextWebSocketHandler {
     @Autowired
     GameServices gameServices;
 
+    @Autowired
+    AdminDatabaseHandler adminDatabaseHandler;
+
     private static final Logger logger = LoggerFactory.getLogger(AdminWebsocketHandler.class);
     List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
 
@@ -31,29 +34,31 @@ public class AdminWebsocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
         webSocketSessions.add(session);
-        logger.info("WebSocket connection established: {}", session.getId());
+        logger.info("AdminWebSocket connection established: {}", session.getId());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
         webSocketSessions.remove(session);
+        logger.info("AdminWebSocket connection removed: {}", session.getId());
     }
 
     @Override
     synchronized public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
-        // Extrahiere die Payload der Nachricht
+        System.out.println("Neuer Admin Request");
         String payload = message.getPayload();
         System.out.println(payload + " from " + session.getRemoteAddress());
 
-        System.out.println("Neuer Request: Setup Computerspiel");
+
 
         // Parst die Payload in ein JsonObject
         JsonObject jsonObject = JsonParser.parseString(payload).getAsJsonObject();
         String category = jsonObject.get("category").getAsString().toLowerCase();
 
         switch (category) {
-            case "setup":
+            case "database":
+                adminDatabaseHandler.handleSetupMessages(jsonObject);
 
                 break;
         }
