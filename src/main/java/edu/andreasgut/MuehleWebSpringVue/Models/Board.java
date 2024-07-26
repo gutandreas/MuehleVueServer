@@ -1,6 +1,9 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
+import jakarta.persistence.Entity;
+
+
 public class Board {
 
     POSITIONSTATE[][] boardPositionsStates;

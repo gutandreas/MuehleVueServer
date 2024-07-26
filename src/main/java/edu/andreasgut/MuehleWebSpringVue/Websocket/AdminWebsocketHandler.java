@@ -58,7 +58,7 @@ public class AdminWebsocketHandler extends TextWebSocketHandler {
 
         switch (category) {
             case "database":
-                adminDatabaseHandler.handleSetupMessages(jsonObject);
+                adminDatabaseHandler.handleSetupMessages(jsonObject, session);
 
                 break;
         }

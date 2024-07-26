@@ -1,6 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
 
+import com.google.gson.Gson;
 import edu.andreasgut.MuehleWebSpringVue.DTO.*;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
@@ -104,7 +105,7 @@ public class GameServices {
     }
 
     private void getGameFromDatabase(String gameCode){
-        System.out.println("Game aus Datenbank: " + gameRepository.findByGameCode(gameCode));
+        gameRepository.findByGameCode(gameCode);
     }
 
     private String generateRandomFreeGameCode(){
