@@ -1,10 +1,14 @@
 package edu.andreasgut.MuehleWebSpringVue.Websocket;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -17,6 +21,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@RestController
 @Component
 public class GameWebsocketHandler extends TextWebSocketHandler {
 
@@ -26,8 +31,19 @@ public class GameWebsocketHandler extends TextWebSocketHandler {
     @Autowired
     GameSetupHandler gameSetupHandler;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    GameActionHandler gameActionHandler;
+
     private static final Logger logger = LoggerFactory.getLogger(GameWebsocketHandler.class);
     List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
 
     @Override
@@ -59,8 +75,29 @@ public class GameWebsocketHandler extends TextWebSocketHandler {
 
         switch (category) {
             case "setup":
-                gameSetupHandler.handleSetupMessages(jsonObject);
+                gameSetupHandler.handleSetupMessages(jsonObject, session);
                 break;
+            case "action":
+                gameActionHandler.handleActionMessages(jsonObject, session);
+
+                /*{
+                "playerUuid": "123e4567-e89b-12d3-a456-426614174000",
+                    "from": {
+                        "ring": 1,
+                        "field": 2
+                },
+                    "to": {
+                        "ring": 3,
+                        "field": 4
+                }
+                }*/
+
+
+
+
+
+            default:
+                session.sendMessage(new TextMessage("Ungültige Category"));
         }
     }
 

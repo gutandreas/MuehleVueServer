@@ -1,11 +1,15 @@
-package edu.andreasgut.MuehleWebSpringVue.Models;
+package edu.andreasgut.MuehleWebSpringVue.Models.GameActions;
 
 
-public class Move {
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.GameAction;
+import edu.andreasgut.MuehleWebSpringVue.Models.Position;
+
+public class Move extends GameAction {
     private Position from, to;
 
 
-    public Move(Position from, Position to) {
+    public Move(String playerUuid, Position from, Position to) {
+        super(playerUuid);
         this.from = from;
         this.to = to;
     }

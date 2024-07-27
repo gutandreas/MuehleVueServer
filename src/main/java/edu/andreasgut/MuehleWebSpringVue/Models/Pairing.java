@@ -1,5 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+
 public class Pairing {
 
     private final Player player1;
@@ -64,6 +66,26 @@ public class Pairing {
         } else {
             currentPlayer = player1;
         }
+    }
+
+    public int getPlayerIndexByPlayerUuid(String playerUuid){
+        int index = 0;
+        String player1Uuid = player1.getPlayerUuid();
+        String player2Uuid = player2.getPlayerUuid();
+
+        if (!player1Uuid.equals(playerUuid) && !player2Uuid.equals(playerUuid)){
+            throw new IllegalArgumentException(Class.class.getSimpleName() + "-  Ungültige playerUuid");
+        }
+
+        if (player1Uuid.equals(playerUuid)){
+            index = 1;
+        }
+
+        if (player2Uuid.equals(playerUuid)){
+            index = 2;
+        }
+
+        return index;
     }
 
     public int getIndexOfPlayer(Player player){

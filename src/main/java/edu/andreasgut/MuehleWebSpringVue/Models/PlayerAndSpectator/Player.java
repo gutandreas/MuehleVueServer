@@ -1,17 +1,22 @@
-package edu.andreasgut.MuehleWebSpringVue.Models;
+package edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator;
 
+
+import edu.andreasgut.MuehleWebSpringVue.Models.Board;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
+import edu.andreasgut.MuehleWebSpringVue.Models.Position;
+import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 
 import java.util.UUID;
 
 public abstract class Player {
 
     private final String name;
-    private final String playerId;
+    private final String playerUuid;
     private final STONECOLOR stonecolor;
 
     public Player(String name,STONECOLOR stonecolor) {
         this.name = name;
-        this.playerId = UUID.randomUUID().toString();
+        this.playerUuid = UUID.randomUUID().toString();
         this.stonecolor = stonecolor;
     }
 
@@ -23,8 +28,8 @@ public abstract class Player {
         return stonecolor;
     }
 
-    public String getPlayerId() {
-        return playerId;
+    public String getPlayerUuid() {
+        return playerUuid;
     }
 
 

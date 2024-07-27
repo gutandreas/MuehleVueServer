@@ -1,6 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;

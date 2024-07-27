@@ -1,6 +1,11 @@
-package edu.andreasgut.MuehleWebSpringVue.Models;
+package edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator;
 
-public class StandardComputerPlayer extends Player{
+import edu.andreasgut.MuehleWebSpringVue.Models.Board;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
+import edu.andreasgut.MuehleWebSpringVue.Models.Position;
+import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
+
+public class StandardComputerPlayer extends Player {
 
     int level;
 

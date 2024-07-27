@@ -1,4 +1,4 @@
-package edu.andreasgut.MuehleWebSpringVue.Models;
+package edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator;
 
 import java.util.UUID;
 

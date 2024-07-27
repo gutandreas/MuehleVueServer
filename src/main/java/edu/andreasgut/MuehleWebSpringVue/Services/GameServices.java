@@ -1,9 +1,15 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
 
-import com.google.gson.Gson;
 import edu.andreasgut.MuehleWebSpringVue.DTO.*;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.GameAction;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.HumanPlayer;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +18,7 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import com.google.gson.JsonObject;
-
+import org.springframework.web.socket.WebSocketSession;
 
 
 @Service
@@ -23,7 +29,7 @@ public class GameServices {
 
     Map<String, Game> gameMap = new HashMap<>();
 
-    public GameDto setupComputerGame(JsonObject jsonRequest){
+    public GameDto setupComputerGame(JsonObject jsonRequest, WebSocketSession webSocketSession){
         STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").toString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
@@ -42,7 +48,7 @@ public class GameServices {
         }
         STONECOLOR computerStonecolor = playerStonecolor == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
 
-        Player humanPlayer = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor);
+        Player humanPlayer = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor, webSocketSession);
         Player computerPlayer = new StandardComputerPlayer(computerName, computerStonecolor, level);
         Pairing pairing = new Pairing(humanPlayer, computerPlayer, startPlayerIndex);
         String gameCode = generateRandomFreeGameCode();
@@ -50,7 +56,7 @@ public class GameServices {
         Game game = new Game(gameCode, new Board(), pairing, 0);
 
         if (addGame(game)){
-            PlayerOwnDto ownPlayerDto = new PlayerOwnDto(humanPlayer.getName(), humanPlayer.getStonecolor(), humanPlayer.getPlayerId());
+            PlayerOwnDto ownPlayerDto = new PlayerOwnDto(humanPlayer.getName(), humanPlayer.getStonecolor(), humanPlayer.getPlayerUuid());
             PlayerEnemyDto enemyPlayerDto = new PlayerEnemyDto(computerPlayer.getName(), computerPlayer.getStonecolor());
             PairingDto pairingDto = new PairingDto(ownPlayerDto, enemyPlayerDto, startPlayerIndex);
             GameDto gameDto = new GameDto(pairingDto, new BoardDto());
@@ -115,6 +121,57 @@ public class GameServices {
         } while (doesGameCodeExist(gameCode));
 
         return gameCode;
+    }
+
+    public void handlePut(String gameCode, String playerUuid, Put put, WebSocketSession webSocketSession){
+        boolean putValid = isItPlayersTurn(gameCode, webSocketSession)
+                && isActionValidInGamePhase(gameCode, put, webSocketSession);
+
+        if (putValid){
+            Game game = gameMap.get(gameCode);
+            int playerIndex = game.getPairing().getPlayerIndexByPlayerUuid(playerUuid);
+            game.getBoard().putStone(put.getPutPosition(), playerIndex);
+        };
+
+    }
+
+    public void handleMove(String gameCode, String playerUuid, Move move, WebSocketSession webSocketSession){
+        boolean moveValid = isItPlayersTurn(gameCode, webSocketSession)
+                && isActionValidInGamePhase(gameCode, move, webSocketSession);
+
+        if (moveValid){
+            Game game = gameMap.get(gameCode);
+            int playerIndex = game.getPairing().getPlayerIndexByPlayerUuid(playerUuid);
+            game.getBoard().moveStone(move, playerIndex);
+        };
+
+    }
+
+    public void handleKill(String gameCode, String playerUuid, Kill kill, WebSocketSession webSocketSession){
+        boolean killValid = isItPlayersTurn(gameCode, webSocketSession)
+                && isActionValidInGamePhase(gameCode, kill, webSocketSession);
+
+        if (killValid){
+            Game game = gameMap.get(gameCode);
+            game.getBoard().killStone(kill.getKillPosition());
+        };
+
+    }
+
+    private boolean isActionValidInGamePhase(String gameCode, GameAction gameAction, WebSocketSession webSocketSession){
+        Game game = gameMap.get(gameCode);
+        if (gameAction instanceof Put){
+            return game.getPhase() == PHASE.SET;
+        }
+        if (gameAction instanceof Move){
+            return game.getPhase() == PHASE.MOVE;
+        }
+        return true;
+    }
+
+    private boolean isItPlayersTurn(String gameCode, WebSocketSession webSocketSession){
+        Game game = gameMap.get(gameCode);
+        return  webSocketSession.equals(((HumanPlayer) game.getPairing().getCurrentPlayer()).getWebSocketSession());
     }
 
     private static String generateRandomStringOfLength6() {

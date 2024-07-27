@@ -1,7 +1,5 @@
 package edu.andreasgut.MuehleWebSpringVue.DTO;
 
-import edu.andreasgut.MuehleWebSpringVue.Models.Player;
-
 public class PairingDto {
 
     private final PlayerDto player1;

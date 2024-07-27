@@ -1,6 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import jakarta.persistence.Entity;
 
 
@@ -49,6 +50,31 @@ public class Board {
         return counter;
 
     }
+
+    public void putStone(Position position, int playerIndex) {
+        setStoneOnPositionInArray(position, playerIndex);
+    }
+
+    public void moveStone(Move move, int playerIndex) {
+        setStoneOnPositionInArray(move.getTo(), playerIndex);
+        removeStoneFromPositionInArray(move.getFrom());
+    }
+
+    public void killStone(Position position) {
+        removeStoneFromPositionInArray(position);
+    }
+
+    private void removeStoneFromPositionInArray(Position position){
+        boardPositionsStates[position.getRing()][position.getField()] = POSITIONSTATE.FREE;
+    }
+
+    private void setStoneOnPositionInArray(Position position, int playerIndex){
+        POSITIONSTATE positionstate = playerIndex == 1 ? POSITIONSTATE.PLAYER1 : POSITIONSTATE.PLAYER2;
+        boardPositionsStates[position.getRing()][position.getField()] = positionstate;
+
+    }
+
+
 
 
 
