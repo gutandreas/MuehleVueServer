@@ -1,4 +1,4 @@
-package edu.andreasgut.MuehleWebSpringVue.Websocket;
+package edu.andreasgut.MuehleWebSpringVue.Websocket.Game;
 
 import com.google.gson.JsonObject;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameServices;

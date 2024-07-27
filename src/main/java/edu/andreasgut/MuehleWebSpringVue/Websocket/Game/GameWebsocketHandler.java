@@ -1,9 +1,8 @@
-package edu.andreasgut.MuehleWebSpringVue.Websocket;
+package edu.andreasgut.MuehleWebSpringVue.Websocket.Game;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
