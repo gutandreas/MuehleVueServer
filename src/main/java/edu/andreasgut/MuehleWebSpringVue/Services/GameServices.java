@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
+
 import com.google.gson.JsonObject;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -65,6 +67,60 @@ public class GameServices {
 
             return gameDto;
         };
+
+        return null;
+
+
+
+    }
+
+    public GameDto setupLoginGame(JsonObject jsonRequest, WebSocketSession webSocketSession){
+
+        String startOrJoin = jsonRequest.get("join").getAsString();
+        String gameCode = jsonRequest.get("gamecode").getAsString();
+
+        System.out.println(Class.class.getSimpleName() + " " + startOrJoin);
+
+
+        switch (startOrJoin){
+            case "s":
+                System.out.println(Class.class.getSimpleName() + "- Neues Logingame (start) erstellt");
+                STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
+                String firstStone = jsonRequest.get("firststone").toString();
+                int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
+
+                Player humanPlayer = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor, webSocketSession);
+                Pairing pairing = new Pairing(humanPlayer, startPlayerIndex);
+                Game game = new Game(gameCode, new Board(), pairing, 0);
+
+                if (addGame(game)){
+                    PlayerOwnDto ownPlayerDto = new PlayerOwnDto(humanPlayer.getName(), humanPlayer.getStonecolor(), humanPlayer.getPlayerUuid());
+                    PairingDto pairingDto = new PairingDto(ownPlayerDto, startPlayerIndex);
+                    GameDto gameDto = new GameDto(pairingDto, new BoardDto());
+                    addGameToDatabase(game);
+                    getGameFromDatabase(gameCode);
+
+                    addGameToDatabase(game);
+                    getGameFromDatabase(gameCode);
+
+                    return gameDto;
+                };
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
         return null;
 

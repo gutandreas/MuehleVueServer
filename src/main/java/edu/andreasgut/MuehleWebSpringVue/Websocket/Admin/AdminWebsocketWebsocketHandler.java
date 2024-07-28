@@ -1,4 +1,4 @@
-package edu.andreasgut.MuehleWebSpringVue.Websocket.Game;
+package edu.andreasgut.MuehleWebSpringVue.Websocket.Admin;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -18,15 +18,15 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class AdminWebsocketHandler extends TextWebSocketHandler {
+public class AdminWebsocketWebsocketHandler extends TextWebSocketHandler {
 
     @Autowired
     GameServices gameServices;
 
     @Autowired
-    AdminDatabaseHandler adminDatabaseHandler;
+    AdminDatabaseWebsocketHandler adminDatabaseWebsocketHandler;
 
-    private static final Logger logger = LoggerFactory.getLogger(AdminWebsocketHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdminWebsocketWebsocketHandler.class);
     List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
 
 
@@ -58,7 +58,7 @@ public class AdminWebsocketHandler extends TextWebSocketHandler {
 
         switch (category) {
             case "database":
-                adminDatabaseHandler.handleSetupMessages(jsonObject, session);
+                adminDatabaseWebsocketHandler.handleSetupMessages(jsonObject, session);
                 break;
         }
     }

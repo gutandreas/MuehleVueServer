@@ -8,7 +8,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 
 @Component
-public class GameSetupHandler {
+public class GameSetupWebsocketHandler {
 
     @Autowired
     GameServices gameServices;
@@ -20,6 +20,10 @@ public class GameSetupHandler {
                 case "c":
                     gameServices.setupComputerGame(jsonObject, webSocketSession);
                     break;
+                case "l":
+                    gameServices.setupLoginGame(jsonObject, webSocketSession);
+                    break;
+
                 default:
                     System.out.println(this.getClass().getSimpleName() + "- Ungültiger Modus");
             }

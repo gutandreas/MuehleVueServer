@@ -1,5 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.DTO;
 
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+
 public class PairingDto {
 
     private final PlayerDto player1;
@@ -23,6 +25,20 @@ public class PairingDto {
 
         this.complete = true;
         this.currentPlayer = this.startPlayerIndex == 1 ? player1 : player2;
+    }
+
+    public PairingDto(PlayerDto player1, int startPlayerIndex) {
+
+        if (startPlayerIndex != 1 && startPlayerIndex != 2){
+            throw new IllegalArgumentException("Ungültiger Playerindex");
+        }
+
+        if (player1 == null){
+            throw new IllegalArgumentException("Ein übergebener Player ist null");
+        }
+
+        this.player1 = player1;
+        this.startPlayerIndex = startPlayerIndex;
     }
 
     public PlayerDto getPlayer1() {

@@ -1,4 +1,4 @@
-package edu.andreasgut.MuehleWebSpringVue.Websocket.Game;
+package edu.andreasgut.MuehleWebSpringVue.Websocket.Admin;
 
 import com.google.gson.JsonObject;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
@@ -10,7 +10,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 @Component
-public class AdminDatabaseHandler {
+public class AdminDatabaseWebsocketHandler {
 
     @Autowired
     GameServices gameServices;
