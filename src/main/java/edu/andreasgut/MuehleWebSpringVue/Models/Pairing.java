@@ -88,6 +88,14 @@ public class Pairing {
         return index;
     }
 
+    public Player getPlayer1() {
+        return player1;
+    }
+
+    public Player getPlayer2() {
+        return player2;
+    }
+
     public int getIndexOfPlayer(Player player){
         return player1.equals(player) ? 1 : 2;
     }
