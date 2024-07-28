@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class AdminWebsocketWebsocketHandler extends TextWebSocketHandler {
+public class AdminMainWebsocketHandler extends TextWebSocketHandler {
 
     @Autowired
     GameServices gameServices;
@@ -26,7 +26,7 @@ public class AdminWebsocketWebsocketHandler extends TextWebSocketHandler {
     @Autowired
     AdminDatabaseWebsocketHandler adminDatabaseWebsocketHandler;
 
-    private static final Logger logger = LoggerFactory.getLogger(AdminWebsocketWebsocketHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdminMainWebsocketHandler.class);
     List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
 
 

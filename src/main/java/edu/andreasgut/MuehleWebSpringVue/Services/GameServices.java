@@ -79,12 +79,10 @@ public class GameServices {
         String startOrJoin = jsonRequest.get("join").getAsString();
         String gameCode = jsonRequest.get("gamecode").getAsString();
 
-        System.out.println(Class.class.getSimpleName() + " " + startOrJoin);
-
 
         switch (startOrJoin){
             case "s":
-                System.out.println(Class.class.getSimpleName() + "- Neues Logingame (start) erstellt");
+                System.out.println(getClass().getSimpleName() + "- Neues Logingame (start) erstellt");
                 STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
                 String firstStone = jsonRequest.get("firststone").toString();
                 int startPlayerIndex = firstStone.equals("e") ? 1 : 2;

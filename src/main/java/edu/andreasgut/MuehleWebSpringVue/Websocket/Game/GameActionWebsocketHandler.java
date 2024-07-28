@@ -13,7 +13,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 @RestController
 @Component
-public class GameActionHandler {
+public class GameActionWebsocketHandler {
 
     @Autowired
     GameServices gameServices;

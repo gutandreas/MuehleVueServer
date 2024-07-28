@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @Component
-public class GameWebsocketWebsocketHandler extends TextWebSocketHandler {
+public class GameMainWebsocketHandler extends TextWebSocketHandler {
 
     @Autowired
     GameServices gameServices;
@@ -31,9 +31,9 @@ public class GameWebsocketWebsocketHandler extends TextWebSocketHandler {
 
 
     @Autowired
-    GameActionHandler gameActionHandler;
+    GameActionWebsocketHandler gameActionWebsocketHandler;
 
-    private static final Logger logger = LoggerFactory.getLogger(GameWebsocketWebsocketHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(GameMainWebsocketHandler.class);
     List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
 
 
@@ -71,7 +71,7 @@ public class GameWebsocketWebsocketHandler extends TextWebSocketHandler {
                 gameSetupWebsocketHandler.handleSetupMessages(jsonObject, session);
                 break;
             case "action":
-                gameActionHandler.handleActionMessages(jsonObject, session);
+                gameActionWebsocketHandler.handleActionMessages(jsonObject, session);
 
                 /*{
                 "playerUuid": "123e4567-e89b-12d3-a456-426614174000",
