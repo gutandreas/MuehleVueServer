@@ -6,6 +6,8 @@ public class BoardDto {
 
     POSITIONSTATE[][] boardPositionsStates;
 
+
+
     public BoardDto() {
         boardPositionsStates = new POSITIONSTATE[3][8];
         for (int i = 0; i < boardPositionsStates.length; i++) {

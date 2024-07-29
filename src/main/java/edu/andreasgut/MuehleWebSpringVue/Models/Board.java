@@ -1,13 +1,32 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
+import edu.andreasgut.MuehleWebSpringVue.Converter.BoardArrayConverter;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+
+import java.util.List;
+import java.util.UUID;
 
 
+@Entity
 public class Board {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID boardUuid;
+
+    @Convert(converter = BoardArrayConverter.class)
     POSITIONSTATE[][] boardPositionsStates;
+
+
+
+
+    public POSITIONSTATE[][] getBoardPositionsStates() {
+        return boardPositionsStates;
+    }
+
 
     public Board() {
         boardPositionsStates = new POSITIONSTATE[3][8];
@@ -27,9 +46,7 @@ public class Board {
     }
 
 
-    public POSITIONSTATE[][] getBoardPositionsStates() {
-        return boardPositionsStates;
-    }
+
 
 
     public POSITIONSTATE getStateOfPosition(Position position){
@@ -73,6 +90,7 @@ public class Board {
         boardPositionsStates[position.getRing()][position.getField()] = positionstate;
 
     }
+
 
 
 

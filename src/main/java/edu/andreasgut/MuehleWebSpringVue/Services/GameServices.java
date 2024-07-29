@@ -111,7 +111,6 @@ public class GameServices {
 
 
                 Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolorJoin, webSocketSession);
-
                 gameJoin.getPairing().addSecondPlayer(humanPlayerJoin);
 
 
