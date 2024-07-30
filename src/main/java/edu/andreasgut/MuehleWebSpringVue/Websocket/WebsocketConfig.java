@@ -1,4 +1,4 @@
-package edu.andreasgut.MuehleWebSpringVue.Websocket.AllInOneWebsocket;
+package edu.andreasgut.MuehleWebSpringVue.Websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

@@ -1,34 +1,29 @@
-package edu.andreasgut.MuehleWebSpringVue.Websocket.Game;
+package edu.andreasgut.MuehleWebSpringVue.Websocket;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
-import edu.andreasgut.MuehleWebSpringVue.Services.GameServices;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.stereotype.Controller;
 
-@RestController
-@Component
+@Controller
 public class GameActionWebsocketHandler {
 
-    @Autowired
-    GameServices gameServices;
+    @MessageMapping("/game/action")
+    public void handleGameActionMessage(
+            @Payload String message,
+            SimpMessageHeaderAccessor headerAccessor
+    ){
+        System.out.println(headerAccessor.getSessionId());
+        System.out.println(message);
 
-    @Autowired
-    ObjectMapper objectMapper;
 
-
-
-
-    public void handleActionMessages(JsonObject jsonObject, WebSocketSession webSocketSession){
-        try {
+        //TODO: Das implementieren aus der Message heraus. Evtl. direkt mit objectMapper eine Instanz des JavaObjekts erstellen.
+        /*try {
             String type = jsonObject.get("type").getAsString();
             String gameCode = jsonObject.get("gamecode").getAsString();
             String playerUuid = jsonObject.get("playeruuid").getAsString();
@@ -53,11 +48,6 @@ public class GameActionWebsocketHandler {
         catch (Exception e){
             e.printStackTrace();
 
-        }
-
-    }
-
-    private static void setupComputerGame(JsonObject jsonObject){
-
+        }*/
     }
 }
