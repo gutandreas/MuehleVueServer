@@ -7,6 +7,9 @@ import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.WebSocketSession;
@@ -20,6 +23,8 @@ public class GameActionWebsocketHandler {
 
     @Autowired
     ObjectMapper objectMapper;
+
+
 
 
     public void handleActionMessages(JsonObject jsonObject, WebSocketSession webSocketSession){
