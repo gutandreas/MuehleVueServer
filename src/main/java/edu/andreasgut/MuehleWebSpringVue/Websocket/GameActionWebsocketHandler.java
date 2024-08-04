@@ -1,10 +1,6 @@
 package edu.andreasgut.MuehleWebSpringVue.Websocket;
 
-import com.google.gson.JsonObject;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
-import org.apache.tomcat.util.json.JSONParser;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -14,6 +10,7 @@ import org.springframework.stereotype.Controller;
 public class GameActionWebsocketHandler {
 
     @MessageMapping("/game/action")
+
     public void handleGameActionMessage(
             @Payload String message,
             SimpMessageHeaderAccessor headerAccessor
