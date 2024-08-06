@@ -7,14 +7,21 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.LinkedList;
 
-@Controller
+@RestController
 public class GameManagerController {
 
     @Autowired
     GameManagerService gameManagerService;
+
+    @GetMapping("/manager/activegames")
+    public LinkedList<Game> getActiveGamesSetup(){
+        return gameManagerService.getActiveGames();
+    }
 
     @MessageMapping("/manager/activegames")
     public LinkedList<Game> getActiveGames(
