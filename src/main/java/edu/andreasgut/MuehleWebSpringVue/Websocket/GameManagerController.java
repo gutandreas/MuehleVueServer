@@ -1,5 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Websocket;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
 import org.slf4j.Logger;
@@ -29,20 +31,27 @@ public class GameManagerController {
     }
 
     @Transactional
-    @DeleteMapping("/manager/delete/{gamecode}")
-    public ResponseEntity<?> deleteGameByGameCode(@PathVariable(value = "gamecode") String gamecode) {
-        logger.info("DELETE request received for gamecode: {}", gamecode);
+    @MessageMapping("/manager/delete")
+    public void deleteGameByGameCode(@Payload String message) {
 
-        boolean gameExists = gameManagerService.doesGameExist(gamecode);
+        try {
+            JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+            String gamecode = jsonObject.get("gamecode").getAsString();
 
-        if (gameExists) {
-            logger.info("Game exists, proceeding to delete.");
-            gameManagerService.deleteGameByGameCode(gamecode);
-            return ResponseEntity.ok().body("Game gelöscht");
-        } else {
-            logger.warn("Game with gamecode {} does not exist", gamecode);
-            return ResponseEntity.badRequest().body("Game mit Gamecode " + gamecode + " existiert nicht");
+            logger.info("DELETE request received for gamecode: {}", gamecode);
+
+            boolean gameExists = gameManagerService.doesGameExist(gamecode);
+
+            if (gameExists) {
+                logger.info("Game exists, proceeding to delete.");
+                gameManagerService.deleteGameByGameCode(gamecode);
+            } else {
+                logger.warn("Game with gamecode {} does not exist", gamecode);
+            }
+        } catch (Exception e) {
+            logger.error("Error processing DELETE request", e);
         }
+
     }
 
 
