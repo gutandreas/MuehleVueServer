@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +26,12 @@ public class GameManagerController {
     @Autowired
     GameManagerService gameManagerService;
 
-    @GetMapping("/manager/activegames")
-    public LinkedList<Game> getActiveGamesSetup(){
-        return gameManagerService.getActiveGames();
-    }
+
 
     @Transactional
     @MessageMapping("/manager/delete")
-    public void deleteGameByGameCode(@Payload String message) {
+    @SendTo("/topic/manager")
+    public LinkedList<Game> deleteGameByGameCode(@Payload String message) {
 
         try {
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
@@ -45,17 +44,22 @@ public class GameManagerController {
             if (gameExists) {
                 logger.info("Game exists, proceeding to delete.");
                 gameManagerService.deleteGameByGameCode(gamecode);
+                return gameManagerService.getActiveGames();
+
             } else {
                 logger.warn("Game with gamecode {} does not exist", gamecode);
+                return null;
             }
         } catch (Exception e) {
             logger.error("Error processing DELETE request", e);
+            return null;
         }
 
     }
 
 
     @MessageMapping("/manager/activegames")
+    @SendTo("/topic/manager")
     public LinkedList<Game> getActiveGames(
             @Payload String message,
             SimpMessageHeaderAccessor headerAccessor
