@@ -37,21 +37,21 @@ public class GameManagerController {
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             String gamecode = jsonObject.get("gamecode").getAsString();
 
-            logger.info("DELETE request received for gamecode: {}", gamecode);
+            logger.info("DELETE Request für folgenden Gamecode: {}", gamecode);
 
             boolean gameExists = gameManagerService.doesGameExist(gamecode);
 
             if (gameExists) {
-                logger.info("Game exists, proceeding to delete.");
+                logger.info("Game mit Gamecode {} existiert, Löschen wird gestartet...", gamecode);
                 gameManagerService.deleteGameByGameCode(gamecode);
                 return gameManagerService.getActiveGames();
 
             } else {
-                logger.warn("Game with gamecode {} does not exist", gamecode);
+                logger.warn("Game mit Gamecode {} existiert nicht, Löschen wird abgebrochen", gamecode);
                 return null;
             }
         } catch (Exception e) {
-            logger.error("Error processing DELETE request", e);
+            logger.error("Fehler bei DELETE Request!", e);
             return null;
         }
 
