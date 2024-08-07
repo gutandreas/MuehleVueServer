@@ -16,6 +16,8 @@ public interface GameRepository extends JpaRepository<Game, Long>{
     LinkedList<Game> findAll();
     LinkedList<Game> findByFinishedFalse();
 
+    void deleteGameByGameCode(String gameCode);
+
 
 
 

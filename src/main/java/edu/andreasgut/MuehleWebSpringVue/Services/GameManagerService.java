@@ -18,4 +18,12 @@ public class GameManagerService {
         LinkedList<Game> games = gameRepository.findByFinishedFalse();
         return games;
     }
+
+    public boolean doesGameExist(String gameCode){
+        return gameRepository.findByGameCode(gameCode).size() > 0;
+    }
+
+    public void deleteGameByGameCode(String gameCode){
+        gameRepository.deleteGameByGameCode(gameCode);
+    }
 }

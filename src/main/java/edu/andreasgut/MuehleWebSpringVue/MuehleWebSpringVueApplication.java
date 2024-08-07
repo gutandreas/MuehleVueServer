@@ -14,6 +14,8 @@ public class MuehleWebSpringVueApplication {
 
         SpringApplication.run(MuehleWebSpringVueApplication.class, args);
 
+
+
     }
 
 }
