@@ -7,6 +7,7 @@ import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.Pairing;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.HumanPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
@@ -18,6 +19,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -80,25 +82,45 @@ public class GameManagerController {
     }
 
     @MessageMapping("/manager/setup/computer")
-    @SendTo("/queue/")
-    public ResponseEntity<String> setupComputerGame(@Payload String message) {
+    @SendToUser("/queue/reply")
+    public ResponseEntity<String> setupComputerGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
+            logger.info("Request für neuen Spielaufbau...");
+            String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+            gameManagerService.setupComputerGame(jsonObject, sessionId);
+
+
+
+            /*JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             String playerName = jsonObject.get("name").getAsString();
-            int level = Integer.parseInt(jsonObject.get("level").getAsString());
+            int level = jsonObject.get("level").getAsInt();
             String color = jsonObject.get("color").getAsString();
             String firststone = jsonObject.get("firststone").getAsString();
 
-            STONECOLOR stonecolor = color.equals("b") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
+            STONECOLOR humanColor = color.equals("b") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
+            STONECOLOR computerColor = humanColor == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
+
             int startIndex = firststone.equals("e") ? 1 : 2;
 
-            //TODO: Einen Player mit der WebsocketVerbindung erstellen
-            HumanPlayer player = new HumanPlayer(playerName, stonecolor, null);
+            String computerName;
+            if (level == 0){
+                computerName = "Schwacher Computer";
+            } else if (level == 1) {
+                computerName = "Mittelstarker Computer";
+            } else if (level == 2) {
+                computerName = "Starker Computer";
+            } else {
+                computerName = "Computer (ungültiges Level)";
+            }
+
+            HumanPlayer player = new HumanPlayer(playerName, humanColor, sessionId);
+            StandardComputerPlayer computerPlayer = new StandardComputerPlayer(computerName, computerColor, level);
 
             Board board = new Board();
-            Pairing pairing = new Pairing(player, startIndex);
+            Pairing pairing = new Pairing(player, computerPlayer, startIndex);
             Game game = new Game(gameManagerService.generateValidGameCode(), board, pairing, 0);
-            gameRepository.save(game);
+            gameRepository.save(game);*/
 
             return ResponseEntity.ok().body("Game erstellt");
         } catch (Exception e){

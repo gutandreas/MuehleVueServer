@@ -1,12 +1,9 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Group;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.ParticipantGroup;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
-import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import jakarta.persistence.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -18,9 +15,8 @@ public class Game {
     private String gameCode;
     private int round;
     private boolean finished;
-    @OneToOne
-    @JoinColumn(name = "group_ID")
-    private Group group;
+    @Transient
+    private ParticipantGroup participantGroup;
 
 
     @Transient
@@ -32,12 +28,12 @@ public class Game {
     @Transient
     private List<Spectator> spectators = new LinkedList<>();
 
-    public Group getGroup() {
-        return group;
+    public ParticipantGroup getGroup() {
+        return participantGroup;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
+    public void setGroup(ParticipantGroup participantGroup) {
+        this.participantGroup = participantGroup;
     }
 
 

@@ -31,48 +31,7 @@ public class GameServices {
 
     Map<String, Game> gameMap = new HashMap<>();
 
-    public GameDto setupComputerGame(JsonObject jsonRequest, WebSocketSession webSocketSession){
-        STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
-        String firstStone = jsonRequest.get("firststone").toString();
-        int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
 
-
-        int level = jsonRequest.get("level").getAsInt();
-        String computerName;
-        if (level == 0){
-            computerName = "Schwacher Computer";
-        } else if (level == 1) {
-            computerName = "Mittelstarker Computer";
-        } else if (level == 2) {
-            computerName = "Starker Computer";
-        } else {
-            computerName = "Computer (ungültiges Level)";
-        }
-        STONECOLOR computerStonecolor = playerStonecolor == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
-
-        Player humanPlayer = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor, webSocketSession);
-        Player computerPlayer = new StandardComputerPlayer(computerName, computerStonecolor, level);
-        Pairing pairing = new Pairing(humanPlayer, computerPlayer, startPlayerIndex);
-        String gameCode = generateRandomFreeGameCode();
-
-        Game game = new Game(gameCode, new Board(), pairing, 0);
-
-        if (addGame(game)){
-            PlayerOwnDto ownPlayerDto = new PlayerOwnDto(humanPlayer.getName(), humanPlayer.getStonecolor(), humanPlayer.getPlayerUuid());
-            PlayerEnemyDto enemyPlayerDto = new PlayerEnemyDto(computerPlayer.getName(), computerPlayer.getStonecolor());
-            PairingDto pairingDto = new PairingDto(ownPlayerDto, enemyPlayerDto, startPlayerIndex);
-            GameDto gameDto = new GameDto(pairingDto, new BoardDto());
-            addGameToDatabase(game);
-            getGameFromDatabase(gameCode);
-
-            return gameDto;
-        };
-
-        return null;
-
-
-
-    }
 
     public GameDto setupLoginGame(JsonObject jsonRequest, WebSocketSession webSocketSession){
 
@@ -87,12 +46,12 @@ public class GameServices {
                 String firstStone = jsonRequest.get("firststone").toString();
                 int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
 
-                Player humanPlayerStart = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor, webSocketSession);
+                Player humanPlayerStart = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor, webSocketSession.getId());
                 Pairing pairing = new Pairing(humanPlayerStart, startPlayerIndex);
                 Game gameStart = new Game(gameCode, new Board(), pairing, 0);
 
                 if (addGame(gameStart)){
-                    PlayerOwnDto ownPlayerDto = new PlayerOwnDto(humanPlayerStart.getName(), humanPlayerStart.getStonecolor(), humanPlayerStart.getPlayerUuid());
+                    PlayerOwnDto ownPlayerDto = new PlayerOwnDto(humanPlayerStart.getName(), humanPlayerStart.getStonecolor(), humanPlayerStart.getUuid());
                     PairingDto pairingDto = new PairingDto(ownPlayerDto, startPlayerIndex);
                     GameDto gameDto = new GameDto(pairingDto, new BoardDto());
                     addGameToDatabase(gameStart);
@@ -110,7 +69,7 @@ public class GameServices {
                 STONECOLOR playerStonecolorJoin = gameJoin.getPairing().getPlayer1().getStonecolor() == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
 
 
-                Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolorJoin, webSocketSession);
+                Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolorJoin, webSocketSession.getId());
                 gameJoin.getPairing().addSecondPlayer(humanPlayerJoin);
 
 
@@ -239,7 +198,7 @@ public class GameServices {
 
     private boolean isItPlayersTurn(String gameCode, WebSocketSession webSocketSession){
         Game game = gameMap.get(gameCode);
-        return  webSocketSession.equals(((HumanPlayer) game.getPairing().getCurrentPlayer()).getWebSocketSession());
+        return  webSocketSession.equals(((HumanPlayer) game.getPairing().getCurrentPlayer()).getWebSocketSessionId());
     }
 
     private static String generateRandomStringOfLength6() {

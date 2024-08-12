@@ -70,8 +70,8 @@ public class Pairing {
 
     public int getPlayerIndexByPlayerUuid(String playerUuid){
         int index = 0;
-        String player1Uuid = player1.getPlayerUuid();
-        String player2Uuid = player2.getPlayerUuid();
+        String player1Uuid = player1.getUuid();
+        String player2Uuid = player2.getUuid();
 
         if (!player1Uuid.equals(playerUuid) && !player2Uuid.equals(playerUuid)){
             throw new IllegalArgumentException(Class.class.getSimpleName() + "-  Ungültige playerUuid");

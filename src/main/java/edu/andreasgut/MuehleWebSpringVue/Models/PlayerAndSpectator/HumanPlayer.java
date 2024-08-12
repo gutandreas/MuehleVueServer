@@ -4,18 +4,25 @@ import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.Position;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
+import jakarta.persistence.Entity;
 import org.springframework.web.socket.WebSocketSession;
 
+@Entity
 public class HumanPlayer extends Player implements ParticipantWithWebSocketSession {
 
-    private WebSocketSession webSocketSession;
-    public HumanPlayer(String name, STONECOLOR stonecolor, WebSocketSession webSocketSession) {
+    private String webSocketSessionId;
+    public HumanPlayer(String name, STONECOLOR stonecolor, String webSocketSessionId) {
         super(name, stonecolor);
-        this.webSocketSession = webSocketSession;
+        this.webSocketSessionId = webSocketSessionId;
     }
 
-    public WebSocketSession getWebSocketSession() {
-        return webSocketSession;
+    public HumanPlayer() {
+
+    }
+
+    @Override
+    public String getWebSocketSessionId() {
+        return webSocketSessionId;
     }
 
     @Override
