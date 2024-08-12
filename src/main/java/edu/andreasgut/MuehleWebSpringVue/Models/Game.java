@@ -17,7 +17,6 @@ public class Game {
     @Id
     private String gameCode;
     private int round;
-    private PHASE phase;
     private boolean finished;
 
     @Transient
@@ -36,7 +35,6 @@ public class Game {
         this.board = board;
         this.pairing = pairing;
         this.round = round;
-        updatePhase();
 
         this.finished = false;
     }
@@ -45,27 +43,9 @@ public class Game {
         // Leerer Konstruktor für Spring Repository
     }
 
-    public void updatePhase(){
-        if (round <= 17){
-            phase = PHASE.SET;
-        } else {
-            int numberOfStonesPlayer1 = board.getNumberOfStates(POSITIONSTATE.PLAYER1);
-            int numberOfStonesPlayer2 = board.getNumberOfStates(POSITIONSTATE.PLAYER2);
-            if (numberOfStonesPlayer1 <= 3 && numberOfStonesPlayer2 <= 3){
-                phase = PHASE.JUMPALL;
-            } else if (numberOfStonesPlayer1 <= 3) {
-                phase = PHASE.JUMP1;
-            } else if (numberOfStonesPlayer2 <= 3) {
-                phase = PHASE.JUMP2;
-            } else {
-                phase = PHASE.MOVE;
-            }
-        }
-    }
 
-    public void increaseRoundAndUpdatePhase(){
+    public void increaseRound(){
         round++;
-        updatePhase();
     }
 
     public boolean addSpectator(Spectator spectator){
@@ -93,9 +73,6 @@ public class Game {
         return pairing;
     }
 
-    public PHASE getPhase() {
-        return phase;
-    }
 
     public List<Spectator> getSpectators() {
         return spectators;
