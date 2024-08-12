@@ -13,8 +13,7 @@ public class GameActionWebsocketHandler {
 
     public void handleGameActionMessage(
             @Payload String message,
-            SimpMessageHeaderAccessor headerAccessor
-    ){
+            SimpMessageHeaderAccessor headerAccessor) {
         System.out.println(headerAccessor.getSessionId());
         System.out.println(message);
 
