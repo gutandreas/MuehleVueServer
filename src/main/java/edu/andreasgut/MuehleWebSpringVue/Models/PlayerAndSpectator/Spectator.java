@@ -1,13 +1,16 @@
 package edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator;
 
+import org.springframework.web.socket.WebSocketSession;
+
 import java.util.UUID;
 
-public class Spectator {
+public class Spectator implements ParticipantWithWebSocketSession {
 
 
     String spectatorId;
     String name;
     boolean isRoboter;
+    WebSocketSession webSocketSession;
 
     public Spectator(String name, boolean isRoboter) {
         this.spectatorId = UUID.randomUUID().toString();
@@ -25,5 +28,10 @@ public class Spectator {
 
     public boolean isRoboter() {
         return isRoboter;
+    }
+
+    @Override
+    public WebSocketSession getWebSocketSession() {
+        return webSocketSession;
     }
 }

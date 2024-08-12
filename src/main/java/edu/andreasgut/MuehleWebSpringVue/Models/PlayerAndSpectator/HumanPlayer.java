@@ -6,7 +6,7 @@ import edu.andreasgut.MuehleWebSpringVue.Models.Position;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 import org.springframework.web.socket.WebSocketSession;
 
-public class HumanPlayer extends Player {
+public class HumanPlayer extends Player implements ParticipantWithWebSocketSession {
 
     private WebSocketSession webSocketSession;
     public HumanPlayer(String name, STONECOLOR stonecolor, WebSocketSession webSocketSession) {

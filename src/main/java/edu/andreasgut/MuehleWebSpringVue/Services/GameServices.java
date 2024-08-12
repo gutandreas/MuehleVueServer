@@ -229,10 +229,10 @@ public class GameServices {
     private boolean isActionValidInGamePhase(String gameCode, GameAction gameAction, WebSocketSession webSocketSession){
         Game game = gameMap.get(gameCode);
         if (gameAction instanceof Put){
-            return game.getPhase() == PHASE.SET;
+            return game.getPairing().getCurrentPlayer().getCurrentPhase() == PHASE.SET;
         }
         if (gameAction instanceof Move){
-            return game.getPhase() == PHASE.MOVE;
+            return game.getPairing().getCurrentPlayer().getCurrentPhase() == PHASE.MOVE;
         }
         return true;
     }

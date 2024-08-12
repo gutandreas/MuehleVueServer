@@ -1,15 +1,17 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Group;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Game {
@@ -18,6 +20,10 @@ public class Game {
     private String gameCode;
     private int round;
     private boolean finished;
+    @OneToOne
+    @JoinColumn(name = "group_ID")
+    private Group group;
+
 
     @Transient
     private Board board;
@@ -28,6 +34,13 @@ public class Game {
     @Transient
     private List<Spectator> spectators = new LinkedList<>();
 
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
 
 
     public Game(String gameCode, Board board, Pairing pairing, int round) {
@@ -81,6 +94,8 @@ public class Game {
     public boolean isFinished() {
         return finished;
     }
+
+
 
 
 

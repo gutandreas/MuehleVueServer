@@ -6,14 +6,18 @@ import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
 import edu.andreasgut.MuehleWebSpringVue.Models.Position;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import java.util.UUID;
 
+@Entity
 public abstract class Player {
 
-    private final String name;
-    private final String playerUuid;
-    private final STONECOLOR stonecolor;
+    @Id
+    private String playerUuid;
+    private String name;
+    private STONECOLOR stonecolor;
     private PHASE currentPhase;
 
     public Player(String name,STONECOLOR stonecolor) {
@@ -30,6 +34,11 @@ public abstract class Player {
         this.currentPhase = phase;
     }
 
+    public Player() {
+
+    }
+
+
     public String getName() {
         return name;
     }
@@ -45,6 +54,8 @@ public abstract class Player {
     public PHASE getCurrentPhase() {
         return currentPhase;
     }
+
+
 
     abstract Move move(Board board, int playerIndex, boolean allowedToJump);
 
