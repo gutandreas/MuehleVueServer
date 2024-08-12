@@ -9,8 +9,8 @@ import java.util.Set;
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "grou_id", nullable = false)
-    private Long grouId;
+    @Column(name = "group_id", nullable = false)
+    private Long groupId;
 
     @OneToOne
     @JoinColumn(name = "admin_player_uuid")
@@ -18,12 +18,12 @@ public class Group {
     @OneToMany
     private Set<Player> members = new HashSet<>();
 
-    public Long getGrouId() {
-        return grouId;
+    public Long getGroupId() {
+        return groupId;
     }
 
-    public void setGrouId(Long grouId) {
-        this.grouId = grouId;
+    public void setGroupId(Long grouId) {
+        this.groupId = grouId;
     }
 
     public Player getAdmin() {

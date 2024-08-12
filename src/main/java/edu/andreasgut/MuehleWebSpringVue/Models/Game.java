@@ -4,17 +4,15 @@ package edu.andreasgut.MuehleWebSpringVue.Models;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Group;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
+import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-
-
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Game {
+
 
     @Id
     private String gameCode;
@@ -94,6 +92,8 @@ public class Game {
     public boolean isFinished() {
         return finished;
     }
+
+
 
 
 

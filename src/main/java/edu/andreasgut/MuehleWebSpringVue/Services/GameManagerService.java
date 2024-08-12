@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
+import java.util.Random;
 
 @Service
 public class GameManagerService {
@@ -25,5 +26,21 @@ public class GameManagerService {
 
     public void deleteGameByGameCode(String gameCode){
         gameRepository.deleteGameByGameCode(gameCode);
+    }
+
+    public String generateValidGameCode() {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder gameCode = new StringBuilder();
+        Random random = new Random();
+
+        do {
+
+            for (int i = 0; i < 6; i++) {
+                int index = random.nextInt(characters.length());
+                gameCode.append(characters.charAt(index));
+            }
+        } while (gameRepository.existsByGameCode(gameCode.toString()));
+
+        return gameCode.toString();
     }
 }
