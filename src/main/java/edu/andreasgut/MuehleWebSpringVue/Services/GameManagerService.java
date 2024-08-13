@@ -13,10 +13,7 @@ import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Websocket.GameManagerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -26,32 +23,35 @@ public class GameManagerService {
 
     private static final Logger logger = LoggerFactory.getLogger(GameManagerController.class);
 
-    @Autowired
-    GameRepository gameRepository;
+    private final GameRepository gameRepository;
 
-    public LinkedList<Game> getActiveGames(){
+    // Konstruktor-Injektion
+    public GameManagerService(GameRepository gameRepository) {
+        this.gameRepository = gameRepository;
+    }
+
+    public LinkedList<Game> getActiveGames() {
         LinkedList<Game> games = gameRepository.findByFinishedFalse();
         return games;
     }
 
-    public boolean doesGameExist(String gameCode){
+    public boolean doesGameExist(String gameCode) {
         return gameRepository.findByGameCode(gameCode).size() > 0;
     }
 
-    public void deleteGameByGameCode(String gameCode){
+    public void deleteGameByGameCode(String gameCode) {
         gameRepository.deleteGameByGameCode(gameCode);
     }
 
-    public void setupComputerGame(JsonObject jsonRequest, String webSocketSessionId){
+    public void setupComputerGame(JsonObject jsonRequest, String webSocketSessionId) {
         logger.info("Spiel wird aufgebaut");
         STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").toString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
 
-
         int level = jsonRequest.get("level").getAsInt();
         String computerName;
-        if (level == 0){
+        if (level == 0) {
             computerName = "Schwacher Computer";
         } else if (level == 1) {
             computerName = "Mittelstarker Computer";
@@ -70,7 +70,6 @@ public class GameManagerService {
         Game game = new Game(gameCode, new Board(), pairing, 0);
         gameRepository.save(game);
         System.out.println("Test...");
-
     }
 
     private String generateValidGameCode() {
@@ -79,7 +78,6 @@ public class GameManagerService {
         Random random = new Random();
 
         do {
-
             for (int i = 0; i < 6; i++) {
                 int index = random.nextInt(characters.length());
                 gameCode.append(characters.charAt(index));

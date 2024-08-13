@@ -40,6 +40,9 @@ public class GameListener {
         if (messagingTool != null && gameManagerService != null) {
             messagingTool.sendMessageToTopic("/topic/manager", gameManagerService.getActiveGames());
         }
+        else {
+            logger.error("messagingTool oder gameManagerService ist null");
+        }
     }
 
     @PostLoad

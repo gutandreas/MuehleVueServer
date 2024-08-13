@@ -29,15 +29,14 @@ public class GameManagerController {
 
     private static final Logger logger = LoggerFactory.getLogger(GameManagerController.class);
 
-    @Autowired
+
     GameManagerService gameManagerService;
 
-    @Autowired
-    GameRepository gameRepository;
 
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-
+    public GameManagerController(GameManagerService gameManagerService) {
+        this.gameManagerService = gameManagerService;
+    }
 
     @Transactional
     @MessageMapping("/manager/delete")
