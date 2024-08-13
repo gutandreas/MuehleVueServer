@@ -42,6 +42,7 @@ public class GameListener {
         }
         else {
             logger.error("messagingTool oder gameManagerService ist null");
+            //TODO: Landet immer hier wegen Lifecycle Problemen... @EntityListener macht Probleme
         }
     }
 
