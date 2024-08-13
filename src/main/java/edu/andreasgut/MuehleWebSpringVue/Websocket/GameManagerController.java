@@ -2,13 +2,7 @@ package edu.andreasgut.MuehleWebSpringVue.Websocket;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
-import edu.andreasgut.MuehleWebSpringVue.Models.Pairing;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.HumanPlayer;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
-import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
 import org.slf4j.Logger;
