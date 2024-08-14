@@ -23,10 +23,6 @@ public class SenderService {
         template.convertAndSend(path, game);
     }
 
-    public void sendAllGamesToAdminAfterDelete(){
-        String path = "/topic/admin/games/delete";
-        template.convertAndSend(gameRepository.findAll());
-    }
 
     public void sendGetAllGames(){
         String path = "/topic/admin/games/getall";

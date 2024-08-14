@@ -71,13 +71,6 @@ public class GameManagerController {
     }
 
 
-    @MessageMapping("/admin/games/getactive")
-    //@SendTo("/topic/admin/games/getactive")
-    public LinkedList<Game> getActiveGames() {
-        logger.info("Request für aktive Games");
-        return gameManagerService.getActiveGames();
-    }
-
     @MessageMapping("/manager/setup/computer")
     //@SendToUser("/queue/reply")
     public ResponseEntity<String> setupComputerGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
