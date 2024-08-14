@@ -10,6 +10,7 @@ import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.HumanPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -26,7 +27,7 @@ public class GameServices {
 
     private final Map<String, Game> gameMap = new HashMap<>();
 
-    // Konstruktor-Injektion
+    @Autowired
     public GameServices(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
     }

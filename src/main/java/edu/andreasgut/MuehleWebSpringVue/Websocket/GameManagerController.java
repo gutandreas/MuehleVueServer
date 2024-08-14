@@ -3,8 +3,8 @@ package edu.andreasgut.MuehleWebSpringVue.Websocket;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
-import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
+import edu.andreasgut.MuehleWebSpringVue.Services.SenderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,16 +13,11 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
-import java.util.Random;
-import java.util.UUID;
 
 @RestController
 public class GameManagerController {
@@ -31,11 +26,13 @@ public class GameManagerController {
 
 
     GameManagerService gameManagerService;
+    SenderService senderService;
 
 
     @Autowired
-    public GameManagerController(GameManagerService gameManagerService) {
+    public GameManagerController(GameManagerService gameManagerService, SenderService senderService) {
         this.gameManagerService = gameManagerService;
+        this.senderService = senderService;
     }
 
     @Transactional
@@ -86,7 +83,8 @@ public class GameManagerController {
             logger.info("Request für neuen Spielaufbau...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            gameManagerService.setupComputerGame(jsonObject, sessionId);
+            Game game = gameManagerService.setupComputerGame(jsonObject, sessionId);
+            senderService.addGameToAdmin(game);
             return ResponseEntity.ok().body("Game erstellt");
         } catch (Exception e){
             return ResponseEntity.badRequest().body("Game konnte nicht erstellt werden");

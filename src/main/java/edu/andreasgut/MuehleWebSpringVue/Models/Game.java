@@ -1,7 +1,6 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
-import edu.andreasgut.MuehleWebSpringVue.Listeners.GameListener;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.ParticipantGroup;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
 import jakarta.persistence.*;
@@ -9,7 +8,6 @@ import jakarta.persistence.*;
 import java.util.*;
 
 @Entity
-@EntityListeners(GameListener.class)
 public class Game {
 
 

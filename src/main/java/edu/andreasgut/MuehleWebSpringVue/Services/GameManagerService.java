@@ -13,6 +13,8 @@ import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Websocket.GameManagerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -25,9 +27,11 @@ public class GameManagerService {
 
     private final GameRepository gameRepository;
 
-    // Konstruktor-Injektion
-    public GameManagerService(GameRepository gameRepository) {
+
+    @Autowired
+    public GameManagerService(GameRepository gameRepository, SimpMessagingTemplate messagingTemplate) {
         this.gameRepository = gameRepository;
+
     }
 
     public LinkedList<Game> getActiveGames() {
@@ -43,7 +47,7 @@ public class GameManagerService {
         gameRepository.deleteGameByGameCode(gameCode);
     }
 
-    public void setupComputerGame(JsonObject jsonRequest, String webSocketSessionId) {
+    public Game setupComputerGame(JsonObject jsonRequest, String webSocketSessionId) {
         logger.info("Spiel wird aufgebaut");
         STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").toString();
@@ -69,7 +73,9 @@ public class GameManagerService {
 
         Game game = new Game(gameCode, new Board(), pairing, 0);
         gameRepository.save(game);
-        System.out.println("Test...");
+
+        return game;
+
     }
 
     private String generateValidGameCode() {
