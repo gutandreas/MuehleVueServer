@@ -36,9 +36,9 @@ public class GameManagerController {
     }
 
     @Transactional
-    @MessageMapping("/manager/delete")
-    @SendTo("/topic/manager")
-    public LinkedList<Game> deleteGameByGameCode(@Payload String message) {
+    @MessageMapping("/admin/games/delete")
+    //@SendTo("/topic/admin/games/delete")
+    public void deleteGameByGameCode(@Payload String message) {
 
         try {
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
@@ -51,40 +51,42 @@ public class GameManagerController {
             if (gameExists) {
                 logger.info("Game mit Gamecode {} existiert, Löschen wird gestartet...", gamecode);
                 gameManagerService.deleteGameByGameCode(gamecode);
-                return gameManagerService.getActiveGames();
+                senderService.sendGetAllGames();
+
 
             } else {
                 logger.warn("Game mit Gamecode {} existiert nicht, Löschen wird abgebrochen", gamecode);
-                return null;
+
             }
         } catch (Exception e) {
             logger.error("Fehler bei DELETE Request!", e);
-            return null;
         }
 
     }
 
+    @MessageMapping("/admin/games/getall")
+    public void getAllGames() {
+        logger.info("Request für alle Games");
+        senderService.sendGetAllGames();
+    }
 
-    @MessageMapping("/manager/activegames")
-    @SendTo("/topic/manager")
-    public LinkedList<Game> getActiveGames(
-            @Payload String message,
-            SimpMessageHeaderAccessor headerAccessor
-    ) {
-        System.out.println(headerAccessor.getSessionId());
-        System.out.println(message);
+
+    @MessageMapping("/admin/games/getactive")
+    //@SendTo("/topic/admin/games/getactive")
+    public LinkedList<Game> getActiveGames() {
+        logger.info("Request für aktive Games");
         return gameManagerService.getActiveGames();
     }
 
     @MessageMapping("/manager/setup/computer")
-    @SendToUser("/queue/reply")
+    //@SendToUser("/queue/reply")
     public ResponseEntity<String> setupComputerGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
             logger.info("Request für neuen Spielaufbau...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupComputerGame(jsonObject, sessionId);
-            senderService.addGameToAdmin(game);
+            senderService.sendAddGameToAdmin(game);
             return ResponseEntity.ok().body("Game erstellt");
         } catch (Exception e){
             return ResponseEntity.badRequest().body("Game konnte nicht erstellt werden");

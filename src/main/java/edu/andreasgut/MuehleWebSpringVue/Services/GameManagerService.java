@@ -34,6 +34,11 @@ public class GameManagerService {
 
     }
 
+    public LinkedList<Game> getAllGames() {
+        LinkedList<Game> games = gameRepository.findAll();
+        return games;
+    }
+
     public LinkedList<Game> getActiveGames() {
         LinkedList<Game> games = gameRepository.findByFinishedFalse();
         return games;
