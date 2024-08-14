@@ -89,6 +89,8 @@ public class GameManagerController {
             senderService.sendAddGameToAdmin(game);
             return ResponseEntity.ok().body("Game erstellt");
         } catch (Exception e){
+            e.printStackTrace();
+            logger.warn("Game konnte nicht erstellt werden");
             return ResponseEntity.badRequest().body("Game konnte nicht erstellt werden");
         }
 

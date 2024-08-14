@@ -19,7 +19,9 @@ public class Game {
     private ParticipantGroup participantGroup;
 
 
-    @Transient
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "board_fk")
     private Board board;
 
     @Transient
@@ -27,6 +29,10 @@ public class Game {
 
     @Transient
     private List<Spectator> spectators = new LinkedList<>();
+
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 
     public ParticipantGroup getGroup() {
         return participantGroup;

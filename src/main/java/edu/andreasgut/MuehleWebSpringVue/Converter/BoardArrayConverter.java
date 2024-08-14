@@ -25,11 +25,7 @@ public class BoardArrayConverter implements AttributeConverter<POSITIONSTATE[][]
 
         }
 
-
-
-
-
-        return null;
+        return boardAsString.toString();
     }
 
     @Override
@@ -49,6 +45,6 @@ public class BoardArrayConverter implements AttributeConverter<POSITIONSTATE[][]
 
             }
         }
-        return new POSITIONSTATE[0][];
+        return boardPositionsStates;
     }
 }
