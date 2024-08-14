@@ -24,7 +24,8 @@ public class Game {
     @JoinColumn(name = "board_fk")
     private Board board;
 
-    @Transient
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "pairing_fk")
     private Pairing pairing;
 
     @Transient

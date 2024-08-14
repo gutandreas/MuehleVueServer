@@ -4,7 +4,11 @@ import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.Position;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
+@Entity
+@DiscriminatorValue("STANDARDCOMPUTER")
 public class StandardComputerPlayer extends Player {
 
     int level;
@@ -12,6 +16,10 @@ public class StandardComputerPlayer extends Player {
     public StandardComputerPlayer(String name, STONECOLOR stonecolor, int level) {
         super(name, stonecolor);
         this.level = level;
+    }
+
+    public StandardComputerPlayer() {
+
     }
 
     @Override

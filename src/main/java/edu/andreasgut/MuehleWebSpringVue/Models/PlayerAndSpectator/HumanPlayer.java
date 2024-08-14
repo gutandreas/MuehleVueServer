@@ -4,10 +4,12 @@ import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.Position;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import org.springframework.web.socket.WebSocketSession;
 
 @Entity
+@DiscriminatorValue("HUMAN")
 public class HumanPlayer extends Player implements ParticipantWithWebSocketSession {
 
     private String webSocketSessionId;

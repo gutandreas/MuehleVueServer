@@ -1,14 +1,10 @@
 package edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@MappedSuperclass
 public abstract class Participant {
 
 

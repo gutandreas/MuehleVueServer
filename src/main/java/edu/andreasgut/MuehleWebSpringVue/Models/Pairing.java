@@ -1,13 +1,28 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import jakarta.persistence.*;
 
+import java.util.UUID;
+
+@Entity
 public class Pairing {
 
-    private final Player player1;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID pairingUuid;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private Player player1;
+
+    @OneToOne(cascade = CascadeType.ALL)
     private Player player2;
+
+    @OneToOne(cascade = CascadeType.ALL)
     private Player currentPlayer;
-    private final int startPlayerIndex;
+
+    private int startPlayerIndex;
+
     private boolean complete = false;
 
     public Pairing(Player player1, Player player2, int startPlayerIndex) {
@@ -40,6 +55,9 @@ public class Pairing {
 
         this.player1 = player1;
         this.startPlayerIndex = startPlayerIndex;
+    }
+
+    public Pairing() {
     }
 
     public void addSecondPlayer(Player player2) {
