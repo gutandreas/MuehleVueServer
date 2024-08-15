@@ -96,12 +96,12 @@ public class Game {
         return finished;
     }
 
+    public int getRound() {
+        return round;
+    }
 
-
-
-
-
-
-
+    public ParticipantGroup getParticipantGroup() {
+        return participantGroup;
+    }
 }
 
