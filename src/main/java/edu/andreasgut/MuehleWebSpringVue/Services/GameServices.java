@@ -32,50 +32,7 @@ public class GameServices {
         this.gameRepository = gameRepository;
     }
 
-    public GameDto setupLoginGame(JsonObject jsonRequest, WebSocketSession webSocketSession) {
 
-        String startOrJoin = jsonRequest.get("join").getAsString();
-        String gameCode = jsonRequest.get("gamecode").getAsString();
-
-        switch (startOrJoin) {
-            case "s":
-                System.out.println(getClass().getSimpleName() + "- Neues Logingame (start) erstellt");
-                STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
-                String firstStone = jsonRequest.get("firststone").toString();
-                int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
-
-                Player humanPlayerStart = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor, webSocketSession.getId());
-                Pairing pairing = new Pairing(humanPlayerStart, startPlayerIndex);
-                Game gameStart = new Game(gameCode, new Board(), pairing, 0);
-
-                if (addGame(gameStart)) {
-                    PlayerOwnDto ownPlayerDto = new PlayerOwnDto(humanPlayerStart.getName(), humanPlayerStart.getStonecolor(), humanPlayerStart.getUuid());
-                    PairingDto pairingDto = new PairingDto(ownPlayerDto, startPlayerIndex);
-                    GameDto gameDto = new GameDto(pairingDto, new BoardDto());
-                    addGameToDatabase(gameStart);
-                    getGameFromDatabase(gameCode);
-
-                    return gameDto;
-                }
-                break;
-
-            case "j":
-                System.out.println(getClass().getSimpleName() + "- Logingame (join) beigetreten");
-
-                Game gameJoin = gameMap.get(gameCode);
-                STONECOLOR playerStonecolorJoin = gameJoin.getPairing().getPlayer1().getStonecolor() == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
-
-                Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolorJoin, webSocketSession.getId());
-                gameJoin.getPairing().addSecondPlayer(humanPlayerJoin);
-
-                addGameToDatabase(gameJoin);
-                getGameFromDatabase(gameCode);
-
-                return null; // TODO: muss noch durch GameDto ersetzt werden
-        }
-
-        return null;
-    }
 
     public boolean doesGameExist(Game game) {
         return gameMap.containsKey(game.getGameCode());

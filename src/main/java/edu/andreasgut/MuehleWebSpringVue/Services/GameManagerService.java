@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -45,11 +46,46 @@ public class GameManagerService {
     }
 
     public boolean doesGameExist(String gameCode) {
-        return gameRepository.findByGameCode(gameCode).size() > 0;
+        return gameRepository.findByGameCode(gameCode) != null;
     }
 
     public void deleteGameByGameCode(String gameCode) {
         gameRepository.deleteGameByGameCode(gameCode);
+    }
+
+
+    public void setupLoginGameStart(JsonObject jsonRequest, String webSocketSessionId) {
+
+        String gameCode = jsonRequest.get("gamecode").getAsString();
+
+        System.out.println(getClass().getSimpleName() + "- Neues Logingame (start) erstellt");
+        STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
+        String firstStone = jsonRequest.get("firststone").toString();
+        int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
+
+        Player humanPlayerStart = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor, webSocketSessionId);
+        Pairing pairing = new Pairing(humanPlayerStart, startPlayerIndex);
+        Game gameStart = new Game(gameCode, new Board(), pairing, 0);
+        gameRepository.save(gameStart);
+
+
+
+
+
+    }
+
+
+    public void setupLoginGameJoin(JsonObject jsonRequest, String webSocketSessionId) {
+
+        System.out.println(getClass().getSimpleName() + "- Logingame (join) beigetreten");
+        String gameCode = jsonRequest.get("gamecode").getAsString();
+
+        Game gameJoin = gameRepository.findByGameCode(gameCode);
+        STONECOLOR playerStonecolorJoin = gameJoin.getPairing().getPlayer1().getStonecolor() == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
+
+        Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolorJoin, webSocketSessionId);
+        gameJoin.getPairing().addSecondPlayer(humanPlayerJoin);
+
     }
 
     public Game setupComputerGame(JsonObject jsonRequest, String webSocketSessionId) {

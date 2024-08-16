@@ -12,7 +12,7 @@ import java.util.Map;
 @Repository
 public interface GameRepository extends JpaRepository<Game, Long>{
 
-    LinkedList<Game> findByGameCode(String gameCode);
+    Game findByGameCode(String gameCode);
     LinkedList<Game> findAll();
     LinkedList<Game> findByFinishedFalse();
 

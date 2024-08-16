@@ -75,13 +75,30 @@ public class GameManagerController {
     //@SendToUser("/queue/reply")
     public ResponseEntity<String> setupComputerGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
-            logger.info("Request für neuen Spielaufbau...");
+            logger.info("Request für neuen Spielaufbau (Computerspiel) ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupComputerGame(jsonObject, sessionId);
             senderService.sendAddGameToAdmin(game);
             return ResponseEntity.ok().body("Game erstellt");
-        } catch (Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.warn("Game konnte nicht erstellt werden");
+            return ResponseEntity.badRequest().body("Game konnte nicht erstellt werden");
+        }
+    }
+
+
+    @MessageMapping("/manager/setup/start")
+    //@SendToUser("/queue/reply")
+    public ResponseEntity<String> setupStartGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
+        try {
+            logger.info("Request für neuen Spielaufbau (Logingame Start) ...");
+            String sessionId = headerAccessor.getSessionId();
+            JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+            gameManagerService.setupLoginGameStart(jsonObject, sessionId);
+            return ResponseEntity.ok().body("Game erstellt");
+        } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
             return ResponseEntity.badRequest().body("Game konnte nicht erstellt werden");
@@ -89,8 +106,5 @@ public class GameManagerController {
 
 
     }
-
-
-
 
 }
