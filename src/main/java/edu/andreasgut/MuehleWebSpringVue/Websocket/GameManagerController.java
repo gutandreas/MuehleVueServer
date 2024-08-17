@@ -52,8 +52,6 @@ public class GameManagerController {
                 logger.info("Game mit Gamecode {} existiert, Löschen wird gestartet...", gamecode);
                 gameManagerService.deleteGameByGameCode(gamecode);
                 senderService.sendGetAllGames();
-
-
             } else {
                 logger.warn("Game mit Gamecode {} existiert nicht, Löschen wird abgebrochen", gamecode);
 
