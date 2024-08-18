@@ -54,7 +54,7 @@ public class GameManagerService {
     }
 
 
-    public void setupLoginGameStart(JsonObject jsonRequest, String webSocketSessionId) {
+    public Game setupLoginGameStart(JsonObject jsonRequest, String webSocketSessionId) {
 
         String gameCode = jsonRequest.get("gamecode").getAsString();
 
@@ -67,15 +67,12 @@ public class GameManagerService {
         Pairing pairing = new Pairing(humanPlayerStart, startPlayerIndex);
         Game gameStart = new Game(gameCode, new Board(), pairing, 0);
         gameRepository.save(gameStart);
-
-
-
-
+        return gameStart;
 
     }
 
 
-    public void setupLoginGameJoin(JsonObject jsonRequest, String webSocketSessionId) {
+    public Game setupLoginGameJoin(JsonObject jsonRequest, String webSocketSessionId) {
 
         System.out.println(getClass().getSimpleName() + "- Logingame (join) beigetreten");
         String gameCode = jsonRequest.get("gamecode").getAsString();
@@ -85,6 +82,8 @@ public class GameManagerService {
 
         Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolorJoin, webSocketSessionId);
         gameJoin.getPairing().addSecondPlayer(humanPlayerJoin);
+        gameRepository.save(gameJoin);
+        return gameJoin;
 
     }
 
