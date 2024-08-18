@@ -28,7 +28,8 @@ public class Game {
     @JoinColumn(name = "pairing_fk")
     private Pairing pairing;
 
-    @Transient
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "spectators_fk")
     private List<Spectator> spectators = new LinkedList<>();
 
     public void setBoard(Board board) {

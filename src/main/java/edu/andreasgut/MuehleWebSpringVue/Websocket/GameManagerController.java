@@ -120,8 +120,23 @@ public class GameManagerController {
             logger.warn("Game konnte nicht erstellt werden");
             return ResponseEntity.badRequest().body("Dem Game konnte nicht beigetreten werden");
         }
+    }
 
-
+    @MessageMapping("/manager/setup/watch")
+    //@SendToUser("/queue/reply")
+    public ResponseEntity<String> watchGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
+        try {
+            logger.info("Request für eine Spielbeobachtung ...");
+            String sessionId = headerAccessor.getSessionId();
+            JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+            Game game = gameManagerService.addSpectatorToGame(jsonObject, sessionId);
+            //TODO: Admin und Spieler über neuen Beobachter informieren
+            return ResponseEntity.ok().body("Das Spiel wird beobachtet");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.warn("Das Spiel kann nicht beobachtet werden");
+            return ResponseEntity.badRequest().body("Das Spiel kann nicht beobachtet werden");
+        }
     }
 
 }

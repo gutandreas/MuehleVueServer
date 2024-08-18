@@ -7,6 +7,7 @@ import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.Pairing;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.HumanPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
@@ -116,6 +117,18 @@ public class GameManagerService {
 
         return game;
 
+    }
+
+    public Game addSpectatorToGame(JsonObject jsonRequest, String webSocketSessionId) {
+        logger.info("Spectator wird hinzugefügt...");
+        String name = jsonRequest.get("name").getAsString();
+        String gameCode = jsonRequest.get("gamecode").getAsString();
+        boolean isRoboter = jsonRequest.get("isroboter").getAsBoolean();
+
+        Game game = gameRepository.findByGameCode(gameCode);
+        game.addSpectator(new Spectator(name, isRoboter));
+        gameRepository.save(game);
+        return game;
     }
 
     private String generateValidGameCode() {
