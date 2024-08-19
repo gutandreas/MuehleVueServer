@@ -29,6 +29,11 @@ public class SenderService {
         template.convertAndSend(path, gameRepository.findAll());
     }
 
+    public void sendBoardUpdate(String gameCode){
+        String path = "/topic/game/boardupdate";
+        template.convertAndSend(path, gameRepository.findByGameCode(gameCode).getBoard());
+    }
+
 
 
 }
