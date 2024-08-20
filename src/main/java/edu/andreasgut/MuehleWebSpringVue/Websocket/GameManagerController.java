@@ -2,7 +2,11 @@ package edu.andreasgut.MuehleWebSpringVue.Websocket;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import edu.andreasgut.MuehleWebSpringVue.DTO.ComputerGameSetupDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
+import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
 import edu.andreasgut.MuehleWebSpringVue.Services.SenderService;
 import org.slf4j.Logger;
@@ -70,19 +74,24 @@ public class GameManagerController {
 
 
     @MessageMapping("/manager/setup/computer")
-    //@SendToUser("/queue/reply")
-    public ResponseEntity<String> setupComputerGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
+    @SendToUser("/queue/reply")
+    public ComputerGameSetupDto setupComputerGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
             logger.info("Request für neuen Spielaufbau (Computerspiel) ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupComputerGame(jsonObject, sessionId);
             senderService.sendAddGameToAdmin(game);
-            return ResponseEntity.ok().body("Game erstellt");
+            Player ownPlayer = game.getPairing().getPlayer1();
+            String uuid = ownPlayer.getUuid();
+            String name = ownPlayer.getName();
+            PHASE phase = ownPlayer.getCurrentPhase();
+            STONECOLOR stonecolor = ownPlayer.getStonecolor();
+            return new ComputerGameSetupDto(uuid, name, phase, stonecolor);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
-            return ResponseEntity.badRequest().body("Game konnte nicht erstellt werden");
+            return null;
         }
     }
 

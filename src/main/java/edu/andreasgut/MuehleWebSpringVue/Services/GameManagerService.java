@@ -1,7 +1,6 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import com.google.gson.JsonObject;
-import edu.andreasgut.MuehleWebSpringVue.DTO.GameDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.Pairing;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.util.LinkedList;
 import java.util.Random;
