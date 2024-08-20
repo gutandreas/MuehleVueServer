@@ -9,12 +9,14 @@ public class ComputerGameSetupDto {
     private String name;
     private PHASE phase;
     private STONECOLOR stonecolor;
+    private int index;
 
-    public ComputerGameSetupDto(String uuid, String name, PHASE phase, STONECOLOR stonecolor) {
+    public ComputerGameSetupDto(String uuid, String name, PHASE phase, STONECOLOR stonecolor, int index) {
         this.uuid = uuid;
         this.name = name;
         this.phase = phase;
         this.stonecolor = stonecolor;
+        this.index = index;
     }
 
     public String getUuid() {
@@ -31,5 +33,9 @@ public class ComputerGameSetupDto {
 
     public STONECOLOR getStonecolor() {
         return stonecolor;
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

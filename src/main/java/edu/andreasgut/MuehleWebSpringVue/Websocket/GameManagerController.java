@@ -87,7 +87,7 @@ public class GameManagerController {
             String name = ownPlayer.getName();
             PHASE phase = ownPlayer.getCurrentPhase();
             STONECOLOR stonecolor = ownPlayer.getStonecolor();
-            return new ComputerGameSetupDto(uuid, name, phase, stonecolor);
+            return new ComputerGameSetupDto(uuid, name, phase, stonecolor, 1);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
