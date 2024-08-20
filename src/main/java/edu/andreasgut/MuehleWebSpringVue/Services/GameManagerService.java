@@ -88,7 +88,7 @@ public class GameManagerService {
 
     public Game setupComputerGame(JsonObject jsonRequest, String webSocketSessionId) {
         logger.info("Spiel wird aufgebaut...");
-        STONECOLOR playerStonecolor = jsonRequest.get("color").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
+        STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").toString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
 

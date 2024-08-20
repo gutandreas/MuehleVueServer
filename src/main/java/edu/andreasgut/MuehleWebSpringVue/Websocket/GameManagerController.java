@@ -83,11 +83,13 @@ public class GameManagerController {
             Game game = gameManagerService.setupComputerGame(jsonObject, sessionId);
             senderService.sendAddGameToAdmin(game);
             Player ownPlayer = game.getPairing().getPlayer1();
+            Player enemyPlayer = game.getPairing().getPlayer2();
             String uuid = ownPlayer.getUuid();
-            String name = ownPlayer.getName();
+            String player1Name = ownPlayer.getName();
+            String player2Name = enemyPlayer.getName();
             PHASE phase = ownPlayer.getCurrentPhase();
             STONECOLOR stonecolor = ownPlayer.getStonecolor();
-            return new ComputerGameSetupDto(uuid, name, phase, stonecolor, 1);
+            return new ComputerGameSetupDto(uuid, player1Name, player2Name, phase, stonecolor, 1);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
