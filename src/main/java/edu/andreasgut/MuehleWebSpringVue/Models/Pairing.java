@@ -86,8 +86,7 @@ public class Pairing {
         }
     }
 
-    public int getPlayerIndexByPlayerUuid(String playerUuid){
-        int index = 0;
+    public Player getPlayerByPlayerUuid(String playerUuid){
         String player1Uuid = player1.getUuid();
         String player2Uuid = player2.getUuid();
 
@@ -96,14 +95,28 @@ public class Pairing {
         }
 
         if (player1Uuid.equals(playerUuid)){
-            index = 1;
+            return player1;
+        } else {
+            return player2;
         }
 
-        if (player2Uuid.equals(playerUuid)){
-            index = 2;
+
+
+    }
+
+    public int getPlayerIndexByPlayerUuid(String playerUuid){
+        String player1Uuid = player1.getUuid();
+        String player2Uuid = player2.getUuid();
+
+        if (!player1Uuid.equals(playerUuid) && !player2Uuid.equals(playerUuid)){
+            throw new IllegalArgumentException(Class.class.getSimpleName() + "-  Ungültige playerUuid");
         }
 
-        return index;
+        if (player1Uuid.equals(playerUuid)){
+            return 1;
+        } else {
+            return 2;
+        }
     }
 
     public Player getPlayer1() {

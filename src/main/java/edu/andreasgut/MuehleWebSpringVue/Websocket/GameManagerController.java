@@ -2,7 +2,7 @@ package edu.andreasgut.MuehleWebSpringVue.Websocket;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import edu.andreasgut.MuehleWebSpringVue.DTO.ComputerGameSetupDto;
+import edu.andreasgut.MuehleWebSpringVue.DTO.GameSetupDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
@@ -15,13 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.LinkedList;
 
 @RestController
 public class GameManagerController {
@@ -75,7 +72,7 @@ public class GameManagerController {
 
     @MessageMapping("/manager/setup/computer")
     @SendToUser("/queue/reply")
-    public ComputerGameSetupDto setupComputerGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
+    public GameSetupDto setupComputerGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
             logger.info("Request für neuen Spielaufbau (Computerspiel) ...");
             String sessionId = headerAccessor.getSessionId();
@@ -89,7 +86,7 @@ public class GameManagerController {
             String player2Name = enemyPlayer.getName();
             PHASE phase = ownPlayer.getCurrentPhase();
             STONECOLOR stonecolor = ownPlayer.getStonecolor();
-            return new ComputerGameSetupDto(uuid, player1Name, player2Name, phase, stonecolor, 1);
+            return new GameSetupDto(game.getGameCode(), uuid, player1Name, player2Name, phase, stonecolor, 1);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");

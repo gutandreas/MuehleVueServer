@@ -3,8 +3,12 @@ package edu.andreasgut.MuehleWebSpringVue.Websocket;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
+import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameActionService;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
 import edu.andreasgut.MuehleWebSpringVue.Services.SenderService;
@@ -25,13 +29,15 @@ public class GameActionController {
     GameManagerService gameManagerService;
     GameActionService gameActionService;
     SenderService senderService;
+    GameRepository gameRepository;
 
 
     @Autowired
-    public GameActionController(GameManagerService gameManagerService, SenderService senderService, GameActionService gameActionService){
+    public GameActionController(GameManagerService gameManagerService, SenderService senderService, GameActionService gameActionService, GameRepository gameRepository){
         this.gameManagerService = gameManagerService;
         this.senderService = senderService;
         this.gameActionService = gameActionService;
+        this.gameRepository = gameRepository;
     };
 
     @MessageMapping("/game/action")
@@ -46,15 +52,20 @@ public class GameActionController {
             boolean gameExists = gameManagerService.doesGameExist(gameCode);
 
             if (gameExists) {
+                Game game = gameRepository.findByGameCode(gameCode);
+                Player player1 = game.getPairing().getPlayer1();
+                Player player2 = game.getPairing().getPlayer2();
                 Board board = gameActionService.handleAction(jsonObject, sessionId);
-                senderService.sendBoardUpdate(board);
+                GameUpdateDto gameUpdateDto = new GameUpdateDto(board, player1, player2);
+                senderService.sendGameUpdate(gameUpdateDto);
                 return ResponseEntity.ok().body("Action wurde ausgeführt...");
 
             } else {
-                return ResponseEntity.badRequest().body("Gamecode ist Ungültig...");
+                return ResponseEntity.badRequest().body("Gamecode ist ungültig...");
             }
         }
         catch (Exception e){
+            e.printStackTrace();
             logger.warn("Action konnte nicht ausgeführt werden");
             return ResponseEntity.badRequest().body("Action konnte nicht ausgeführt werden");
 

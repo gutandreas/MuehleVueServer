@@ -3,8 +3,9 @@ package edu.andreasgut.MuehleWebSpringVue.DTO;
 import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 
-public class ComputerGameSetupDto {
+public class GameSetupDto {
 
+    private String gameCode;
     private String uuid;
     private String player1Name;
     private String player2Name;
@@ -12,13 +13,18 @@ public class ComputerGameSetupDto {
     private STONECOLOR stonecolor;
     private int index;
 
-    public ComputerGameSetupDto(String uuid, String player1Name, String player2Name, PHASE phase, STONECOLOR stonecolor, int index) {
+    public GameSetupDto(String gameCode, String uuid, String player1Name, String player2Name, PHASE phase, STONECOLOR stonecolor, int index) {
+        this.gameCode = gameCode;
         this.uuid = uuid;
         this.player1Name = player1Name;
         this.player2Name = player2Name;
         this.phase = phase;
         this.stonecolor = stonecolor;
         this.index = index;
+    }
+
+    public String getGameCode() {
+        return gameCode;
     }
 
     public String getUuid() {

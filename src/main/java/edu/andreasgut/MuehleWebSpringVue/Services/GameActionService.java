@@ -46,8 +46,7 @@ public class GameActionService {
 
         switch (type){
             case "put":
-                Board board = handlePut(jsonObject, webSocketSessionId);
-                return board;
+                return handlePut(jsonObject, webSocketSessionId);
             case "move":
                 //handleMove(jsonObject, webSocketSessionId);
                 return null;
@@ -73,7 +72,8 @@ public class GameActionService {
                 Pairing pairing = game.getPairing();
                 Board board = game.getBoard();
                 board.putStone(put.getPutPosition(), pairing.getPlayerIndexByPlayerUuid(uuid));
-                boardRepository.save(board);
+                game.getPairing().getPlayerByPlayerUuid(uuid).increaseNumberOfStonesPut();
+                gameRepository.save(game);
                 return board;
             } else {
                 logger.warn("Ungültige Position bei Put in Game " + gameCode);

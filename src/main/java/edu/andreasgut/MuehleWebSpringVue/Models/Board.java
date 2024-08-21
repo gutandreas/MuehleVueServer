@@ -23,6 +23,8 @@ public class Board {
 
 
 
+
+
     public POSITIONSTATE[][] getBoardPositionsStates() {
         return boardPositionsStates;
     }

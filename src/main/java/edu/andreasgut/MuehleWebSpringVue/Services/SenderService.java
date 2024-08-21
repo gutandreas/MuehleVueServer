@@ -1,5 +1,6 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
+import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
@@ -30,9 +31,11 @@ public class SenderService {
         template.convertAndSend(path, gameRepository.findAll());
     }
 
-    public void sendBoardUpdate(Board board){
-        String path = "/topic/game/boardupdate";
-        template.convertAndSend(path, board);
+
+    public void sendGameUpdate(GameUpdateDto gameUpdateDto){
+        String path = "/topic/game/gameupdate";
+        System.out.println(gameUpdateDto);
+        template.convertAndSend(path, gameUpdateDto);
     }
 
 

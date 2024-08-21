@@ -20,6 +20,7 @@ public class Game {
 
 
 
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "board_fk")
     private Board board;
@@ -62,6 +63,7 @@ public class Game {
     public void increaseRound(){
         round++;
     }
+
 
     public boolean addSpectator(Spectator spectator){
         if (!spectators.contains(spectator)) {

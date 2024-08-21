@@ -18,11 +18,17 @@ public abstract class Player extends Participant {
 
     private STONECOLOR stonecolor;
     private PHASE currentPhase;
+    private int numberOfStonesPut;
+    private int numberOfStonesLost;
+    private int numberOfStonesKilled;
 
     public Player(String name, STONECOLOR stonecolor) {
         super(name);
         this.stonecolor = stonecolor;
         this.currentPhase = PHASE.SET;
+        this.numberOfStonesPut = 0;
+        this.numberOfStonesLost = 0;
+        this.numberOfStonesKilled = 0;
     }
 
     public Player(String name,STONECOLOR stonecolor, PHASE phase) {
@@ -45,13 +51,37 @@ public abstract class Player extends Participant {
         return currentPhase;
     }
 
+    public int getNumberOfStonesPut() {
+        return numberOfStonesPut;
+    }
 
+    public int getNumberOfStonesLost() {
+        return numberOfStonesLost;
+    }
+
+    public int getNumberOfStonesKilled() {
+        return numberOfStonesKilled;
+    }
+
+    public void increaseNumberOfStonesPut(){
+        numberOfStonesPut++;
+    }
+
+    public void increaseNumberOfStonesLost(){
+        numberOfStonesLost++;
+    }
+
+    public void increaseNumberOfStonesKilled(){
+        numberOfStonesKilled++;
+    }
 
     abstract Move move(Board board, int playerIndex, boolean allowedToJump);
 
     abstract Position put(Board board, int playerIndex);
 
     abstract Position kill(Board board, int otherPlayerIndex);
+
+
 
 
 }
