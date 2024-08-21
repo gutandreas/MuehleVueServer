@@ -46,8 +46,8 @@ public class GameActionController {
             boolean gameExists = gameManagerService.doesGameExist(gameCode);
 
             if (gameExists) {
-                gameActionService.handleAction(jsonObject, sessionId);
-                senderService.sendBoardUpdate(gameCode);
+                Board board = gameActionService.handleAction(jsonObject, sessionId);
+                senderService.sendBoardUpdate(board);
                 return ResponseEntity.ok().body("Action wurde ausgeführt...");
 
             } else {

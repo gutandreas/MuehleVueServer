@@ -40,25 +40,27 @@ public class GameActionService {
 
 
 
-    public void handleAction(JsonObject jsonObject, String webSocketSessionId) {
+    public Board handleAction(JsonObject jsonObject, String webSocketSessionId) {
         String type = jsonObject.get("type").getAsString();
         String uuid = jsonObject.get("uuid").getAsString();
 
         switch (type){
             case "put":
-                handlePut(jsonObject, webSocketSessionId);
-                break;
+                Board board = handlePut(jsonObject, webSocketSessionId);
+                return board;
             case "move":
                 //handleMove(jsonObject, webSocketSessionId);
-                break;
+                return null;
             case "kill":
                 //handleKill(jsonObject, webSocketSessionId);
-                break;
+                return null;
+            default:
+                return null;
 
         }
     }
 
-    private void handlePut(JsonObject jsonObject, String webSocketSessionId){
+    private Board handlePut(JsonObject jsonObject, String webSocketSessionId){
         try {
             int ring = jsonObject.get("ring").getAsInt();
             int field = jsonObject.get("field").getAsInt();
@@ -72,14 +74,18 @@ public class GameActionService {
                 Board board = game.getBoard();
                 board.putStone(put.getPutPosition(), pairing.getPlayerIndexByPlayerUuid(uuid));
                 boardRepository.save(board);
+                return board;
             } else {
                 logger.warn("Ungültige Position bei Put in Game " + gameCode);
+                return null;
             }
 
 
         } catch (Exception e){
             logger.warn("Put konnte nicht ausgeführt werden...");
         }
+
+        return null;
 
     }
 

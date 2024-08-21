@@ -1,5 +1,6 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
+import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,9 @@ public class SenderService {
         template.convertAndSend(path, gameRepository.findAll());
     }
 
-    public void sendBoardUpdate(String gameCode){
+    public void sendBoardUpdate(Board board){
         String path = "/topic/game/boardupdate";
-        template.convertAndSend(path, gameRepository.findByGameCode(gameCode).getBoard());
+        template.convertAndSend(path, board);
     }
 
 
