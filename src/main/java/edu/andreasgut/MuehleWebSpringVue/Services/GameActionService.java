@@ -72,6 +72,7 @@ public class GameActionService {
                 Pairing pairing = game.getPairing();
                 Board board = game.getBoard();
                 board.putStone(put.getPutPosition(), pairing.getPlayerIndexByPlayerUuid(uuid));
+                game.increaseRound();
                 game.getPairing().getPlayerByPlayerUuid(uuid).increaseNumberOfStonesPut();
                 gameRepository.save(game);
                 return board;

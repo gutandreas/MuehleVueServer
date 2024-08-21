@@ -5,14 +5,17 @@ import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 
 public class GameUpdateDto {
 
-    Board board;
-    Player player1;
-    Player player2;
+    private Board board;
+    private Player player1;
+    private Player player2;
+    private int round;
 
-    public GameUpdateDto(Board board, Player player1, Player player2) {
+    public GameUpdateDto(Board board, Player player1, Player player2, int round) {
         this.board = board;
         this.player1 = player1;
         this.player2 = player2;
+        this.round = round;
+
     }
 
     public Board getBoard() {
@@ -25,5 +28,9 @@ public class GameUpdateDto {
 
     public Player getPlayer2() {
         return player2;
+    }
+
+    public int getRound() {
+        return round;
     }
 }
