@@ -80,8 +80,6 @@ public class GameActionService {
                 logger.warn("Ungültige Position bei Put in Game " + gameCode);
                 return null;
             }
-
-
         } catch (Exception e){
             logger.warn("Put konnte nicht ausgeführt werden...");
         }

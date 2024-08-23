@@ -121,7 +121,7 @@ public class GameManagerController {
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupLoginGameJoin(jsonObject, sessionId);
-            senderService.sendAddGameToAdmin(game);
+            senderService.sendUpdateGameToAdmin(game);
             return ResponseEntity.ok().body("Dem Game beigetreten");
         } catch (Exception e) {
             e.printStackTrace();

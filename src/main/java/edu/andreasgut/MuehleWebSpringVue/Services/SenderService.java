@@ -20,6 +20,11 @@ public class SenderService {
         this.gameRepository = gameRepository;
     }
 
+    public void sendUpdateGameToAdmin(Game game){
+        String path = "/topic/admin/games/update";
+        template.convertAndSend(path, game);
+    }
+
     public void sendAddGameToAdmin(Game game){
         String path = "/topic/admin/games/add";
         template.convertAndSend(path, game);
