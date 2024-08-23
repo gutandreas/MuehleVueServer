@@ -105,7 +105,7 @@ public class GameManagerService {
         }
         STONECOLOR computerStonecolor = playerStonecolor == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
 
-        Player humanPlayer = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor, webSocketSessionId);
+        Player humanPlayer = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolor, webSocketSessionId);
         Player computerPlayer = new StandardComputerPlayer(computerName, computerStonecolor, level);
         Pairing pairing = new Pairing(humanPlayer, computerPlayer, startPlayerIndex);
         String gameCode = generateValidGameCode();
