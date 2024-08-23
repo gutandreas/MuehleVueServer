@@ -3,6 +3,7 @@ package edu.andreasgut.MuehleWebSpringVue.Websocket;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.andreasgut.MuehleWebSpringVue.DTO.StatisticsDto;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.HumanPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.HumanPlayerRepository;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.SpectatorRepository;
@@ -13,6 +14,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedList;
 
 @RestController
 public class StatisticsController {
@@ -37,8 +40,9 @@ public class StatisticsController {
         int numberOfGamesTotal = gameRepository.findAll().size();
         int numberOfHumanPlayers = humanPlayerRepository.findAll().size();
         int numberOfSpectators = spectatorRepository.findAll().size();
+        LinkedList<HumanPlayer> activeHumanPlayers = humanPlayerRepository.findAllWithUnfinishedGames();
         logger.info("Statistiken abgefragt...");
 
-        return new StatisticsDto(numberOfActiveGames, numberOfGamesTotal, numberOfHumanPlayers, numberOfSpectators);
+        return new StatisticsDto(numberOfActiveGames, numberOfGamesTotal, numberOfHumanPlayers, activeHumanPlayers, numberOfSpectators);
     }
 }
