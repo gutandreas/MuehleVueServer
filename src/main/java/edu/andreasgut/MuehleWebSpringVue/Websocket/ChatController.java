@@ -32,8 +32,6 @@ public class ChatController {
         String message = jsonObject.get("message").getAsString();
         logger.info("Nachricht von " + name + " in Game " + gameCode + ": " + message);
 
-
-        // Die Nachricht wird an alle Abonnenten dieses Channels gesendet
         return data;
     }
 
