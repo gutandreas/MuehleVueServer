@@ -116,8 +116,8 @@ public class GameManagerController {
 
 
     @MessageMapping("/manager/setup/join")
-    //@SendToUser("/queue/reply")
-    public ResponseEntity<String> setupJoinGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
+    @SendToUser("/queue/reply")
+    public GameSetupDto setupJoinGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
             logger.info("Request für neuen Spielaufbau (Logingame Join) ...");
             String sessionId = headerAccessor.getSessionId();
@@ -126,11 +126,14 @@ public class GameManagerController {
             senderService.sendUpdateGameToAdmin(game);
             PlayerDto secondPlayer = new PlayerDto(game.getPairing().getPlayer2().getName());
             senderService.sendSecondPlayer(secondPlayer, game.getGameCode());
-            return ResponseEntity.ok().body("Dem Game beigetreten");
+            senderService.sendAddGameToAdmin(game);
+            Player player1 = game.getPairing().getPlayer1();
+            Player player2 = game.getPairing().getPlayer2();
+            return new GameSetupDto(game.getGameCode(), player2.getUuid(), player1.getName(), player2.getName(), PHASE.SET, player2.getStonecolor(), 2);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
-            return ResponseEntity.badRequest().body("Dem Game konnte nicht beigetreten werden");
+            return null;
         }
     }
 

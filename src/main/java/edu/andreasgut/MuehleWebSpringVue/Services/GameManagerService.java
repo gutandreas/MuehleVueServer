@@ -79,7 +79,7 @@ public class GameManagerService {
         Game gameJoin = gameRepository.findByGameCode(gameCode);
         STONECOLOR playerStonecolorJoin = gameJoin.getPairing().getPlayer1().getStonecolor() == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
 
-        Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolorJoin, webSocketSessionId);
+        Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolorJoin, webSocketSessionId);
         gameJoin.getPairing().addSecondPlayer(humanPlayerJoin);
         gameRepository.save(gameJoin);
         return gameJoin;
