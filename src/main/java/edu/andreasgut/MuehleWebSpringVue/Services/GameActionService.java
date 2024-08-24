@@ -2,22 +2,13 @@ package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import com.google.gson.JsonObject;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.GameAction;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.HumanPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.BoardRepository;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
-import edu.andreasgut.MuehleWebSpringVue.Websocket.GameManagerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketSession;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class GameActionService {

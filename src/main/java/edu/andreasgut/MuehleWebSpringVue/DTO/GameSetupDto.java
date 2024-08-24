@@ -12,8 +12,9 @@ public class GameSetupDto {
     private PHASE phase;
     private STONECOLOR stonecolor;
     private int index;
+    private int currentPlayerIndex;
 
-    public GameSetupDto(String gameCode, String uuid, String player1Name, String player2Name, PHASE phase, STONECOLOR stonecolor, int index) {
+    public GameSetupDto(String gameCode, String uuid, String player1Name, String player2Name, PHASE phase, STONECOLOR stonecolor, int index, int currentPlayerIndex) {
         this.gameCode = gameCode;
         this.uuid = uuid;
         this.player1Name = player1Name;
@@ -21,6 +22,7 @@ public class GameSetupDto {
         this.phase = phase;
         this.stonecolor = stonecolor;
         this.index = index;
+        this.currentPlayerIndex = currentPlayerIndex;
     }
 
     public String getGameCode() {
@@ -49,5 +51,9 @@ public class GameSetupDto {
 
     public int getIndex() {
         return index;
+    }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
     }
 }

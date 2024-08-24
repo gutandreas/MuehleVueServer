@@ -14,8 +14,6 @@ public class GameUpdateDto {
         this.board = board;
         this.pairing = pairing;
         this.round = round;
-
-
     }
 
     public Board getBoard() {

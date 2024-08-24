@@ -87,7 +87,7 @@ public class GameManagerController {
             String player2Name = enemyPlayer.getName();
             PHASE phase = ownPlayer.getCurrentPhase();
             STONECOLOR stonecolor = ownPlayer.getStonecolor();
-            return new GameSetupDto(game.getGameCode(), uuid, player1Name, player2Name, phase, stonecolor, 1);
+            return new GameSetupDto(game.getGameCode(), uuid, player1Name, player2Name, phase, stonecolor, 1, game.getPairing().getCurrentPlayerIndex());
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
@@ -106,7 +106,7 @@ public class GameManagerController {
             Game game = gameManagerService.setupLoginGameStart(jsonObject, sessionId);
             senderService.sendAddGameToAdmin(game);
             Player player1 = game.getPairing().getPlayer1();
-            return new GameSetupDto(game.getGameCode(), player1.getUuid(), player1.getName(), "---", PHASE.SET, player1.getStonecolor(), 1);
+            return new GameSetupDto(game.getGameCode(), player1.getUuid(), player1.getName(), "---", PHASE.SET, player1.getStonecolor(), 1, game.getPairing().getCurrentPlayerIndex());
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
@@ -129,7 +129,7 @@ public class GameManagerController {
             senderService.sendAddGameToAdmin(game);
             Player player1 = game.getPairing().getPlayer1();
             Player player2 = game.getPairing().getPlayer2();
-            return new GameSetupDto(game.getGameCode(), player2.getUuid(), player1.getName(), player2.getName(), PHASE.SET, player2.getStonecolor(), 2);
+            return new GameSetupDto(game.getGameCode(), player2.getUuid(), player1.getName(), player2.getName(), PHASE.SET, player2.getStonecolor(), 2, game.getPairing().getCurrentPlayerIndex());
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");

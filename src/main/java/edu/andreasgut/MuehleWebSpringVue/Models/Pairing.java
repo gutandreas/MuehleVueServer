@@ -18,8 +18,8 @@ public class Pairing {
     @OneToOne(cascade = CascadeType.ALL)
     private Player player2;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Player currentPlayer;
+
+    private int currentPlayerIndex;
 
     private int startPlayerIndex;
 
@@ -40,7 +40,7 @@ public class Pairing {
         this.startPlayerIndex = startPlayerIndex;
 
         complete = true;
-        currentPlayer = this.startPlayerIndex == 1 ? player1 : player2;
+        currentPlayerIndex = startPlayerIndex;
     }
 
     public Pairing(Player player1, int startPlayerIndex) {
@@ -69,21 +69,25 @@ public class Pairing {
         this.player2 = player2;
 
         complete = true;
-        currentPlayer = this.startPlayerIndex == 1 ? player1 : player2;
+        currentPlayerIndex = startPlayerIndex;
+    }
+
+    public Player getPlayerByIndex(int index){
+        return index == 1 ? player1 : player2;
     }
 
 
 
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
+
     public Player getCurrentPlayer() {
-        return currentPlayer;
+        return currentPlayerIndex == 1 ? player1 : player2;
     }
 
     public void changeTurn() {
-        if (currentPlayer.equals(player1)){
-            currentPlayer = player2;
-        } else {
-            currentPlayer = player1;
-        }
+        currentPlayerIndex = currentPlayerIndex == 1 ? 2 :1;
     }
 
     public Player getPlayerByPlayerUuid(String playerUuid){
