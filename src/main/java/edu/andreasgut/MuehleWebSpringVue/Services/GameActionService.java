@@ -31,7 +31,7 @@ public class GameActionService {
 
 
 
-    public Board handleAction(JsonObject jsonObject, String webSocketSessionId) {
+    public Game handleAction(JsonObject jsonObject, String webSocketSessionId) {
         String type = jsonObject.get("type").getAsString();
 
         switch (type){
@@ -49,7 +49,7 @@ public class GameActionService {
         }
     }
 
-    private Board handlePut(JsonObject jsonObject, String webSocketSessionId){
+    private Game handlePut(JsonObject jsonObject, String webSocketSessionId){
         try {
             int ring = jsonObject.get("ring").getAsInt();
             int field = jsonObject.get("field").getAsInt();
@@ -65,7 +65,7 @@ public class GameActionService {
                 game.increaseRound();
                 game.getPairing().getPlayerByPlayerUuid(uuid).increaseNumberOfStonesPut();
                 gameRepository.save(game);
-                return board;
+                return game;
             } else {
                 logger.warn("Ungültige Position bei Put in Game " + gameCode);
                 return null;

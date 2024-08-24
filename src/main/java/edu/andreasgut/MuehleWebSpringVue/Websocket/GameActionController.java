@@ -53,10 +53,7 @@ public class GameActionController {
             boolean gameExists = gameManagerService.doesGameExist(gameCode);
 
             if (gameExists) {
-                Game game = gameRepository.findByGameCode(gameCode);
-                int round = game.getRound();
-                Board board = gameActionService.handleAction(jsonObject, sessionId);
-                Pairing pairing = game.getPairing();
+                Game game = gameActionService.handleAction(jsonObject, sessionId);
                 GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
                 senderService.sendGameUpdate(gameUpdateDto, gameCode);
                 return ResponseEntity.ok().body("Action wurde ausgeführt...");
