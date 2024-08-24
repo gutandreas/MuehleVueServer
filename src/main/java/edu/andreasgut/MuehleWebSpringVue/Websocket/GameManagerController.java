@@ -3,6 +3,7 @@ package edu.andreasgut.MuehleWebSpringVue.Websocket;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameSetupDto;
+import edu.andreasgut.MuehleWebSpringVue.DTO.PlayerDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
@@ -96,19 +97,20 @@ public class GameManagerController {
 
 
     @MessageMapping("/manager/setup/start")
-    //@SendToUser("/queue/reply")
-    public ResponseEntity<String> setupStartGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
+    @SendToUser("/queue/reply")
+    public GameSetupDto setupStartGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
             logger.info("Request für neuen Spielaufbau (Logingame Start) ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupLoginGameStart(jsonObject, sessionId);
             senderService.sendAddGameToAdmin(game);
-            return ResponseEntity.ok().body("Game erstellt");
+            Player player1 = game.getPairing().getPlayer1();
+            return new GameSetupDto(game.getGameCode(), player1.getUuid(), player1.getName(), "---", PHASE.SET, player1.getStonecolor(), 1);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
-            return ResponseEntity.badRequest().body("Game konnte nicht erstellt werden");
+            return null;
         }
     }
 
@@ -117,11 +119,13 @@ public class GameManagerController {
     //@SendToUser("/queue/reply")
     public ResponseEntity<String> setupJoinGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
-            logger.info("Request für neuen Spielaufbau (Logingame Start) ...");
+            logger.info("Request für neuen Spielaufbau (Logingame Join) ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupLoginGameJoin(jsonObject, sessionId);
             senderService.sendUpdateGameToAdmin(game);
+            PlayerDto secondPlayer = new PlayerDto(game.getPairing().getPlayer2().getName());
+            senderService.sendSecondPlayer(secondPlayer, game.getGameCode());
             return ResponseEntity.ok().body("Dem Game beigetreten");
         } catch (Exception e) {
             e.printStackTrace();

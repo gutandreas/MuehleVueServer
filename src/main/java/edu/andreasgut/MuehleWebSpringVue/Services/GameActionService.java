@@ -42,7 +42,6 @@ public class GameActionService {
 
     public Board handleAction(JsonObject jsonObject, String webSocketSessionId) {
         String type = jsonObject.get("type").getAsString();
-        String uuid = jsonObject.get("uuid").getAsString();
 
         switch (type){
             case "put":

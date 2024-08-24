@@ -62,7 +62,7 @@ public class GameManagerService {
         String firstStone = jsonRequest.get("firststone").toString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
 
-        Player humanPlayerStart = new HumanPlayer(jsonRequest.get("name").toString(), playerStonecolor, webSocketSessionId);
+        Player humanPlayerStart = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolor, webSocketSessionId);
         Pairing pairing = new Pairing(humanPlayerStart, startPlayerIndex);
         Game gameStart = new Game(gameCode, new Board(), pairing, 0);
         gameRepository.save(gameStart);

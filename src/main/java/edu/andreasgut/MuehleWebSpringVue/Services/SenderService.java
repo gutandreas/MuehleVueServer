@@ -1,6 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
+import edu.andreasgut.MuehleWebSpringVue.DTO.PlayerDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
@@ -37,10 +38,16 @@ public class SenderService {
     }
 
 
-    public void sendGameUpdate(GameUpdateDto gameUpdateDto){
-        String path = "/topic/game/gameupdate";
+    public void sendGameUpdate(GameUpdateDto gameUpdateDto, String gameCode){
+        String path = "/topic/game/" + gameCode + "/gameupdate";
         System.out.println(gameUpdateDto);
         template.convertAndSend(path, gameUpdateDto);
+    }
+
+    public void sendSecondPlayer(PlayerDto playerDto, String gameCode){
+        String path = "/topic/game/" + gameCode + "/secondplayer";
+        System.out.println(playerDto);
+        template.convertAndSend(path, playerDto);
     }
 
 

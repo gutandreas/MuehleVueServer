@@ -1,20 +1,20 @@
 package edu.andreasgut.MuehleWebSpringVue.DTO;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
+import edu.andreasgut.MuehleWebSpringVue.Models.Pairing;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 
 public class GameUpdateDto {
 
     private Board board;
-    private Player player1;
-    private Player player2;
+    private Pairing pairing;
     private int round;
 
-    public GameUpdateDto(Board board, Player player1, Player player2, int round) {
+    public GameUpdateDto(Board board, Pairing pairing, int round) {
         this.board = board;
-        this.player1 = player1;
-        this.player2 = player2;
+        this.pairing = pairing;
         this.round = round;
+
 
     }
 
@@ -22,12 +22,8 @@ public class GameUpdateDto {
         return board;
     }
 
-    public Player getPlayer1() {
-        return player1;
-    }
-
-    public Player getPlayer2() {
-        return player2;
+    public Pairing getPairing() {
+        return pairing;
     }
 
     public int getRound() {

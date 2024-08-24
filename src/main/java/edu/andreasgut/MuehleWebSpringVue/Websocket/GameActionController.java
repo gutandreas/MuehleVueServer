@@ -7,6 +7,7 @@ import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
+import edu.andreasgut.MuehleWebSpringVue.Models.Pairing;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameActionService;
@@ -54,13 +55,11 @@ public class GameActionController {
             if (gameExists) {
                 Game game = gameRepository.findByGameCode(gameCode);
                 int round = game.getRound();
-                Player player1 = game.getPairing().getPlayer1();
-                Player player2 = game.getPairing().getPlayer2();
                 Board board = gameActionService.handleAction(jsonObject, sessionId);
-                GameUpdateDto gameUpdateDto = new GameUpdateDto(board, player1, player2, round);
-                senderService.sendGameUpdate(gameUpdateDto);
+                Pairing pairing = game.getPairing();
+                GameUpdateDto gameUpdateDto = new GameUpdateDto(board, pairing, round);
+                senderService.sendGameUpdate(gameUpdateDto, gameCode);
                 return ResponseEntity.ok().body("Action wurde ausgeführt...");
-
             } else {
                 return ResponseEntity.badRequest().body("Gamecode ist ungültig...");
             }
