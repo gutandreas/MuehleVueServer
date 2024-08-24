@@ -3,6 +3,7 @@ package edu.andreasgut.MuehleWebSpringVue.Websocket;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameSetupDto;
+import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
 import edu.andreasgut.MuehleWebSpringVue.DTO.PlayerDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
@@ -80,14 +81,7 @@ public class GameManagerController {
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupComputerGame(jsonObject, sessionId);
             senderService.sendAddGameToAdmin(game);
-            Player ownPlayer = game.getPairing().getPlayer1();
-            Player enemyPlayer = game.getPairing().getPlayer2();
-            String uuid = ownPlayer.getUuid();
-            String player1Name = ownPlayer.getName();
-            String player2Name = enemyPlayer.getName();
-            PHASE phase = ownPlayer.getCurrentPhase();
-            STONECOLOR stonecolor = ownPlayer.getStonecolor();
-            return new GameSetupDto(game.getGameCode(), uuid, player1Name, player2Name, phase, stonecolor, 1, game.getPairing().getCurrentPlayerIndex());
+            return new GameSetupDto(game, 1);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
@@ -105,8 +99,7 @@ public class GameManagerController {
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupLoginGameStart(jsonObject, sessionId);
             senderService.sendAddGameToAdmin(game);
-            Player player1 = game.getPairing().getPlayer1();
-            return new GameSetupDto(game.getGameCode(), player1.getUuid(), player1.getName(), "---", PHASE.SET, player1.getStonecolor(), 1, game.getPairing().getCurrentPlayerIndex());
+            return new GameSetupDto(game, 1);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
@@ -124,12 +117,10 @@ public class GameManagerController {
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupLoginGameJoin(jsonObject, sessionId);
             senderService.sendUpdateGameToAdmin(game);
-            PlayerDto secondPlayer = new PlayerDto(game.getPairing().getPlayer2().getName());
-            senderService.sendSecondPlayer(secondPlayer, game.getGameCode());
+            GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
+            senderService.sendGameUpdate(gameUpdateDto, game.getGameCode());
             senderService.sendAddGameToAdmin(game);
-            Player player1 = game.getPairing().getPlayer1();
-            Player player2 = game.getPairing().getPlayer2();
-            return new GameSetupDto(game.getGameCode(), player2.getUuid(), player1.getName(), player2.getName(), PHASE.SET, player2.getStonecolor(), 2, game.getPairing().getCurrentPlayerIndex());
+            return new GameSetupDto(game, 2);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");

@@ -57,7 +57,7 @@ public class GameActionController {
                 int round = game.getRound();
                 Board board = gameActionService.handleAction(jsonObject, sessionId);
                 Pairing pairing = game.getPairing();
-                GameUpdateDto gameUpdateDto = new GameUpdateDto(board, pairing, round);
+                GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
                 senderService.sendGameUpdate(gameUpdateDto, gameCode);
                 return ResponseEntity.ok().body("Action wurde ausgeführt...");
             } else {

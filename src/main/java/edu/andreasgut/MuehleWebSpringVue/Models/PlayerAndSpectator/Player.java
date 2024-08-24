@@ -22,20 +22,16 @@ public abstract class Player extends Participant {
     private int numberOfStonesLost;
     private int numberOfStonesKilled;
 
-    public Player(String name, STONECOLOR stonecolor) {
+    public Player(String name, STONECOLOR stonecolor, PHASE phase) {
         super(name);
         this.stonecolor = stonecolor;
-        this.currentPhase = PHASE.SET;
+        this.currentPhase = phase;
         this.numberOfStonesPut = 0;
         this.numberOfStonesLost = 0;
         this.numberOfStonesKilled = 0;
     }
 
-    public Player(String name,STONECOLOR stonecolor, PHASE phase) {
-        super(name);
-        this.stonecolor = stonecolor;
-        this.currentPhase = phase;
-    }
+
 
     public Player() {
 

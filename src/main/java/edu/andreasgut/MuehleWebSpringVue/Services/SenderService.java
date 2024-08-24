@@ -4,6 +4,7 @@ import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
 import edu.andreasgut.MuehleWebSpringVue.DTO.PlayerDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -44,10 +45,10 @@ public class SenderService {
         template.convertAndSend(path, gameUpdateDto);
     }
 
-    public void sendSecondPlayer(PlayerDto playerDto, String gameCode){
+    public void sendSecondPlayer(Player player, String gameCode){
         String path = "/topic/game/" + gameCode + "/secondplayer";
-        System.out.println(playerDto);
-        template.convertAndSend(path, playerDto);
+        System.out.println(player);
+        template.convertAndSend(path, player);
     }
 
 

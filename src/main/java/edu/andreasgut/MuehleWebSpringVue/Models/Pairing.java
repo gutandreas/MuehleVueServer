@@ -18,7 +18,6 @@ public class Pairing {
     @OneToOne(cascade = CascadeType.ALL)
     private Player player2;
 
-
     private int currentPlayerIndex;
 
     private int startPlayerIndex;

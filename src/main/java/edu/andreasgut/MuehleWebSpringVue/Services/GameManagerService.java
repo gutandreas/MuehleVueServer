@@ -1,14 +1,11 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import com.google.gson.JsonObject;
-import edu.andreasgut.MuehleWebSpringVue.Models.Board;
-import edu.andreasgut.MuehleWebSpringVue.Models.Game;
-import edu.andreasgut.MuehleWebSpringVue.Models.Pairing;
+import edu.andreasgut.MuehleWebSpringVue.Models.*;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.HumanPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
-import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Websocket.GameManagerController;
 import org.slf4j.Logger;
@@ -61,8 +58,9 @@ public class GameManagerService {
         STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").toString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
+        PHASE phase = startPlayerIndex == 1 ? PHASE.SET : PHASE.WAIT;
 
-        Player humanPlayerStart = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolor, webSocketSessionId);
+        Player humanPlayerStart = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolor, webSocketSessionId, phase);
         Pairing pairing = new Pairing(humanPlayerStart, startPlayerIndex);
         Game gameStart = new Game(gameCode, new Board(), pairing, 0);
         gameRepository.save(gameStart);
@@ -79,7 +77,8 @@ public class GameManagerService {
         Game gameJoin = gameRepository.findByGameCode(gameCode);
         STONECOLOR playerStonecolorJoin = gameJoin.getPairing().getPlayer1().getStonecolor() == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
 
-        Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolorJoin, webSocketSessionId);
+        PHASE phase = gameJoin.getPairing().getCurrentPlayerIndex() == 2 ? PHASE.SET : PHASE.WAIT;
+        Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolorJoin, webSocketSessionId, phase);
         gameJoin.getPairing().addSecondPlayer(humanPlayerJoin);
         gameRepository.save(gameJoin);
         return gameJoin;
@@ -91,6 +90,8 @@ public class GameManagerService {
         STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").getAsString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
+        PHASE phaseHumanPlayer = startPlayerIndex == 1 ? PHASE.SET : PHASE.WAIT;
+        PHASE phaseComputerPlayer = startPlayerIndex == 2 ? PHASE.SET : PHASE.WAIT;
 
         int level = jsonRequest.get("level").getAsInt();
         String computerName;
@@ -105,8 +106,10 @@ public class GameManagerService {
         }
         STONECOLOR computerStonecolor = playerStonecolor == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
 
-        Player humanPlayer = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolor, webSocketSessionId);
-        Player computerPlayer = new StandardComputerPlayer(computerName, computerStonecolor, level);
+
+
+        Player humanPlayer = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolor, webSocketSessionId, phaseHumanPlayer);
+        Player computerPlayer = new StandardComputerPlayer(computerName, computerStonecolor, level, phaseComputerPlayer);
         Pairing pairing = new Pairing(humanPlayer, computerPlayer, startPlayerIndex);
         String gameCode = generateValidGameCode();
 

@@ -2,6 +2,7 @@ package edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
+import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
 import edu.andreasgut.MuehleWebSpringVue.Models.Position;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 import jakarta.persistence.DiscriminatorValue;
@@ -13,8 +14,8 @@ public class StandardComputerPlayer extends Player {
 
     int level;
 
-    public StandardComputerPlayer(String name, STONECOLOR stonecolor, int level) {
-        super(name, stonecolor);
+    public StandardComputerPlayer(String name, STONECOLOR stonecolor, int level, PHASE phase) {
+        super(name, stonecolor, phase);
         this.level = level;
     }
 
