@@ -3,6 +3,7 @@ package edu.andreasgut.MuehleWebSpringVue.Services;
 import com.google.gson.JsonObject;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.BoardRepository;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import org.slf4j.Logger;
@@ -61,7 +62,20 @@ public class GameActionService {
                 Game game = gameRepository.findByGameCode(gameCode);
                 Pairing pairing = game.getPairing();
                 Board board = game.getBoard();
-                board.putStone(put.getPutPosition(), pairing.getPlayerIndexByPlayerUuid(uuid));
+                int activePlayerIndex = pairing.getPlayerIndexByPlayerUuid(uuid);
+                int passivePlayerIndex = activePlayerIndex == 1 ? 2 : 1;
+                board.putStone(put.getPutPosition(), activePlayerIndex);
+
+                boolean morrisDetected = false;
+                if (morrisDetected){
+                    pairing.getPlayerByIndex(activePlayerIndex).setCurrentPhase(PHASE.KILL);
+                    pairing.getPlayerByIndex(passivePlayerIndex).setCurrentPhase(PHASE.WAIT);
+
+                } else {
+                    pairing.getPlayerByIndex(activePlayerIndex).setCurrentPhase(PHASE.WAIT);
+                    //TODO: Hier muss die wirkliche PHASE ermittelt werden
+                    pairing.getPlayerByIndex(passivePlayerIndex).setCurrentPhase(PHASE.SET);
+                }
                 game.increaseRound();
                 game.getPairing().getPlayerByPlayerUuid(uuid).increaseNumberOfStonesPut();
                 gameRepository.save(game);

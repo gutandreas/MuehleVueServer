@@ -71,6 +71,10 @@ public abstract class Player extends Participant {
         numberOfStonesKilled++;
     }
 
+    public void setCurrentPhase(PHASE currentPhase) {
+        this.currentPhase = currentPhase;
+    }
+
     abstract Move move(Board board, int playerIndex, boolean allowedToJump);
 
     abstract Position put(Board board, int playerIndex);
