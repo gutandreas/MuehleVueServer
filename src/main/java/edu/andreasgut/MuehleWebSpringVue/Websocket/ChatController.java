@@ -11,6 +11,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Random;
+
 @RestController
 public class ChatController {
 
@@ -35,6 +37,46 @@ public class ChatController {
         return data;
     }
 
+
+    @MessageMapping("/chat/{gameCode}/offend")
+    @SendTo("/topic/chat/{gameCode}/messages")
+    public String offend(@Payload String data, @DestinationVariable("gameCode") String gameCode){
+
+        System.out.println(data);
+        JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
+        String name = jsonObject.get("name").getAsString();
+        String offend = generateRandomOffend();
+        jsonObject.addProperty("message", offend);
+        logger.info("Beleidigung von " + name + " in Game " + gameCode + ": " + offend);
+
+        return jsonObject.toString();
+    }
+
+
+    private String generateRandomOffend(){
+
+        String[] offends = {"Uuuuuh, das war blöd...",
+                "Mein Cousin spielt besser. ...und der ist 3.",
+                "Das war ja gar nix...",
+                "Und so willst du gewinnen?",
+                "Deine Strategie ist... ...speziell.",
+                "Effiziente Strategie, um zu verlieren.",
+                "Also so gewinnst du garantiert nicht!",
+                "Meine Grossmutter gewinnt gegen dich im Schlaf!",
+                "Meinst du diesen Zug wirklich ernst?",
+                "Hoffentlich gibt's Spiele, die du besser spielst!",
+                "Hoffentlich hast du ein anderes Talent!",
+                "Ist das wirklich alles, was du kannst?",
+                "Ist dein Gehirn schon an?",
+                "Weisst du wirklich, was das Ziel des Spiels ist?",
+                "Fährst du nebenbei noch Auto?",
+                "Du bist ein guter Egobooster für mich!",
+                "Soll ich dir das Ziel des Spiels nochmals erklären?"};
+
+        Random random = new Random();
+        return offends[random.nextInt(offends.length)];
+
+    }
 
 
 

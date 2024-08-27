@@ -61,8 +61,6 @@ public class GameActionService {
             Game game = gameRepository.findByGameCode(gameCode);
 
             if (game.executePut(put, uuid)) {
-                game.increaseRound();
-                game.getPairing().getPlayerByPlayerUuid(uuid).increaseNumberOfStonesPut();
                 gameRepository.save(game);
                 return game;
             } else {
