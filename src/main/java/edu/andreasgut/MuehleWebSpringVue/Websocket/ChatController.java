@@ -42,12 +42,24 @@ public class ChatController {
     @SendTo("/topic/chat/{gameCode}/messages")
     public String offend(@Payload String data, @DestinationVariable("gameCode") String gameCode){
 
-        System.out.println(data);
         JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
         String name = jsonObject.get("name").getAsString();
         String offend = generateRandomOffend();
         jsonObject.addProperty("message", offend);
         logger.info("Beleidigung von " + name + " in Game " + gameCode + ": " + offend);
+
+        return jsonObject.toString();
+    }
+
+    @MessageMapping("/chat/{gameCode}/compliment")
+    @SendTo("/topic/chat/{gameCode}/messages")
+    public String compliment(@Payload String data, @DestinationVariable("gameCode") String gameCode){
+
+        JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
+        String name = jsonObject.get("name").getAsString();
+        String compliment = generateRandomCompliment();
+        jsonObject.addProperty("message", compliment);
+        logger.info("Beleidigung von " + name + " in Game " + gameCode + ": " + compliment);
 
         return jsonObject.toString();
     }
@@ -77,6 +89,27 @@ public class ChatController {
         return offends[random.nextInt(offends.length)];
 
     }
+
+
+    private String generateRandomCompliment(){
+
+        String[] compliments = {"Cleverer Zug!",
+                "Du spielst beeindruckend!",
+                "Gute Strategie!",
+                "Du bist ein wirklich harter Gegner!",
+                "Wow, der war gut!",
+                "Echt stark gespielt!",
+                "Saubere Leistung!",
+                "Du spielst gut!",
+                "Du machst mir das Leben schwer!",
+                "Gut gespielt!"};
+
+        Random random = new Random();
+        return compliments[random.nextInt(compliments.length)];
+
+    }
+
+
 
 
 
