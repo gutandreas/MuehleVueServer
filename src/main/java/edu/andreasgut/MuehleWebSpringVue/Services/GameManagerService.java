@@ -55,7 +55,7 @@ public class GameManagerService {
         String gameCode = jsonRequest.get("gamecode").getAsString();
 
         System.out.println(getClass().getSimpleName() + "- Neues Logingame (start) erstellt");
-        STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
+        STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").getAsString().equals("b") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").getAsString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
         PHASE phase = startPlayerIndex == 1 ? PHASE.SET : PHASE.WAIT;
@@ -87,7 +87,7 @@ public class GameManagerService {
 
     public Game setupComputerGame(JsonObject jsonRequest, String webSocketSessionId) {
         logger.info("Spiel wird aufgebaut...");
-        STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
+        STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").getAsString().equals("b") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").getAsString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
         PHASE phaseHumanPlayer = startPlayerIndex == 1 ? PHASE.SET : PHASE.WAIT;
