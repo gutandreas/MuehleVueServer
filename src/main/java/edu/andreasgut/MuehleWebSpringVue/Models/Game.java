@@ -1,7 +1,9 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.ParticipantGroup;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
 import jakarta.persistence.*;
 
@@ -72,6 +74,34 @@ public class Game {
         }
         return false;
     }
+
+    public boolean executePut(Put put, String uuid){
+        boolean phaseOk = pairing.getPlayerByPlayerUuid(uuid).getCurrentPhase() == PHASE.SET;
+        boolean positionOk = board.getStateOfPosition(put.getPutPosition()) == POSITIONSTATE.FREE;
+
+        if (phaseOk && positionOk){
+            int index = getPairing().getPlayerIndexByPlayerUuid(uuid);
+            board.putStone(put.getPutPosition(), index);
+            Player activePlayer = pairing.getPlayerByIndex(index);
+            activePlayer.increaseNumberOfStonesPut();
+            Player passivePlayer = pairing.getEnemyOf(activePlayer);
+            increaseRound();
+            boolean buildsMorris = board.isPositionPartOfMorris(put.getPutPosition());
+            if (buildsMorris){
+                activePlayer.setCurrentPhase(PHASE.KILL);
+                passivePlayer.setCurrentPhase(PHASE.WAIT);
+            } else {
+                activePlayer.setCurrentPhase(PHASE.WAIT);
+                passivePlayer.setCurrentPhase(PHASE.SET);
+            }
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+
 
 
 

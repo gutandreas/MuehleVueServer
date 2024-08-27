@@ -74,6 +74,10 @@ public class Board {
         setStoneOnPositionInArray(position, playerIndex);
     }
 
+    private boolean isPutPossibleAt(Position position){
+        return boardPositionsStates[position.getRing()][position.getField()] == POSITIONSTATE.FREE;
+    }
+
     public void moveStone(Move move, int playerIndex) {
         setStoneOnPositionInArray(move.getTo(), playerIndex);
         removeStoneFromPositionInArray(move.getFrom());
@@ -91,6 +95,42 @@ public class Board {
         POSITIONSTATE positionstate = playerIndex == 1 ? POSITIONSTATE.PLAYER1 : POSITIONSTATE.PLAYER2;
         boardPositionsStates[position.getRing()][position.getField()] = positionstate;
 
+    }
+
+    public boolean isPositionPartOfMorris(Position position) {
+        boolean cornerField = position.getField() % 2 == 0;
+        boolean morris;
+        POSITIONSTATE positionstate = boardPositionsStates[position.getRing()][position.getField()];
+
+        if (cornerField) {
+            morris = isPositionPartOfMorrisInRingFromCornerField(position, positionstate);
+        } else {
+            morris = isPositionPartOfMorrisInRingFromCenterField(position, positionstate) || isPositionPartOfMorrisBetweenRings(position, positionstate);
+        }
+
+        return morris;
+    }
+
+    private boolean isPositionPartOfMorrisInRingFromCornerField(Position position, POSITIONSTATE positionstate) {
+
+        boolean morrisUpwards = positionstate == boardPositionsStates[position.getRing()][(position.getField() + 1) % 8]
+                && positionstate == boardPositionsStates[position.getRing()][(position.getField() + 2) % 8];
+        boolean morrisDownwards = positionstate == boardPositionsStates[position.getRing()][(position.getField() + 6) % 8]
+                && positionstate == boardPositionsStates[position.getRing()][(position.getField() + 7) % 8];
+
+        return morrisUpwards || morrisDownwards;
+    }
+
+
+    private boolean isPositionPartOfMorrisInRingFromCenterField(Position position, POSITIONSTATE positionstate) {
+        return positionstate == boardPositionsStates[position.getRing()][(position.getField() + 1) % 8]
+                && positionstate == boardPositionsStates[position.getRing()][(position.getField() + 7) % 8];
+    }
+
+
+    private boolean isPositionPartOfMorrisBetweenRings(Position position, POSITIONSTATE positionstate) {
+        return positionstate == boardPositionsStates[(position.getRing() + 1) % 3][position.getField()]
+                && positionstate == boardPositionsStates[(position.getRing() + 2) % 3][position.getField()];
     }
 
 

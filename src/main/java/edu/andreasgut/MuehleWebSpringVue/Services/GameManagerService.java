@@ -56,7 +56,7 @@ public class GameManagerService {
 
         System.out.println(getClass().getSimpleName() + "- Neues Logingame (start) erstellt");
         STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").toString().equals("BLACK") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
-        String firstStone = jsonRequest.get("firststone").toString();
+        String firstStone = jsonRequest.get("firststone").getAsString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
         PHASE phase = startPlayerIndex == 1 ? PHASE.SET : PHASE.WAIT;
 

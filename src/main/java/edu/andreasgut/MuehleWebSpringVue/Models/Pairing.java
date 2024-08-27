@@ -1,12 +1,18 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import edu.andreasgut.MuehleWebSpringVue.Services.GameActionService;
 import jakarta.persistence.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 @Entity
 public class Pairing {
+
+    private static final Logger logger = LoggerFactory.getLogger(Pairing.class);
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -85,15 +91,21 @@ public class Pairing {
         return currentPlayerIndex == 1 ? player1 : player2;
     }
 
+    public Player getEnemyOf(Player player){
+        return player.equals(player1) ? player2 : player1;
+    }
+
     public void changeTurn() {
         currentPlayerIndex = currentPlayerIndex == 1 ? 2 :1;
     }
+
 
     public Player getPlayerByPlayerUuid(String playerUuid){
         String player1Uuid = player1.getUuid();
         String player2Uuid = player2.getUuid();
 
         if (!player1Uuid.equals(playerUuid) && !player2Uuid.equals(playerUuid)){
+            logger.warn("Ungültige playerUuid: " + player1Uuid);
             throw new IllegalArgumentException(Class.class.getSimpleName() + "-  Ungültige playerUuid");
         }
 

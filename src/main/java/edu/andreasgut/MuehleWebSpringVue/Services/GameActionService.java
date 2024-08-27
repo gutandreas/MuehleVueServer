@@ -57,34 +57,19 @@ public class GameActionService {
             String uuid = jsonObject.get("uuid").getAsString();
             String gameCode = jsonObject.get("gamecode").getAsString();
 
-            if (isPutValid(jsonObject, webSocketSessionId)){
-                Put put = new Put(uuid, new Position(ring, field));
-                Game game = gameRepository.findByGameCode(gameCode);
-                Pairing pairing = game.getPairing();
-                Board board = game.getBoard();
-                int activePlayerIndex = pairing.getPlayerIndexByPlayerUuid(uuid);
-                int passivePlayerIndex = activePlayerIndex == 1 ? 2 : 1;
-                board.putStone(put.getPutPosition(), activePlayerIndex);
+            Put put = new Put(uuid, new Position(ring, field));
+            Game game = gameRepository.findByGameCode(gameCode);
 
-                boolean morrisDetected = false;
-                if (morrisDetected){
-                    pairing.getPlayerByIndex(activePlayerIndex).setCurrentPhase(PHASE.KILL);
-                    pairing.getPlayerByIndex(passivePlayerIndex).setCurrentPhase(PHASE.WAIT);
-
-                } else {
-                    pairing.getPlayerByIndex(activePlayerIndex).setCurrentPhase(PHASE.WAIT);
-                    //TODO: Hier muss die wirkliche PHASE ermittelt werden
-                    pairing.getPlayerByIndex(passivePlayerIndex).setCurrentPhase(PHASE.SET);
-                }
+            if (game.executePut(put, uuid)) {
                 game.increaseRound();
                 game.getPairing().getPlayerByPlayerUuid(uuid).increaseNumberOfStonesPut();
                 gameRepository.save(game);
                 return game;
             } else {
                 logger.warn("Ungültige Position bei Put in Game " + gameCode);
-                return null;
             }
         } catch (Exception e){
+            logger.warn(e.getMessage());
             logger.warn("Put konnte nicht ausgeführt werden...");
         }
 
@@ -92,24 +77,7 @@ public class GameActionService {
 
     }
 
-    private boolean isPutValid(JsonObject jsonObject, String webSocketSessionId) {
-        try {
-            int ring = jsonObject.get("ring").getAsInt();
-            int field = jsonObject.get("field").getAsInt();
-            String gameCode = jsonObject.get("gamecode").getAsString();
-            Game game = gameRepository.findByGameCode(gameCode);
-            String uuid = jsonObject.get("uuid").getAsString();
-            boolean phaseOk = game.getPairing().getCurrentPlayer().getCurrentPhase() == PHASE.SET;
-            boolean turnOk = game.getPairing().getCurrentPlayer().getUuid().equals(uuid);
-            boolean positionOk = game.getBoard().getStateOfPosition(new Position(ring, field)) == POSITIONSTATE.FREE;
 
-            return phaseOk /*&& turnOk*/ && positionOk;
-        } catch (Exception e) {
-            logger.warn("Put konnte nicht ausgeführt werden...");
-        }
-
-        return false;
-    }
 }
 
 
