@@ -84,22 +84,42 @@ public class Game {
             board.putStone(put.getPutPosition(), index);
             Player activePlayer = pairing.getPlayerByIndex(index);
             activePlayer.increaseNumberOfStonesPut();
-            Player passivePlayer = pairing.getEnemyOf(activePlayer);
-            increaseRound();
-            boolean buildsMorris = board.isPositionPartOfMorris(put.getPutPosition());
-            if (buildsMorris){
-                activePlayer.setCurrentPhase(PHASE.KILL);
-                passivePlayer.setCurrentPhase(PHASE.WAIT);
-            } else {
-                activePlayer.setCurrentPhase(PHASE.WAIT);
-                passivePlayer.setCurrentPhase(PHASE.SET);
-            }
+            updateRoundAndPhasesOfPlayers(put);
             return true;
         } else {
             return false;
         }
 
     }
+
+    private void updateRoundAndPhasesOfPlayers(Put put){
+
+        boolean buildsMorris = board.isPositionPartOfMorris(put.getPutPosition());
+
+        if (buildsMorris){
+            pairing.getCurrentPlayer().setCurrentPhase(PHASE.KILL);
+            return;
+        } else {
+            increaseRound();
+            pairing.changeTurn();
+            Player activePlayer = pairing.getCurrentPlayer();
+            Player passivePlayer = pairing.getEnemyOf(activePlayer);
+            passivePlayer.setCurrentPhase(PHASE.WAIT);
+            if (round <= 18) {
+                activePlayer.setCurrentPhase(PHASE.SET);
+            } else {
+                int index = pairing.getIndexOfPlayer(activePlayer);
+                if (board.getNumberOfStonesOfPlayerWithIndex(index) > 3) {
+                    activePlayer.setCurrentPhase(PHASE.MOVE);
+                } else {
+                    activePlayer.setCurrentPhase(PHASE.JUMP);
+                }
+            }
+        }
+
+    }
+
+
 
 
 

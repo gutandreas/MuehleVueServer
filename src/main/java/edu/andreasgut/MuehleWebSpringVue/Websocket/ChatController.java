@@ -102,7 +102,8 @@ public class ChatController {
                 "Saubere Leistung!",
                 "Du spielst gut!",
                 "Du machst mir das Leben schwer!",
-                "Gut gespielt!"};
+                "Gut gespielt!",
+                "Ach, ich verzweifle gegen dich..."};
 
         Random random = new Random();
         return compliments[random.nextInt(compliments.length)];

@@ -3,6 +3,7 @@ package edu.andreasgut.MuehleWebSpringVue.Models;
 
 import edu.andreasgut.MuehleWebSpringVue.Converter.BoardArrayConverter;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -67,6 +68,13 @@ public class Board {
             }
         }
         return counter;
+
+    }
+
+    public int getNumberOfStonesOfPlayerWithIndex(int index){
+
+        POSITIONSTATE state = index == 1 ? POSITIONSTATE.PLAYER1 : POSITIONSTATE.PLAYER2;
+        return getNumberOfStates(state);
 
     }
 
