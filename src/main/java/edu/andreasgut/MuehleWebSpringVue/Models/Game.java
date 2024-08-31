@@ -109,7 +109,7 @@ public class Game {
             board.killStone(kill.getKillPosition());
             activePlayer.increaseNumberOfStonesKilled();
             passivePlayer.increaseNumberOfStonesLost();
-            updateRoundAndPhasesOfPlayersAfterKill(kill);
+            updateRoundAndPhasesOfPlayersAfterKill();
             return true;
         } else {
             return false;
@@ -147,7 +147,7 @@ public class Game {
             Player activePlayer = pairing.getCurrentPlayer();
             Player passivePlayer = pairing.getEnemyOf(activePlayer);
             passivePlayer.setCurrentPhase(PHASE.WAIT);
-            if (round <= 18) {
+            if (round < 18) {
                 activePlayer.setCurrentPhase(PHASE.PUT);
             } else {
                 int index = pairing.getIndexOfPlayer(activePlayer);
@@ -174,7 +174,7 @@ public class Game {
             Player activePlayer = pairing.getCurrentPlayer();
             Player passivePlayer = pairing.getEnemyOf(activePlayer);
             passivePlayer.setCurrentPhase(PHASE.WAIT);
-            if (round <= 18) {
+            if (round < 18) {
                 activePlayer.setCurrentPhase(PHASE.PUT);
             } else {
                 int index = pairing.getIndexOfPlayer(activePlayer);
@@ -188,13 +188,13 @@ public class Game {
 
     }
 
-    private void updateRoundAndPhasesOfPlayersAfterKill(Kill kill){
+    private void updateRoundAndPhasesOfPlayersAfterKill(){
         increaseRound();
         pairing.changeTurn();
         Player activePlayer = pairing.getCurrentPlayer();
         Player passivePlayer = pairing.getEnemyOf(activePlayer);
         passivePlayer.setCurrentPhase(PHASE.WAIT);
-        if (round <= 18) {
+        if (round < 18) {
             activePlayer.setCurrentPhase(PHASE.PUT);
         } else {
             int index = pairing.getIndexOfPlayer(activePlayer);
