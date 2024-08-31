@@ -58,7 +58,7 @@ public class GameManagerService {
         STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").getAsString().equals("b") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").getAsString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
-        PHASE phase = startPlayerIndex == 1 ? PHASE.SET : PHASE.WAIT;
+        PHASE phase = startPlayerIndex == 1 ? PHASE.PUT : PHASE.WAIT;
 
         Player humanPlayerStart = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolor, webSocketSessionId, phase);
         Pairing pairing = new Pairing(humanPlayerStart, startPlayerIndex);
@@ -77,7 +77,7 @@ public class GameManagerService {
         Game gameJoin = gameRepository.findByGameCode(gameCode);
         STONECOLOR playerStonecolorJoin = gameJoin.getPairing().getPlayer1().getStonecolor() == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
 
-        PHASE phase = gameJoin.getPairing().getCurrentPlayerIndex() == 2 ? PHASE.SET : PHASE.WAIT;
+        PHASE phase = gameJoin.getPairing().getCurrentPlayerIndex() == 2 ? PHASE.PUT : PHASE.WAIT;
         Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolorJoin, webSocketSessionId, phase);
         gameJoin.getPairing().addSecondPlayer(humanPlayerJoin);
         gameRepository.save(gameJoin);
@@ -90,8 +90,8 @@ public class GameManagerService {
         STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").getAsString().equals("b") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").getAsString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
-        PHASE phaseHumanPlayer = startPlayerIndex == 1 ? PHASE.SET : PHASE.WAIT;
-        PHASE phaseComputerPlayer = startPlayerIndex == 2 ? PHASE.SET : PHASE.WAIT;
+        PHASE phaseHumanPlayer = startPlayerIndex == 1 ? PHASE.PUT : PHASE.WAIT;
+        PHASE phaseComputerPlayer = startPlayerIndex == 2 ? PHASE.PUT : PHASE.WAIT;
 
         int level = jsonRequest.get("level").getAsInt();
         String computerName;

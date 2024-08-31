@@ -78,17 +78,37 @@ public class Board {
 
     }
 
+    public boolean isThisPositionOccupiedByPlayerWithIndex(int index, Position position){
+        POSITIONSTATE positionstateInBoard = boardPositionsStates[position.getRing()][position.getField()];
+        POSITIONSTATE expectedPositionState = index == 1 ? POSITIONSTATE.PLAYER1 : POSITIONSTATE.PLAYER2;
+
+        return positionstateInBoard == expectedPositionState;
+    }
+
     public void putStone(Position position, int playerIndex) {
         setStoneOnPositionInArray(position, playerIndex);
     }
 
-    private boolean isPutPossibleAt(Position position){
-        return boardPositionsStates[position.getRing()][position.getField()] == POSITIONSTATE.FREE;
-    }
 
     public void moveStone(Move move, int playerIndex) {
         setStoneOnPositionInArray(move.getTo(), playerIndex);
         removeStoneFromPositionInArray(move.getFrom());
+    }
+
+    public boolean isPositionFree(Position position){
+        return boardPositionsStates[position.getRing()][position.getField()] == POSITIONSTATE.FREE;
+    }
+
+    public boolean arePositionsNeighbours(Position position1, Position position2) {
+
+
+        boolean neighboursInRing = (position1.getRing() == position2.getRing() && Math.abs(position1.getField() - position2.getField()) == 1)
+                || (position1.getRing() == position2.getRing() && Math.abs(position1.getField() - position2.getField()) == 7);
+
+        boolean neighboursBetweenRings = position1.getField() % 2 == 1 && position1.getField() == position2.getField()
+                && Math.abs(position1.getRing() - position2.getRing()) == 1;
+
+        return neighboursInRing || neighboursBetweenRings;
     }
 
     public void killStone(Position position) {

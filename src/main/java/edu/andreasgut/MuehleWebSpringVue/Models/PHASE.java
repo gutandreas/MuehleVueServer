@@ -1,5 +1,5 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 public enum PHASE {
-    SET, MOVE, KILL, JUMP, WAIT
+    PUT, MOVE, KILL, JUMP, WAIT
 }
