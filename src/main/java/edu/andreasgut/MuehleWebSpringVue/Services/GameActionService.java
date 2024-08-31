@@ -2,6 +2,7 @@ package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import com.google.gson.JsonObject;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Jump;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
@@ -38,6 +39,8 @@ public class GameActionService {
                 return handleMove(jsonObject, webSocketSessionId);
             case "KILL":
                 return handleKill(jsonObject, webSocketSessionId);
+            case "JUMP":
+                return handleJump(jsonObject, webSocketSessionId);
             default:
                 logger.warn("Ungültiger Action Type");
                 return null;
@@ -125,6 +128,36 @@ public class GameActionService {
         return null;
 
 
+    }
+
+    public Game handleJump(JsonObject jsonObject, String webSocketSessionId) {
+        try {
+            JsonObject fromObject = jsonObject.getAsJsonObject("from");
+            int fromRing = fromObject.get("ring").getAsInt();
+            int fromField = fromObject.get("field").getAsInt();
+
+            JsonObject toObject = jsonObject.getAsJsonObject("to");
+            int toRing = toObject.get("ring").getAsInt();
+            int toField = toObject.get("field").getAsInt();
+
+            String uuid = jsonObject.get("uuid").getAsString();
+            String gameCode = jsonObject.get("gamecode").getAsString();
+
+            Jump jump = new Jump(uuid, new Position(fromRing, fromField), new Position(toRing, toField));
+            Game game = gameRepository.findByGameCode(gameCode);
+
+            if (game.executeJump(jump, uuid)) {
+                gameRepository.save(game);
+                return game;
+            } else {
+                logger.warn("Ungültige Position bei Jump in Game " + gameCode);
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+            logger.warn("Jump konnte nicht ausgeführt werden...");
+        }
+
+        return null;
     }
 
 }

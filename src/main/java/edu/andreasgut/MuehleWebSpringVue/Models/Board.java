@@ -2,6 +2,7 @@ package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
 import edu.andreasgut.MuehleWebSpringVue.Converter.BoardArrayConverter;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Jump;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import jakarta.persistence.*;
@@ -93,6 +94,11 @@ public class Board {
     public void moveStone(Move move, int playerIndex) {
         setStoneOnPositionInArray(move.getTo(), playerIndex);
         removeStoneFromPositionInArray(move.getFrom());
+    }
+
+    public void jumpStone(Jump jump, int playerIndex) {
+        setStoneOnPositionInArray(jump.getTo(), playerIndex);
+        removeStoneFromPositionInArray(jump.getFrom());
     }
 
     public boolean isPositionFree(Position position){

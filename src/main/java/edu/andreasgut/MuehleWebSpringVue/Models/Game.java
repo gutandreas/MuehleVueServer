@@ -1,6 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Jump;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
@@ -23,6 +24,7 @@ public class Game {
     private String gameCode;
     private int round;
     private boolean finished;
+    private int winnerIndex;
     @Transient
     private ParticipantGroup participantGroup;
 
@@ -59,7 +61,6 @@ public class Game {
         this.board = board;
         this.pairing = pairing;
         this.round = round;
-
         this.finished = false;
     }
 
@@ -110,6 +111,9 @@ public class Game {
             activePlayer.increaseNumberOfStonesKilled();
             passivePlayer.increaseNumberOfStonesLost();
             updateRoundAndPhasesOfPlayersAfterKill();
+            if (isGameWon()){
+                calculateWinnerAndFinishGame();
+            }
             return true;
         } else {
             return false;
@@ -131,6 +135,22 @@ public class Game {
             return false;
         }
 
+    }
+
+    public boolean executeJump(Jump jump, String uuid){
+
+        boolean phaseOk = pairing.getPlayerByPlayerUuid(uuid).getCurrentPhase() == PHASE.JUMP;
+        int playerIndex = pairing.getPlayerIndexByPlayerUuid(uuid);
+        boolean fromPositionOk = board.isThisPositionOccupiedByPlayerWithIndex(playerIndex, jump.getFrom());
+        boolean toPositionOk = board.isPositionFree(jump.getTo());
+
+        if (phaseOk && fromPositionOk && toPositionOk){
+            board.jumpStone(jump, playerIndex);
+            updateRoundAndPhasesOfPlayersAfterJump(jump);
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
@@ -188,6 +208,15 @@ public class Game {
 
     }
 
+    private boolean isGameWon(){
+        return round > 18 && (board.getNumberOfStonesOfPlayerWithIndex(1) < 3 || board.getNumberOfStonesOfPlayerWithIndex(2) < 3);
+    }
+
+    private void calculateWinnerAndFinishGame(){
+        finished = true;
+        winnerIndex = board.getNumberOfStonesOfPlayerWithIndex(1) == 2 ? 2 : 1;
+    }
+
     private void updateRoundAndPhasesOfPlayersAfterKill(){
         increaseRound();
         pairing.changeTurn();
@@ -204,6 +233,33 @@ public class Game {
                 activePlayer.setCurrentPhase(PHASE.JUMP);
             }
         }
+    }
+
+    private void updateRoundAndPhasesOfPlayersAfterJump(Jump jump){
+
+        boolean buildsMorris = board.isPositionPartOfMorris(jump.getTo());
+
+        if (buildsMorris){
+            pairing.getCurrentPlayer().setCurrentPhase(PHASE.KILL);
+            return;
+        } else {
+            increaseRound();
+            pairing.changeTurn();
+            Player activePlayer = pairing.getCurrentPlayer();
+            Player passivePlayer = pairing.getEnemyOf(activePlayer);
+            passivePlayer.setCurrentPhase(PHASE.WAIT);
+            if (round < 18) {
+                activePlayer.setCurrentPhase(PHASE.PUT);
+            } else {
+                int index = pairing.getIndexOfPlayer(activePlayer);
+                if (board.getNumberOfStonesOfPlayerWithIndex(index) > 3) {
+                    activePlayer.setCurrentPhase(PHASE.MOVE);
+                } else {
+                    activePlayer.setCurrentPhase(PHASE.JUMP);
+                }
+            }
+        }
+
     }
 
 
