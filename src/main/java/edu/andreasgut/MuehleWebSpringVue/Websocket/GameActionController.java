@@ -54,6 +54,7 @@ public class GameActionController {
 
             if (gameExists) {
                 Game game = gameActionService.handleAction(jsonObject, sessionId);
+                game = game == null ? gameRepository.findByGameCode(gameCode) : game;
                 GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
                 senderService.sendGameUpdate(gameUpdateDto, gameCode);
                 return ResponseEntity.ok().body("Action wurde ausgeführt...");
