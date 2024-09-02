@@ -9,6 +9,7 @@ import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
+import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
 import edu.andreasgut.MuehleWebSpringVue.Services.SenderService;
 import org.slf4j.Logger;
@@ -28,14 +29,16 @@ public class GameManagerController {
     private static final Logger logger = LoggerFactory.getLogger(GameManagerController.class);
 
 
-    GameManagerService gameManagerService;
-    SenderService senderService;
+    private GameManagerService gameManagerService;
+    private SenderService senderService;
+    private GameRepository gameRepository;
 
 
     @Autowired
-    public GameManagerController(GameManagerService gameManagerService, SenderService senderService) {
+    public GameManagerController(GameManagerService gameManagerService, SenderService senderService, GameRepository gameRepository) {
         this.gameManagerService = gameManagerService;
         this.senderService = senderService;
+        this.gameRepository = gameRepository;
     }
 
     @Transactional
@@ -130,18 +133,20 @@ public class GameManagerController {
 
     @MessageMapping("/manager/setup/watch")
     //@SendToUser("/queue/reply")
-    public ResponseEntity<String> watchGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
+    public GameSetupDto watchGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
             logger.info("Request für eine Spielbeobachtung ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.addSpectatorToGame(jsonObject, sessionId);
-            //TODO: Admin und Spieler über neuen Beobachter informieren
-            return ResponseEntity.ok().body("Das Spiel wird beobachtet");
+            GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
+            senderService.sendGameUpdate(gameUpdateDto, game.getGameCode());
+            gameRepository.save(game);
+            return new GameSetupDto(game, 0);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Das Spiel kann nicht beobachtet werden");
-            return ResponseEntity.badRequest().body("Das Spiel kann nicht beobachtet werden");
+            return null;
         }
     }
 
