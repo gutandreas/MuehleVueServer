@@ -70,6 +70,9 @@ public class Pairing {
         if (player2 == null){
             throw new IllegalArgumentException("Ein übergebener Player ist null");
         }
+        if (this.player2 != null){
+            throw new IllegalArgumentException("Der zweite Spieler ist bereits belegt");
+        }
 
         this.player2 = player2;
 

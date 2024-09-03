@@ -75,6 +75,7 @@ public class GameManagerController {
     }
 
 
+
     @MessageMapping("/manager/setup/computer")
     @SendToUser("/queue/reply")
     public GameSetupDto setupComputerGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
@@ -84,11 +85,11 @@ public class GameManagerController {
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupComputerGame(jsonObject, sessionId);
             senderService.sendAddGameToAdmin(game);
-            return new GameSetupDto(game, 1);
+            return new GameSetupDto(game, 1, true);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
-            return null;
+            return new GameSetupDto(null, 0, false);
         }
     }
 
@@ -102,11 +103,11 @@ public class GameManagerController {
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupLoginGameStart(jsonObject, sessionId);
             senderService.sendAddGameToAdmin(game);
-            return new GameSetupDto(game, 1);
+            return new GameSetupDto(game, 1, true);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
-            return null;
+            return new GameSetupDto(null, 0, false);
         }
     }
 
@@ -123,11 +124,11 @@ public class GameManagerController {
             GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
             senderService.sendGameUpdate(gameUpdateDto, game.getGameCode());
             senderService.sendAddGameToAdmin(game);
-            return new GameSetupDto(game, 2);
+            return new GameSetupDto(game, 2, true);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
-            return null;
+            return new GameSetupDto(null, 0, false);
         }
     }
 
@@ -141,11 +142,11 @@ public class GameManagerController {
             Game game = gameManagerService.addSpectatorToGame(jsonObject, sessionId);
             GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
             senderService.sendGameUpdate(gameUpdateDto, game.getGameCode());
-            return new GameSetupDto(game, 0);
+            return new GameSetupDto(game, 0, true);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Das Spiel kann nicht beobachtet werden");
-            return null;
+            return new GameSetupDto(null, 0, false);
         }
     }
 

@@ -39,6 +39,7 @@ public class SenderService {
     }
 
 
+
     public void sendGameUpdate(GameUpdateDto gameUpdateDto, String gameCode){
         String path = "/topic/game/" + gameCode + "/gameupdate";
         System.out.println(gameUpdateDto);
