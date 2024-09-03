@@ -75,7 +75,10 @@ public class Game {
 
 
     public boolean addSpectator(Spectator spectator){
-        if (!spectators.contains(spectator)) {
+        boolean alreadyExists = spectators.stream()
+                .anyMatch(s -> s.getWebSocketSessionId().equals(spectator.getWebSocketSessionId()));
+
+        if (!alreadyExists) {
             spectators.add(spectator);
             return true;
         }

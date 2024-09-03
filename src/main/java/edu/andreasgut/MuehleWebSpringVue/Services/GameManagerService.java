@@ -127,7 +127,7 @@ public class GameManagerService {
         boolean isRoboter = jsonRequest.get("isroboter").getAsBoolean();
 
         Game game = gameRepository.findByGameCode(gameCode);
-        game.addSpectator(new Spectator(name, isRoboter));
+        game.addSpectator(new Spectator(name, isRoboter, webSocketSessionId));
         gameRepository.save(game);
         return game;
     }

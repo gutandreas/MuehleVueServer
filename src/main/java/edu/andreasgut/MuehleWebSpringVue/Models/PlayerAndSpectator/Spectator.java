@@ -13,9 +13,10 @@ public class Spectator extends Participant implements ParticipantWithWebSocketSe
     boolean isRoboter;
     String webSocketSessionId;
 
-    public Spectator(String name, boolean isRoboter) {
+    public Spectator(String name, boolean isRoboter, String webSocketSessionId) {
         super(name);
         this.isRoboter = isRoboter;
+        this.webSocketSessionId = webSocketSessionId;
     }
 
     public Spectator() {
