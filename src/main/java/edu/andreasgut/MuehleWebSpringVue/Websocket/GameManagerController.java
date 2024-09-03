@@ -132,7 +132,7 @@ public class GameManagerController {
     }
 
     @MessageMapping("/manager/setup/watch")
-    //@SendToUser("/queue/reply")
+    @SendToUser("/queue/reply")
     public GameSetupDto watchGame(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
             logger.info("Request für eine Spielbeobachtung ...");
@@ -141,7 +141,6 @@ public class GameManagerController {
             Game game = gameManagerService.addSpectatorToGame(jsonObject, sessionId);
             GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
             senderService.sendGameUpdate(gameUpdateDto, game.getGameCode());
-            gameRepository.save(game);
             return new GameSetupDto(game, 0);
         } catch (Exception e) {
             e.printStackTrace();
