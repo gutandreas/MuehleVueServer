@@ -9,6 +9,7 @@ import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
 import edu.andreasgut.MuehleWebSpringVue.Models.Pairing;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameActionService;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
@@ -21,6 +22,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
+
+import java.time.LocalDateTime;
 
 @Controller
 public class GameActionController {
@@ -53,10 +56,7 @@ public class GameActionController {
             boolean gameExists = gameManagerService.doesGameExist(gameCode);
 
             if (gameExists) {
-                Game game = gameActionService.handleAction(jsonObject, sessionId);
-                game = game == null ? gameRepository.findByGameCode(gameCode) : game;
-                GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
-                senderService.sendGameUpdate(gameUpdateDto, gameCode);
+                gameActionService.handleAction(jsonObject, sessionId);
                 return ResponseEntity.ok().body("Action wurde ausgeführt...");
             } else {
                 return ResponseEntity.badRequest().body("Gamecode ist ungültig...");

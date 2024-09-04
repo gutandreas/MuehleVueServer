@@ -1,6 +1,5 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
-
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Jump;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
@@ -8,6 +7,7 @@ import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.ParticipantGroup;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
 import jakarta.persistence.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +87,10 @@ public class Game {
 
     public boolean executePut(Put put, String uuid){
         boolean phaseOk = pairing.getPlayerByPlayerUuid(uuid).getCurrentPhase() == PHASE.PUT;
+        System.out.println(pairing.getPlayerByPlayerUuid(uuid).getCurrentPhase());
         boolean positionOk = board.isPositionFree(put.getPutPosition());
+        System.out.println(phaseOk);
+        System.out.println(positionOk);
         if (phaseOk && positionOk){
             int index = getPairing().getPlayerIndexByPlayerUuid(uuid);
             board.putStone(put.getPutPosition(), index);
@@ -180,6 +183,7 @@ public class Game {
                     activePlayer.setCurrentPhase(PHASE.JUMP);
                 }
             }
+
         }
 
     }
@@ -210,6 +214,8 @@ public class Game {
         }
 
     }
+
+
 
     private boolean isGameWon(){
         return round > 18 && (board.getNumberOfStonesOfPlayerWithIndex(1) < 3 || board.getNumberOfStonesOfPlayerWithIndex(2) < 3);
@@ -284,6 +290,10 @@ public class Game {
 
     public Pairing getPairing() {
         return pairing;
+    }
+
+    public boolean isCurrentPlayerAComputerPlayer(){
+        return pairing.getCurrentPlayer() instanceof StandardComputerPlayer;
     }
 
 

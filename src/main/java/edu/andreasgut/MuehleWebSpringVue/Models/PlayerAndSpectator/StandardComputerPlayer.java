@@ -1,12 +1,15 @@
 package edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator;
 
-import edu.andreasgut.MuehleWebSpringVue.Models.Board;
+import edu.andreasgut.MuehleWebSpringVue.Models.*;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Jump;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
-import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
-import edu.andreasgut.MuehleWebSpringVue.Models.Position;
-import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+
+import java.util.LinkedList;
+import java.util.Random;
 
 @Entity
 @DiscriminatorValue("STANDARDCOMPUTER")
@@ -23,18 +26,27 @@ public class StandardComputerPlayer extends Player {
 
     }
 
-    @Override
-    Move move(Board board, int playerIndex, boolean allowedToJump) {
+    public Put put(Game game, String uuid) {
+        System.out.println("Computerput getriggert");
+        LinkedList<Put> possiblePuts = Advisor.getPossiblePuts(game, uuid);
+        Random random = new Random();
+        return possiblePuts.get(random.nextInt(possiblePuts.size()));
+    }
+
+    public Move move(Game game, String uuid) {
+        System.out.println("Computermove getriggert");
         return null;
     }
 
-    @Override
-    Position put(Board board, int playerIndex) {
-        return null;
+    public Kill kill(Game game, String uuid) {
+        System.out.println("Computerkill getriggert");
+        LinkedList<Kill> possibleKills = Advisor.getPossibleKills(game, uuid);
+        Random random = new Random();
+        return possibleKills.get(random.nextInt(possibleKills.size()));
     }
 
-    @Override
-    Position kill(Board board, int otherPlayerIndex) {
+    public Jump jump(Game game, String uuid){
+        System.out.println("Computerkill getriggert");
         return null;
     }
 }

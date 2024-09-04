@@ -1,12 +1,14 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import com.google.gson.JsonObject;
+import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Jump;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.BoardRepository;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import org.slf4j.Logger;
@@ -14,39 +16,58 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class GameActionService {
 
     private static final Logger logger = LoggerFactory.getLogger(GameActionService.class);
 
     private final GameRepository gameRepository;
-    private final BoardRepository boardRepository;
+    private final SenderService senderService;
 
     @Autowired
-    public GameActionService(GameRepository gameRepository, BoardRepository boardRepository) {
+    public GameActionService(GameRepository gameRepository, SenderService senderService) {
         this.gameRepository = gameRepository;
-        this.boardRepository = boardRepository;
+        this.senderService = senderService;
     }
 
 
-    public Game handleAction(JsonObject jsonObject, String webSocketSessionId) {
+    public void handleAction(JsonObject jsonObject, String webSocketSessionId) {
         String type = jsonObject.get("type").getAsString();
+        Game gameAfterHumanAction;
 
         switch (type) {
             case "PUT":
-                return handlePut(jsonObject, webSocketSessionId);
+                 gameAfterHumanAction = handlePut(jsonObject, webSocketSessionId);
+                 break;
             case "MOVE":
-                return handleMove(jsonObject, webSocketSessionId);
+                gameAfterHumanAction =  handleMove(jsonObject, webSocketSessionId);
+                break;
             case "KILL":
-                return handleKill(jsonObject, webSocketSessionId);
+                gameAfterHumanAction =  handleKill(jsonObject, webSocketSessionId);
+                break;
             case "JUMP":
-                return handleJump(jsonObject, webSocketSessionId);
+                gameAfterHumanAction =  handleJump(jsonObject, webSocketSessionId);
+                break;
             default:
+                gameAfterHumanAction = null;
                 logger.warn("Ungültiger Action Type");
-                return null;
+        }
 
+        GameUpdateDto updateAfterHumanPlayer = new GameUpdateDto(gameAfterHumanAction, LocalDateTime.now());
+        gameRepository.save(gameAfterHumanAction);
+        senderService.sendGameUpdate(updateAfterHumanPlayer);
+
+        while (gameAfterHumanAction.isCurrentPlayerAComputerPlayer()){
+            Game gameAfterComputerAction = triggerComputerPlayer(gameAfterHumanAction);
+            GameUpdateDto updateAfterComputer = new GameUpdateDto(gameAfterComputerAction, LocalDateTime.now());
+            gameRepository.save(gameAfterComputerAction);
+            senderService.sendGameUpdate(updateAfterComputer);
         }
     }
+
+
 
     private Game handlePut(JsonObject jsonObject, String webSocketSessionId) {
         try {
@@ -158,6 +179,30 @@ public class GameActionService {
         }
 
         return null;
+    }
+
+    private Game triggerComputerPlayer(Game game){
+        StandardComputerPlayer standardComputerPlayer = (StandardComputerPlayer) game.getPairing().getCurrentPlayer();
+        PHASE phase = standardComputerPlayer.getCurrentPhase();
+        int index = game.getPairing().getCurrentPlayerIndex();
+        String uuid = standardComputerPlayer.getUuid();
+        switch (phase){
+            case PUT:
+                Put put = standardComputerPlayer.put(game, uuid);
+                game.executePut(put, uuid);
+                break;
+            case MOVE:
+                standardComputerPlayer.move(game, uuid);
+                break;
+            case KILL:
+                Kill kill = standardComputerPlayer.kill(game, uuid);
+                game.executeKill(kill, uuid);
+                break;
+            case JUMP:
+                standardComputerPlayer.jump(game, uuid);
+                break;
+        }
+        return game;
     }
 
 }

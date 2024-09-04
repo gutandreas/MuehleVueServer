@@ -1,8 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
+import edu.andreasgut.MuehleWebSpringVue.DTO.GameSetupDto;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
-import edu.andreasgut.MuehleWebSpringVue.DTO.PlayerDto;
-import edu.andreasgut.MuehleWebSpringVue.Models.Board;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
@@ -22,14 +21,14 @@ public class SenderService {
         this.gameRepository = gameRepository;
     }
 
-    public void sendUpdateGameToAdmin(Game game){
+    public void sendUpdateGameToAdmin(GameUpdateDto gameUpdateDto){
         String path = "/topic/admin/games/update";
-        template.convertAndSend(path, game);
+        template.convertAndSend(path, gameUpdateDto);
     }
 
-    public void sendAddGameToAdmin(Game game){
+    public void sendAddGameToAdmin(GameSetupDto gameSetupDto){
         String path = "/topic/admin/games/add";
-        template.convertAndSend(path, game);
+        template.convertAndSend(path, gameSetupDto);
     }
 
 
@@ -40,7 +39,8 @@ public class SenderService {
 
 
 
-    public void sendGameUpdate(GameUpdateDto gameUpdateDto, String gameCode){
+    public void sendGameUpdate(GameUpdateDto gameUpdateDto){
+        String gameCode = gameUpdateDto.getGame().getGameCode();
         String path = "/topic/game/" + gameCode + "/gameupdate";
         System.out.println(gameUpdateDto);
         template.convertAndSend(path, gameUpdateDto);

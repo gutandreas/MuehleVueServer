@@ -2,7 +2,9 @@ package edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator;
 
 
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
 import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
 import edu.andreasgut.MuehleWebSpringVue.Models.Position;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
@@ -72,15 +74,9 @@ public abstract class Player extends Participant {
     }
 
     public void setCurrentPhase(PHASE currentPhase) {
+        System.out.println(currentPhase);
         this.currentPhase = currentPhase;
     }
-
-    abstract Move move(Board board, int playerIndex, boolean allowedToJump);
-
-    abstract Position put(Board board, int playerIndex);
-
-    abstract Position kill(Board board, int otherPlayerIndex);
-
 
 
 

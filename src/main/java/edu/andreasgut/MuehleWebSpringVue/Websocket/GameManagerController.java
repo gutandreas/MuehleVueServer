@@ -4,24 +4,21 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameSetupDto;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
-import edu.andreasgut.MuehleWebSpringVue.DTO.PlayerDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
-import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
-import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
 import edu.andreasgut.MuehleWebSpringVue.Services.SenderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 public class GameManagerController {
@@ -84,8 +81,9 @@ public class GameManagerController {
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupComputerGame(jsonObject, sessionId);
-            senderService.sendAddGameToAdmin(game);
-            return new GameSetupDto(game, 1, true);
+            GameSetupDto gameSetupDto = new GameSetupDto(game, 1, true);
+            senderService.sendAddGameToAdmin(gameSetupDto);
+            return gameSetupDto;
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
@@ -102,8 +100,9 @@ public class GameManagerController {
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupLoginGameStart(jsonObject, sessionId);
-            senderService.sendAddGameToAdmin(game);
-            return new GameSetupDto(game, 1, true);
+            GameSetupDto gameSetupDto = new GameSetupDto(game, 1, true);
+            senderService.sendAddGameToAdmin(gameSetupDto);
+            return gameSetupDto;
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Game konnte nicht erstellt werden");
@@ -120,10 +119,9 @@ public class GameManagerController {
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.setupLoginGameJoin(jsonObject, sessionId);
-            senderService.sendUpdateGameToAdmin(game);
-            GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
-            senderService.sendGameUpdate(gameUpdateDto, game.getGameCode());
-            senderService.sendAddGameToAdmin(game);
+            GameUpdateDto gameUpdateDto = new GameUpdateDto(game, LocalDateTime.now());
+            senderService.sendUpdateGameToAdmin(gameUpdateDto);
+            senderService.sendGameUpdate(gameUpdateDto);
             return new GameSetupDto(game, 2, true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -140,8 +138,8 @@ public class GameManagerController {
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
             Game game = gameManagerService.addSpectatorToGame(jsonObject, sessionId);
-            GameUpdateDto gameUpdateDto = new GameUpdateDto(game);
-            senderService.sendGameUpdate(gameUpdateDto, game.getGameCode());
+            GameUpdateDto gameUpdateDto = new GameUpdateDto(game, LocalDateTime.now());
+            senderService.sendGameUpdate(gameUpdateDto);
             return new GameSetupDto(game, 0, true);
         } catch (Exception e) {
             e.printStackTrace();
