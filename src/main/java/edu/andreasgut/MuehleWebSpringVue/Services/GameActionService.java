@@ -32,7 +32,6 @@ public class GameActionService {
         this.senderService = senderService;
     }
 
-
     public void handleAction(JsonObject jsonObject, String webSocketSessionId) {
         String type = jsonObject.get("type").getAsString();
         Game gameAfterHumanAction;
@@ -59,15 +58,13 @@ public class GameActionService {
         gameRepository.save(gameAfterHumanAction);
         senderService.sendGameUpdate(updateAfterHumanPlayer);
 
-        while (gameAfterHumanAction.isCurrentPlayerAComputerPlayer()){
+        while (gameAfterHumanAction.isCurrentPlayerAComputerPlayer() && !gameAfterHumanAction.isFinished()){
             Game gameAfterComputerAction = triggerComputerPlayer(gameAfterHumanAction);
             GameUpdateDto updateAfterComputer = new GameUpdateDto(gameAfterComputerAction, LocalDateTime.now());
             gameRepository.save(gameAfterComputerAction);
             senderService.sendGameUpdate(updateAfterComputer);
         }
     }
-
-
 
     private Game handlePut(JsonObject jsonObject, String webSocketSessionId) {
         try {
@@ -184,7 +181,6 @@ public class GameActionService {
     private Game triggerComputerPlayer(Game game){
         StandardComputerPlayer standardComputerPlayer = (StandardComputerPlayer) game.getPairing().getCurrentPlayer();
         PHASE phase = standardComputerPlayer.getCurrentPhase();
-        int index = game.getPairing().getCurrentPlayerIndex();
         String uuid = standardComputerPlayer.getUuid();
         switch (phase){
             case PUT:
@@ -192,14 +188,16 @@ public class GameActionService {
                 game.executePut(put, uuid);
                 break;
             case MOVE:
-                standardComputerPlayer.move(game, uuid);
+                Move move = standardComputerPlayer.move(game, uuid);
+                game.executeMove(move, uuid);
                 break;
             case KILL:
                 Kill kill = standardComputerPlayer.kill(game, uuid);
                 game.executeKill(kill, uuid);
                 break;
             case JUMP:
-                standardComputerPlayer.jump(game, uuid);
+                Jump jump = standardComputerPlayer.jump(game, uuid);
+                game.executeJump(jump, uuid);
                 break;
         }
         return game;

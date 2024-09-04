@@ -35,7 +35,9 @@ public class StandardComputerPlayer extends Player {
 
     public Move move(Game game, String uuid) {
         System.out.println("Computermove getriggert");
-        return null;
+        LinkedList<Move> possibleMoves = Advisor.getPossibleMoves(game, uuid);
+        Random random = new Random();
+        return possibleMoves.get(random.nextInt(possibleMoves.size()));
     }
 
     public Kill kill(Game game, String uuid) {
@@ -47,6 +49,8 @@ public class StandardComputerPlayer extends Player {
 
     public Jump jump(Game game, String uuid){
         System.out.println("Computerkill getriggert");
-        return null;
+        LinkedList<Jump> possibleJumps = Advisor.getPossibleJumps(game, uuid);
+        Random random = new Random();
+        return possibleJumps.get(random.nextInt(possibleJumps.size()));
     }
 }
