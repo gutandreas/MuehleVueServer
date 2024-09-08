@@ -8,6 +8,7 @@ public class GameSimulation {
     private BoardSimulation board;
     private PairingSimulation pairing;
     private int round;
+    private GameTree gameTree;
 
 
     public GameSimulation(Game game) {

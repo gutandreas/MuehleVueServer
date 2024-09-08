@@ -4,6 +4,14 @@ import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 
 public class GameTree {
 
+    private GameNode root;
+    private GameNode currentNode;
+
+    public GameTree(BoardSimulation initialBoard, int currentPlayerIndex) {
+        this.root = new GameNode(initialBoard, currentPlayerIndex, null);
+        this.currentNode = root;
+    }
+
     public static int evaluateGame(Game game, int index){
         int ownIndex = index;
         int enemyIndex = ownIndex == 1? 2: 1;
