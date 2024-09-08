@@ -7,7 +7,6 @@ public class GameSimulation {
 
     private BoardSimulation board;
     private PairingSimulation pairing;
-    private PlayerSimulation currentPlayer;
     private int round;
 
 
@@ -15,9 +14,6 @@ public class GameSimulation {
         this.round = game.getRound();
         this.board = new BoardSimulation(game.getBoard());
         this.pairing = new PairingSimulation(game.getPairing());
-        this.currentPlayer = pairing.getCurrentPlayerIndex() == 1 ?
-                new PlayerSimulation(game.getPairing().getPlayer1()) :
-                new PlayerSimulation(game.getPairing().getPlayer2());
     }
 
 

@@ -13,17 +13,11 @@ public class PairingSimulation {
     public PairingSimulation(Pairing pairing) {
         this.player1 = new PlayerSimulation(pairing.getPlayer1());
         this.player2 = new PlayerSimulation(pairing.getPlayer2());
+        this.currentPlayerIndex = pairing.getCurrentPlayerIndex();
     }
 
     public int getCurrentPlayerIndex() {
         return currentPlayerIndex;
     }
 
-    public PlayerSimulation getPlayer1() {
-        return player1;
-    }
-
-    public PlayerSimulation getPlayer2() {
-        return player2;
-    }
 }
