@@ -2,7 +2,6 @@ package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameSetupDto;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
-import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;

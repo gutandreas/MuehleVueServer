@@ -4,7 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameSetupDto;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
-import edu.andreasgut.MuehleWebSpringVue.Models.Game;
+import edu.andreasgut.MuehleWebSpringVue.Models.GamePersistent;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameState;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
 import edu.andreasgut.MuehleWebSpringVue.Services.SenderService;
@@ -52,11 +53,11 @@ public class GameManagerController {
             boolean gameExists = gameManagerService.doesGameExist(gamecode);
 
             if (gameExists) {
-                logger.info("Game mit Gamecode {} existiert, Löschen wird gestartet...", gamecode);
+                logger.info("GameState mit Gamecode {} existiert, Löschen wird gestartet...", gamecode);
                 gameManagerService.deleteGameByGameCode(gamecode);
                 senderService.sendGetAllGames();
             } else {
-                logger.warn("Game mit Gamecode {} existiert nicht, Löschen wird abgebrochen", gamecode);
+                logger.warn("GameState mit Gamecode {} existiert nicht, Löschen wird abgebrochen", gamecode);
 
             }
         } catch (Exception e) {
@@ -80,13 +81,13 @@ public class GameManagerController {
             logger.info("Request für neuen Spielaufbau (Computerspiel) ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            Game game = gameManagerService.setupComputerGame(jsonObject, sessionId);
+            GamePersistent game = gameManagerService.setupComputerGame(jsonObject, sessionId);
             GameSetupDto gameSetupDto = new GameSetupDto(game, 1, true);
             senderService.sendAddGameToAdmin(gameSetupDto);
             return gameSetupDto;
         } catch (Exception e) {
             e.printStackTrace();
-            logger.warn("Game konnte nicht erstellt werden");
+            logger.warn("GameState konnte nicht erstellt werden");
             return new GameSetupDto(null, 0, false);
         }
     }
@@ -99,13 +100,13 @@ public class GameManagerController {
             logger.info("Request für neuen Spielaufbau (Logingame Start) ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            Game game = gameManagerService.setupLoginGameStart(jsonObject, sessionId);
+            GamePersistent game = gameManagerService.setupLoginGameStart(jsonObject, sessionId);
             GameSetupDto gameSetupDto = new GameSetupDto(game, 1, true);
             senderService.sendAddGameToAdmin(gameSetupDto);
             return gameSetupDto;
         } catch (Exception e) {
             e.printStackTrace();
-            logger.warn("Game konnte nicht erstellt werden");
+            logger.warn("GameState konnte nicht erstellt werden");
             return new GameSetupDto(null, 0, false);
         }
     }
@@ -118,14 +119,14 @@ public class GameManagerController {
             logger.info("Request für neuen Spielaufbau (Logingame Join) ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            Game game = gameManagerService.setupLoginGameJoin(jsonObject, sessionId);
-            GameUpdateDto gameUpdateDto = new GameUpdateDto(game, LocalDateTime.now());
+            GamePersistent gameJoin = gameManagerService.setupLoginGameJoin(jsonObject, sessionId);
+            GameUpdateDto gameUpdateDto = new GameUpdateDto(gameJoin, LocalDateTime.now());
             senderService.sendUpdateGameToAdmin(gameUpdateDto);
             senderService.sendGameUpdate(gameUpdateDto);
-            return new GameSetupDto(game, 2, true);
+            return new GameSetupDto(gameJoin, 2, true);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.warn("Game konnte nicht erstellt werden");
+            logger.warn("GameState konnte nicht erstellt werden");
             return new GameSetupDto(null, 0, false);
         }
     }
@@ -137,7 +138,7 @@ public class GameManagerController {
             logger.info("Request für eine Spielbeobachtung ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            Game game = gameManagerService.addSpectatorToGame(jsonObject, sessionId);
+            GamePersistent game = gameManagerService.addSpectatorToGame(jsonObject, sessionId);
             GameUpdateDto gameUpdateDto = new GameUpdateDto(game, LocalDateTime.now());
             senderService.sendGameUpdate(gameUpdateDto);
             return new GameSetupDto(game, 0, true);

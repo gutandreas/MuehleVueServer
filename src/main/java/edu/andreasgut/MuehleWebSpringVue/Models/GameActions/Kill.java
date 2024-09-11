@@ -7,8 +7,7 @@ public class Kill extends GameAction {
 
     Position killPosition;
 
-    public Kill(String playerUuid, Position killPosition) {
-        super(playerUuid);
+    public Kill(Position killPosition) {
         this.killPosition = killPosition;
     }
 

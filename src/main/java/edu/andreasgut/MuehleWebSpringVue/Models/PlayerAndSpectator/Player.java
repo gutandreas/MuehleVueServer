@@ -12,9 +12,7 @@ import jakarta.persistence.*;
 
 import java.util.UUID;
 
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE) // oder JOINED, je nach Modellierung
-@DiscriminatorColumn(name = "player_type", discriminatorType = DiscriminatorType.STRING)
+
 public abstract class Player extends Participant {
 
 
@@ -61,16 +59,16 @@ public abstract class Player extends Participant {
         return numberOfStonesKilled;
     }
 
-    public void increaseNumberOfStonesPut(){
-        numberOfStonesPut++;
+    public void setNumberOfStonesPut(int numberOfStonesPut) {
+        this.numberOfStonesPut = numberOfStonesPut;
     }
 
-    public void increaseNumberOfStonesLost(){
-        numberOfStonesLost++;
+    public void setNumberOfStonesLost(int numberOfStonesLost) {
+        this.numberOfStonesLost = numberOfStonesLost;
     }
 
-    public void increaseNumberOfStonesKilled(){
-        numberOfStonesKilled++;
+    public void setNumberOfStonesKilled(int numberOfStonesKilled) {
+        this.numberOfStonesKilled = numberOfStonesKilled;
     }
 
     public void setCurrentPhase(PHASE currentPhase) {

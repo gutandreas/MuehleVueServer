@@ -1,7 +1,5 @@
 package edu.andreasgut.MuehleWebSpringVue.Websocket;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import edu.andreasgut.MuehleWebSpringVue.DTO.StatisticsDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.HumanPlayer;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
@@ -9,9 +7,7 @@ import edu.andreasgut.MuehleWebSpringVue.Repositories.HumanPlayerRepository;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.SpectatorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,7 +32,7 @@ public class StatisticsController {
     @MessageMapping("/statistics/getall")
     @SendTo("/topic/statistics/getall")
     public StatisticsDto handleMessage() {
-        int numberOfActiveGames = gameRepository.findByFinishedFalse().size();
+        int numberOfActiveGames = gameRepository.findByGameState_FinishedFalse().size();
         int numberOfGamesTotal = gameRepository.findAll().size();
         int numberOfHumanPlayers = humanPlayerRepository.findAll().size();
         int numberOfSpectators = spectatorRepository.findAll().size();

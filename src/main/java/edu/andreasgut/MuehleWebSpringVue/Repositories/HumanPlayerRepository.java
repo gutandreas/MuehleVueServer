@@ -13,9 +13,9 @@ public interface HumanPlayerRepository extends JpaRepository<HumanPlayer, UUID> 
 
 
     @Query("SELECT hp FROM HumanPlayer hp WHERE EXISTS (" +
-            "SELECT g FROM Game g WHERE g.pairing.player1 = hp AND g.finished = false" +
+            "SELECT g FROM GamePersistent g WHERE g.pairing.player1 = hp AND g.gameState.finished = false" +
             ") OR EXISTS (" +
-            "SELECT g FROM Game g WHERE g.pairing.player2 = hp AND g.finished = false)")
+            "SELECT g FROM GamePersistent g WHERE g.pairing.player2 = hp AND g.gameState.finished = false)")
     LinkedList<HumanPlayer> findAllWithUnfinishedGames();
 
 }

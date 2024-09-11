@@ -7,8 +7,7 @@ public class Jump extends GameAction {
     private Position from, to;
 
 
-    public Jump(String playerUuid, Position from, Position to) {
-        super(playerUuid);
+    public Jump(Position from, Position to) {
         this.from = from;
         this.to = to;
     }

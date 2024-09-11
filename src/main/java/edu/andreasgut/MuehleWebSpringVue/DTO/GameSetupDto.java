@@ -1,22 +1,21 @@
 package edu.andreasgut.MuehleWebSpringVue.DTO;
 
-import edu.andreasgut.MuehleWebSpringVue.Models.Game;
-import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
-import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
+import edu.andreasgut.MuehleWebSpringVue.Models.GamePersistent;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameState;
 
 public class GameSetupDto {
 
-    private Game game;
+    private GamePersistent game;
     private int index;
     private boolean success;
 
-    public GameSetupDto(Game game, int index, boolean success) {
+    public GameSetupDto(GamePersistent game, int index, boolean success) {
         this.game = game;
         this.index = index;
         this.success = success;
     }
 
-    public Game getGame() {
+    public GamePersistent getGame() {
         return game;
     }
 

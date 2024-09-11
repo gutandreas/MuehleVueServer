@@ -8,8 +8,7 @@ public class Move extends GameAction {
     private Position from, to;
 
 
-    public Move(String playerUuid, Position from, Position to) {
-        super(playerUuid);
+    public Move(Position from, Position to) {
         this.from = from;
         this.to = to;
     }

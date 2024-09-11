@@ -1,6 +1,6 @@
 package edu.andreasgut.MuehleWebSpringVue.AlphaBeta;
 
-import edu.andreasgut.MuehleWebSpringVue.Models.Game;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameState;
 
 public class GameTree {
 
@@ -12,15 +12,15 @@ public class GameTree {
         this.currentNode = root;
     }
 
-    public static int evaluateGame(Game game, int index){
+    public static int evaluateGame(GameState gameState, int index){
         int ownIndex = index;
         int enemyIndex = ownIndex == 1? 2: 1;
-        int numberOfOwnStones = game.getBoard().getNumberOfStonesOfPlayerWithIndex(ownIndex);
-        int numberOfEnemyStones = game.getBoard().getNumberOfStonesOfPlayerWithIndex(enemyIndex);
-        int score = numberOfOwnStones - numberOfEnemyStones;
+        //int numberOfOwnStones = gameState.getBoard().getNumberOfStonesOfPlayerWithIndex(ownIndex);
+        //int numberOfEnemyStones = gameState.getBoard().getNumberOfStonesOfPlayerWithIndex(enemyIndex);
+        //int score = numberOfOwnStones - numberOfEnemyStones;
 
-        System.out.println(score);
+        System.out.println(0);
 
-        return score;
+        return 0;
     }
 }

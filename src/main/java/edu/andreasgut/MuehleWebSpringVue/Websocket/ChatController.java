@@ -32,7 +32,7 @@ public class ChatController {
         JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
         String name = jsonObject.get("name").getAsString();
         String message = jsonObject.get("message").getAsString();
-        logger.info("Nachricht von " + name + " in Game " + gameCode + ": " + message);
+        logger.info("Nachricht von " + name + " in GameState " + gameCode + ": " + message);
 
         return data;
     }
@@ -46,7 +46,7 @@ public class ChatController {
         String name = jsonObject.get("name").getAsString();
         String offend = generateRandomOffend();
         jsonObject.addProperty("message", offend);
-        logger.info("Beleidigung von " + name + " in Game " + gameCode + ": " + offend);
+        logger.info("Beleidigung von " + name + " in GameState " + gameCode + ": " + offend);
 
         return jsonObject.toString();
     }
@@ -59,7 +59,7 @@ public class ChatController {
         String name = jsonObject.get("name").getAsString();
         String compliment = generateRandomCompliment();
         jsonObject.addProperty("message", compliment);
-        logger.info("Beleidigung von " + name + " in Game " + gameCode + ": " + compliment);
+        logger.info("Beleidigung von " + name + " in GameState " + gameCode + ": " + compliment);
 
         return jsonObject.toString();
     }

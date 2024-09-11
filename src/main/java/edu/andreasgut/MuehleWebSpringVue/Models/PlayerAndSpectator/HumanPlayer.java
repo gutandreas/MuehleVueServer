@@ -11,7 +11,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("HUMAN")
-public class HumanPlayer extends Player implements ParticipantWithWebSocketSession {
+public class HumanPlayer extends PlayerPersistent implements ParticipantWithWebSocketSession {
 
     private String webSocketSessionId;
     public HumanPlayer(String name, STONECOLOR stonecolor, String webSocketSessionId, PHASE phase) {

@@ -1,20 +1,21 @@
 package edu.andreasgut.MuehleWebSpringVue.DTO;
 
-import edu.andreasgut.MuehleWebSpringVue.Models.Game;
+import edu.andreasgut.MuehleWebSpringVue.Models.GamePersistent;
+import edu.andreasgut.MuehleWebSpringVue.Models.GameState;
 
 import java.time.LocalDateTime;
 
 public class GameUpdateDto {
 
-    private Game game;
+    private GamePersistent game;
     private LocalDateTime timeStamp;
 
-    public GameUpdateDto(Game game, LocalDateTime timeStamp) {
+    public GameUpdateDto(GamePersistent game, LocalDateTime timeStamp) {
         this.game = game;
         this.timeStamp = timeStamp;
     }
 
-    public Game getGame() {
+    public GamePersistent getGame() {
         return game;
     }
 

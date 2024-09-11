@@ -2,17 +2,14 @@ package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import com.google.gson.JsonObject;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.HumanPlayer;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.*;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Websocket.GameManagerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -23,21 +20,26 @@ public class GameManagerService {
     private static final Logger logger = LoggerFactory.getLogger(GameManagerController.class);
 
     private final GameRepository gameRepository;
+    private PairingService pairingService;
+    private GameService gameService;
+
+
 
 
     @Autowired
-    public GameManagerService(GameRepository gameRepository, SimpMessagingTemplate messagingTemplate) {
+    public GameManagerService(GameRepository gameRepository, PairingService pairingService, GameService gameService) {
         this.gameRepository = gameRepository;
-
+        this.pairingService = pairingService;
+        this.gameService = gameService;
     }
 
-    public LinkedList<Game> getAllGames() {
-        LinkedList<Game> games = gameRepository.findAll();
+    public LinkedList<GamePersistent> getAllGames() {
+        LinkedList<GamePersistent> games = gameRepository.findAll();
         return games;
     }
 
-    public LinkedList<Game> getActiveGames() {
-        LinkedList<Game> games = gameRepository.findByFinishedFalse();
+    public LinkedList<GamePersistent> getActiveGames() {
+        LinkedList<GamePersistent> games = gameRepository.findByGameState_FinishedFalse();
         return games;
     }
 
@@ -50,42 +52,45 @@ public class GameManagerService {
     }
 
 
-    public Game setupLoginGameStart(JsonObject jsonRequest, String webSocketSessionId) {
+    @Transactional
+    public GamePersistent setupLoginGameStart(JsonObject jsonRequest, String webSocketSessionId) {
 
         String gameCode = jsonRequest.get("gamecode").getAsString();
-
-        System.out.println(getClass().getSimpleName() + "- Neues Logingame (start) erstellt");
         STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").getAsString().equals("b") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").getAsString();
         int startPlayerIndex = firstStone.equals("e") ? 1 : 2;
         PHASE phase = startPlayerIndex == 1 ? PHASE.PUT : PHASE.WAIT;
 
-        Player humanPlayerStart = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolor, webSocketSessionId, phase);
-        Pairing pairing = new Pairing(humanPlayerStart, startPlayerIndex);
-        Game gameStart = new Game(gameCode, new Board(), pairing, 0);
+        PlayerPersistent humanPlayerStart = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolor, webSocketSessionId, phase);
+        PairingPersistent pairing = new PairingPersistent(humanPlayerStart, startPlayerIndex);
+
+        GamePersistent gameStart = new GamePersistent(gameCode, new GameStatePersistent(), pairing, new BoardPersistent());
+        System.out.println(gameStart.getBoard());
         gameRepository.save(gameStart);
+        logger.info("Neues Logingame (start) erstellt");
         return gameStart;
 
     }
 
 
-    public Game setupLoginGameJoin(JsonObject jsonRequest, String webSocketSessionId) {
+    public GamePersistent setupLoginGameJoin(JsonObject jsonRequest, String webSocketSessionId) {
 
         System.out.println(getClass().getSimpleName() + "- Logingame (join) beigetreten");
         String gameCode = jsonRequest.get("gamecode").getAsString();
+        GamePersistent game = gameRepository.findByGameCode(gameCode);
+        PairingPersistent pairing = game.getPairing();
 
-        Game gameJoin = gameRepository.findByGameCode(gameCode);
-        STONECOLOR playerStonecolorJoin = gameJoin.getPairing().getPlayer1().getStonecolor() == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
-
-        PHASE phase = gameJoin.getPairing().getCurrentPlayerIndex() == 2 ? PHASE.PUT : PHASE.WAIT;
+        STONECOLOR playerStonecolorJoin = game.getPairing().getPlayer1().getStonecolor() == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
+        PHASE phase = game.getPairing().getCurrentPlayerIndex() == 2 ? PHASE.PUT : PHASE.WAIT;
         Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolorJoin, webSocketSessionId, phase);
-        gameJoin.getPairing().addSecondPlayer(humanPlayerJoin);
-        gameRepository.save(gameJoin);
-        return gameJoin;
+        pairingService.addSecondPlayer(pairing, humanPlayerJoin);
+        gameRepository.save(game);
+        logger.info("Neues Logingame (join) erstellt");
+        return game;
 
     }
 
-    public Game setupComputerGame(JsonObject jsonRequest, String webSocketSessionId) {
+    public GamePersistent setupComputerGame(JsonObject jsonRequest, String webSocketSessionId) {
         logger.info("Spiel wird aufgebaut...");
         STONECOLOR playerStonecolor = jsonRequest.get("stonecolor").getAsString().equals("b") ? STONECOLOR.BLACK : STONECOLOR.WHITE;
         String firstStone = jsonRequest.get("firststone").getAsString();
@@ -110,24 +115,25 @@ public class GameManagerService {
 
         Player humanPlayer = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolor, webSocketSessionId, phaseHumanPlayer);
         Player computerPlayer = new StandardComputerPlayer(computerName, computerStonecolor, level, phaseComputerPlayer);
-        Pairing pairing = new Pairing(humanPlayer, computerPlayer, startPlayerIndex);
+        PairingPersistent pairing = new PairingPersistent(humanPlayer, computerPlayer, startPlayerIndex);
         String gameCode = generateValidGameCode();
 
-        Game game = new Game(gameCode, new Board(), pairing, 0);
+        GamePersistent game = new GamePersistent(gameCode, new GameStatePersistent(), pairing, new BoardPersistent());
         gameRepository.save(game);
 
         return game;
 
     }
 
-    public Game addSpectatorToGame(JsonObject jsonRequest, String webSocketSessionId) {
+    public GamePersistent addSpectatorToGame(JsonObject jsonRequest, String webSocketSessionId) {
         logger.info("Spectator wird hinzugefügt...");
         String name = jsonRequest.get("name").getAsString();
         String gameCode = jsonRequest.get("gamecode").getAsString();
         boolean isRoboter = jsonRequest.get("isroboter").getAsBoolean();
 
-        Game game = gameRepository.findByGameCode(gameCode);
-        game.addSpectator(new Spectator(name, isRoboter, webSocketSessionId));
+        GamePersistent game = gameRepository.findByGameCode(gameCode);
+
+        gameService.addSpectator(game, new Spectator(name, isRoboter, webSocketSessionId));
         gameRepository.save(game);
         return game;
     }

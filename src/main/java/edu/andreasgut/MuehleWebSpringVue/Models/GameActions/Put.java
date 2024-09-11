@@ -6,8 +6,7 @@ public class Put extends GameAction{
 
     Position putPosition;
 
-    public Put(String playerUuid, Position putPosition) {
-        super(playerUuid);
+    public Put(Position putPosition) {
         this.putPosition = putPosition;
     }
 

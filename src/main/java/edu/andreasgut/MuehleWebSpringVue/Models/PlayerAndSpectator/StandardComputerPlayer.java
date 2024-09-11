@@ -13,7 +13,7 @@ import java.util.Random;
 
 @Entity
 @DiscriminatorValue("STANDARDCOMPUTER")
-public class StandardComputerPlayer extends Player {
+public class StandardComputerPlayer extends PlayerPersistent {
 
     int level;
 
@@ -26,31 +26,7 @@ public class StandardComputerPlayer extends Player {
 
     }
 
-    public Put put(Game game, String uuid) {
-        System.out.println("Computerput getriggert");
-        LinkedList<Put> possiblePuts = Advisor.getPossiblePuts(game, uuid);
-        Random random = new Random();
-        return possiblePuts.get(random.nextInt(possiblePuts.size()));
-    }
-
-    public Move move(Game game, String uuid) {
-        System.out.println("Computermove getriggert");
-        LinkedList<Move> possibleMoves = Advisor.getPossibleMoves(game, uuid);
-        Random random = new Random();
-        return possibleMoves.get(random.nextInt(possibleMoves.size()));
-    }
-
-    public Kill kill(Game game, String uuid) {
-        System.out.println("Computerkill getriggert");
-        LinkedList<Kill> possibleKills = Advisor.getPossibleKills(game, uuid);
-        Random random = new Random();
-        return possibleKills.get(random.nextInt(possibleKills.size()));
-    }
-
-    public Jump jump(Game game, String uuid){
-        System.out.println("Computerkill getriggert");
-        LinkedList<Jump> possibleJumps = Advisor.getPossibleJumps(game, uuid);
-        Random random = new Random();
-        return possibleJumps.get(random.nextInt(possibleJumps.size()));
+    public int getLevel() {
+        return level;
     }
 }

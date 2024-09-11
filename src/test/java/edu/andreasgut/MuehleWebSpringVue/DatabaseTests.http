@@ -1,6 +1,6 @@
-### Get active games
+### Get active gameStates
 GET http://localhost:8081/manager/activegames
 Accept: application/json
 
-### Delete a game
+### Delete a gameState
 DELETE http://localhost:8081/manager/delete/K
