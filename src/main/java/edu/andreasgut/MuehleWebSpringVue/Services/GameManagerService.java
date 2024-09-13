@@ -17,7 +17,7 @@ import java.util.Random;
 @Service
 public class GameManagerService {
 
-    private static final Logger logger = LoggerFactory.getLogger(GameManagerController.class);
+    private static final Logger logger = LoggerFactory.getLogger(GameManagerService.class);
 
     private final GameRepository gameRepository;
     private PairingService pairingService;

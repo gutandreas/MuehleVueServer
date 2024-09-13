@@ -13,7 +13,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 
-public abstract class Player extends Participant {
+public class Player extends Participant {
 
 
     private STONECOLOR stonecolor;

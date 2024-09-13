@@ -6,26 +6,36 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-public class BoardPersistent extends Board {
+public class BoardPersistent extends Board  {
+
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID boardUuid;
 
-    @Convert(converter = BoardArrayConverter.class)
-    POSITIONSTATE[][] boardPositionsStates;
-
-
-    public POSITIONSTATE[][] getBoardPositionsStates() {
-        return boardPositionsStates;
-    }
 
 
     public BoardPersistent() {
-        super();
+        super(); // Ruft den Konstruktor der Basisklasse auf
     }
 
     public BoardPersistent(POSITIONSTATE[][] boardPositionsStates){
-        super(boardPositionsStates);
+        super(boardPositionsStates); // Ruft den Konstruktor der Basisklasse auf
     }
+
+    public UUID getBoardUuid() {
+        return boardUuid;
+    }
+
+    @Convert(converter = BoardArrayConverter.class)
+    @Override
+    public POSITIONSTATE[][] getBoardPositionsStates() {
+        return super.getBoardPositionsStates();
+    }
+
+
+
+
+
 }

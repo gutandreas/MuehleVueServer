@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.UUID;
 
 
-@MappedSuperclass
-public abstract class Board {
 
-    @Transient
+
+public class Board {
+
     POSITIONSTATE[][] boardPositionsStates;
 
     public Board() {
@@ -34,6 +34,8 @@ public abstract class Board {
             this.boardPositionsStates = boardPositionsStates;
         }
     }
+
+
 
     public POSITIONSTATE[][] getBoardPositionsStates(){
         return boardPositionsStates;

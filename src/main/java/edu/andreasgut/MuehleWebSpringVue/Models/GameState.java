@@ -2,14 +2,14 @@ package edu.andreasgut.MuehleWebSpringVue.Models;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.MappedSuperclass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-@MappedSuperclass
-public abstract class GameState {
+public class GameState {
 
     private static final Logger logger = LoggerFactory.getLogger(GameState.class);
 

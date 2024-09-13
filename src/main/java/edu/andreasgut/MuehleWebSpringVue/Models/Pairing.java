@@ -1,11 +1,12 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.MappedSuperclass;
 
 
-@MappedSuperclass
-public abstract class Pairing {
+
+public class Pairing {
 
 
     private Player player1;

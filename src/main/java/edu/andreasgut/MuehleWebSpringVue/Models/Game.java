@@ -1,13 +1,14 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
 import java.util.LinkedList;
 
-@MappedSuperclass
-public abstract class Game {
+
+public class Game {
 
 
     private GameState gameState;
