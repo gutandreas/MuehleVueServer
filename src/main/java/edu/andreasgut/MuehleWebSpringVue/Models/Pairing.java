@@ -1,16 +1,22 @@
 package edu.andreasgut.MuehleWebSpringVue.Models;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
+
+import java.util.UUID;
 
 
-
+@Entity
 public class Pairing {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID pairingUuid;
 
+    @OneToOne(cascade = CascadeType.ALL)
     private Player player1;
 
+    @OneToOne(cascade = CascadeType.ALL)
     private Player player2;
 
     private int currentPlayerIndex;

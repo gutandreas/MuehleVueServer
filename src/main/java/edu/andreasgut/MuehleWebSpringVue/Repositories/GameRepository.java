@@ -8,12 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.util.LinkedList;
 
 @Repository
-public interface GameRepository extends JpaRepository<GamePersistent, Long>{
+public interface GameRepository extends JpaRepository<Game, Long>{
 
-    GamePersistent findByGameCode(String gameCode);
-    LinkedList<GamePersistent> findAll();
+    Game findByGameCode(String gameCode);
+    LinkedList<Game> findAll();
 
-    LinkedList<GamePersistent> findByGameState_FinishedFalse();
+    LinkedList<Game> findByGameState_FinishedFalse();
 
     void deleteGameByGameCode(String gameCode);
 

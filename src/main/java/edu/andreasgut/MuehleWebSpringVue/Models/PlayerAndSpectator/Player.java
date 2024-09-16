@@ -13,6 +13,9 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE) // oder JOINED, je nach Modellierung
+@DiscriminatorColumn(name = "player_type", discriminatorType = DiscriminatorType.STRING)
 public class Player extends Participant {
 
 

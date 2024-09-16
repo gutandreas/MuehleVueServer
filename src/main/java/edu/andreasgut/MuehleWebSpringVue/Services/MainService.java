@@ -39,8 +39,8 @@ public class MainService {
 
     public void handleAction(JsonObject jsonObject, String webSocketSessionId) {
         String type = jsonObject.get("type").getAsString();
-        String gameCode = jsonObject.get("gameCode").getAsString();
-        GameState gameStateAfterHumanAction;
+        String gameCode = jsonObject.get("gamecode").getAsString();
+        logger.info("Action in Game " + gameCode + " wird bearbeitet.");
 
         switch (type) {
             case "PUT":
@@ -73,7 +73,7 @@ public class MainService {
     private void handlePut(JsonObject jsonObject) {
 
         String gameCode = jsonObject.get("gamecode").getAsString();
-        GamePersistent game = gameRepository.findByGameCode(gameCode);
+        Game game = gameRepository.findByGameCode(gameCode);
 
         try {
             int ring = jsonObject.get("ring").getAsInt();

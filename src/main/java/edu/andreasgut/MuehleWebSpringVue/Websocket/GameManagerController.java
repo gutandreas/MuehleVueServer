@@ -4,8 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameSetupDto;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
-import edu.andreasgut.MuehleWebSpringVue.Models.GamePersistent;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameState;
+import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
 import edu.andreasgut.MuehleWebSpringVue.Services.SenderService;
@@ -81,7 +80,7 @@ public class GameManagerController {
             logger.info("Request für neuen Spielaufbau (Computerspiel) ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            GamePersistent game = gameManagerService.setupComputerGame(jsonObject, sessionId);
+            Game game = gameManagerService.setupComputerGame(jsonObject, sessionId);
             GameSetupDto gameSetupDto = new GameSetupDto(game, 1, true);
             senderService.sendAddGameToAdmin(gameSetupDto);
             return gameSetupDto;
@@ -100,7 +99,7 @@ public class GameManagerController {
             logger.info("Request für neuen Spielaufbau (Logingame Start) ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            GamePersistent game = gameManagerService.setupLoginGameStart(jsonObject, sessionId);
+            Game game = gameManagerService.setupLoginGameStart(jsonObject, sessionId);
             GameSetupDto gameSetupDto = new GameSetupDto(game, 1, true);
             senderService.sendAddGameToAdmin(gameSetupDto);
             return gameSetupDto;
@@ -119,7 +118,7 @@ public class GameManagerController {
             logger.info("Request für neuen Spielaufbau (Logingame Join) ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            GamePersistent gameJoin = gameManagerService.setupLoginGameJoin(jsonObject, sessionId);
+            Game gameJoin = gameManagerService.setupLoginGameJoin(jsonObject, sessionId);
             GameUpdateDto gameUpdateDto = new GameUpdateDto(gameJoin, LocalDateTime.now());
             senderService.sendUpdateGameToAdmin(gameUpdateDto);
             senderService.sendGameUpdate(gameUpdateDto);
@@ -138,7 +137,7 @@ public class GameManagerController {
             logger.info("Request für eine Spielbeobachtung ...");
             String sessionId = headerAccessor.getSessionId();
             JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            GamePersistent game = gameManagerService.addSpectatorToGame(jsonObject, sessionId);
+            Game game = gameManagerService.addSpectatorToGame(jsonObject, sessionId);
             GameUpdateDto gameUpdateDto = new GameUpdateDto(game, LocalDateTime.now());
             senderService.sendGameUpdate(gameUpdateDto);
             return new GameSetupDto(game, 0, true);

@@ -2,17 +2,20 @@ package edu.andreasgut.MuehleWebSpringVue.Models;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Spectator;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+@Entity
 public class GameState {
 
     private static final Logger logger = LoggerFactory.getLogger(GameState.class);
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID uuid;
     private int round;
     private boolean finished;
     private int winnerIndex;
@@ -52,6 +55,14 @@ public class GameState {
 
     public void setWinnerIndex(int winnerIndex) {
         this.winnerIndex = winnerIndex;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public int getWinnerIndex() {
+        return winnerIndex;
     }
 }
 

@@ -14,8 +14,14 @@ import java.util.UUID;
 
 
 
+@Entity
 public class Board {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID boardUuid;
+
+    @Convert(converter = BoardArrayConverter.class)
     POSITIONSTATE[][] boardPositionsStates;
 
     public Board() {
@@ -37,7 +43,13 @@ public class Board {
 
 
 
-    public POSITIONSTATE[][] getBoardPositionsStates(){
+
+    public UUID getBoardUuid() {
+        return boardUuid;
+    }
+
+
+    public POSITIONSTATE[][] getBoardPositionsStates() {
         return boardPositionsStates;
-    };
+    }
 }

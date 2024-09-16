@@ -1,21 +1,20 @@
 package edu.andreasgut.MuehleWebSpringVue.DTO;
 
-import edu.andreasgut.MuehleWebSpringVue.Models.GamePersistent;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameState;
+import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 
 public class GameSetupDto {
 
-    private GamePersistent game;
+    private Game game;
     private int index;
     private boolean success;
 
-    public GameSetupDto(GamePersistent game, int index, boolean success) {
+    public GameSetupDto(Game game, int index, boolean success) {
         this.game = game;
         this.index = index;
         this.success = success;
     }
 
-    public GamePersistent getGame() {
+    public Game getGame() {
         return game;
     }
 

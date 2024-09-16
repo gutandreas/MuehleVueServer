@@ -2,7 +2,6 @@ package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
-import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.PlayerPersistent;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.PlayerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,9 +74,7 @@ public class PlayerService {
     }
 
     private void savePlayer(Player player) {
-        if (player instanceof PlayerPersistent) {
-            playerRepository.save((PlayerPersistent) player);
-        }
+        playerRepository.save(player);
     }
 
 }

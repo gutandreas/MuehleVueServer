@@ -1,7 +1,6 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
-import edu.andreasgut.MuehleWebSpringVue.Models.BoardPersistent;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Jump;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
@@ -84,9 +83,7 @@ public class BoardService {
     }
 
     private void saveBoard(Board board){
-        if (board instanceof BoardPersistent){
-            boardRepository.save((BoardPersistent) board);
-        }
+            boardRepository.save(board);
     }
 
 
