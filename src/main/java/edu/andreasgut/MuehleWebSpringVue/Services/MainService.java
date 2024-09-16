@@ -50,7 +50,7 @@ public class MainService {
                  handlePut(jsonObject);
                  break;
             case "MOVE":
-                //handleMove(jsonObject);
+                handleMove(jsonObject);
                 break;
             case "KILL":
                 //handleKill(jsonObject);
@@ -69,6 +69,7 @@ public class MainService {
 
         while (!gameStateService.isGameFinished(game.getGameState()) && pairingService.getCurrentPlayer(game.getPairing()) instanceof StandardComputerPlayer){
             StandardComputerPlayer standardComputerPlayer = (StandardComputerPlayer) pairingService.getCurrentPlayer(game.getPairing());
+            Player enemyPlayer = pairingService.getEnemyOf(game.getPairing(), standardComputerPlayer);
             int index = pairingService.getIndexOfPlayer(game.getPairing(), standardComputerPlayer);
             PHASE phase = playerService.getPhase(standardComputerPlayer);
 
@@ -76,14 +77,18 @@ public class MainService {
                 case PUT:
                     Put put = computerService.calculatePut(standardComputerPlayer, game.getBoard(), index);
                     boardService.putStone(game.getBoard(), put, index);
-                    updateStatesAfterPut(game.getGameState(), game.getBoard(), game.getPairing(), put);
+                    playerService.increasePutStones(standardComputerPlayer);
+                    updateStatesAfterPutOrMove(game.getGameState(), game.getBoard(), game.getPairing(), put);
                     break;
                 case MOVE:
                     Move move = computerService.calculateMove(standardComputerPlayer, game.getBoard(), index);
                     boardService.moveStone(game.getBoard(), move, index);
+                    updateStatesAfterPutOrMove(game.getGameState(), game.getBoard(), game.getPairing(), move);
                     break;
                 case KILL:
                     Kill kill = computerService.calculateKill(standardComputerPlayer, game.getBoard(), index);
+                    playerService.increaseKilledStones(standardComputerPlayer);
+                    playerService.increaseLostStones(enemyPlayer);
                     boardService.killStone(game.getBoard(), kill);
                     break;
                 case JUMP:
@@ -111,7 +116,6 @@ public class MainService {
             Put put = new Put(new Position(ring, field));
             Pairing pairing = game.getPairing();
             Player currentPlayer = pairingService.getCurrentPlayer(pairing);
-            Player enemyPlayer = pairingService.getEnemyOf(pairing, currentPlayer);
             Board board = game.getBoard();
             GameState gameState = game.getGameState();
 
@@ -122,7 +126,8 @@ public class MainService {
             if (phaseOK && uuidOK && positionOK){
                 boardService.putStone(board, put, pairingService.getCurrentPlayerIndex(pairing));
                 logger.info("Put ausgeführt in GameState " + gameCode);
-                updateStatesAfterPut(gameState, board, pairing, put);
+                updateStatesAfterPutOrMove(gameState, board, pairing, put);
+                playerService.increasePutStones(currentPlayer);
             } else {
                 logger.warn("Ungültige Position, Phase oder UUID bei Put in GameState " + gameCode);
             }
@@ -137,8 +142,12 @@ public class MainService {
 
     }
 
-    public GameState handleMove(JsonObject jsonObject, String webSocketSessionId) {
-        /*try {
+    public void handleMove(JsonObject jsonObject) {
+
+        String gameCode = jsonObject.get("gamecode").getAsString();
+        Game game = gameRepository.findByGameCode(gameCode);
+
+        try {
             JsonObject fromObject = jsonObject.getAsJsonObject("from");
             int fromRing = fromObject.get("ring").getAsInt();
             int fromField = fromObject.get("field").getAsInt();
@@ -148,25 +157,34 @@ public class MainService {
             int toField = toObject.get("field").getAsInt();
 
             String uuid = jsonObject.get("uuid").getAsString();
-            String gameCode = jsonObject.get("gamecode").getAsString();
-
             Move move = new Move(new Position(fromRing, fromField), new Position(toRing, toField));
-            GameState gameState = gameRepository.findByGameCode(gameCode);
+            Pairing pairing = game.getPairing();
+            Player currentPlayer = pairingService.getCurrentPlayer(pairing);
+            Board board = game.getBoard();
+            GameState gameState = game.getGameState();
+            int index = game.getPairing().getCurrentPlayerIndex();
 
+            boolean phaseOK = playerService.isPlayerInPutPhase(currentPlayer);
+            boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
+            boolean toPositionFree = boardService.isPositionFree(board, move.getTo());
+            boolean fromPositionWithOwnStone = boardService.isThisPositionOccupiedByPlayerWithIndex(board, index, move.getFrom());
+            boolean fromPostionAndToPostionAreNeighbours = boardService.arePositionsNeighbours(move.getFrom(), move.getTo());
 
-
-            if (gameState.executeMove(move, uuid)) {
-
-                return gameState;
+            if (phaseOK && uuidOK && toPositionFree && fromPositionWithOwnStone && fromPostionAndToPostionAreNeighbours){
+                boardService.moveStone(board, move, pairingService.getCurrentPlayerIndex(pairing));
+                logger.info("Put ausgeführt in GameState " + gameCode);
+                updateStatesAfterPutOrMove(gameState, board, pairing, move);
             } else {
-                logger.warn("Ungültige Position bei Kill in GameState " + gameCode);
+                logger.warn("Ungültige Position, Phase oder UUID bei Put in GameState " + gameCode);
             }
+
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            logger.warn("Kill konnte nicht ausgeführt werden...");
-        }*/
+            logger.warn("Put konnte nicht ausgeführt werden...");
+        }
 
-        return null;
+        senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
+        gameRepository.save(game);
     }
 
     public GameState handleKill(JsonObject jsonObject, String webSocketSessionId) {
@@ -224,12 +242,22 @@ public class MainService {
         return null;
     }
 
-    private void updateStatesAfterPut(GameState gameState, Board board, Pairing pairing, Put put){
-        boolean putBuildsMorris = boardService.isPositionPartOfMorris(board, put.getPutPosition());
+    private void updateStatesAfterPutOrMove(GameState gameState, Board board, Pairing pairing, GameAction gameAction){
+
+        Position positionToCheck;
+
+        if (gameAction instanceof Put){
+            positionToCheck = ((Put) gameAction).getPutPosition();
+        } else {
+            positionToCheck = ((Move) gameAction).getTo();
+        }
+
+
+        boolean actionBuildsMorris = boardService.isPositionPartOfMorris(board, positionToCheck);
         Player currentPlayer = pairingService.getCurrentPlayer(pairing);
         Player enemyPlayer = pairingService.getEnemyOf(pairing, currentPlayer);
         boolean allEnemyStonesInMorris  = boardService.areAllStonesPartOfMorris(board, pairingService.getIndexOfPlayer(pairing, enemyPlayer));
-        if (putBuildsMorris && !allEnemyStonesInMorris){
+        if (actionBuildsMorris && !allEnemyStonesInMorris){
             playerService.changeToKillPhase(currentPlayer);
             playerService.changeToWaitPhase(enemyPlayer);
         } else {

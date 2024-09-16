@@ -91,7 +91,7 @@ public class BoardService {
         return board.getBoardPositionsStates()[position.getRing()][position.getField()] == POSITIONSTATE.FREE;
     }
 
-    public boolean arePositionsNeighbours(Board board, Position position1, Position position2) {
+    public boolean arePositionsNeighbours(Position position1, Position position2) {
 
 
         boolean neighboursInRing = (position1.getRing() == position2.getRing() && Math.abs(position1.getField() - position2.getField()) == 1)
