@@ -43,7 +43,7 @@ public class PairingService {
     }
 
     public void changeTurn(Pairing pairing) {
-        pairing.setCurrentPlayerIndex( pairing.getCurrentPlayerIndex() == 1 ? 2 :1);
+        pairing.setCurrentPlayerIndex( pairing.getCurrentPlayerIndex() == 1 ? 2 : 1);
     }
 
 
@@ -90,7 +90,7 @@ public class PairingService {
     }
 
     public int getIndexOfPlayer(Pairing pairing, Player player){
-        return pairing.equals(player) ? 1 : 2;
+        return getPlayer1(pairing).equals(player) ? 1 : 2;
     }
 
     public boolean isComplete(Pairing pairing) {

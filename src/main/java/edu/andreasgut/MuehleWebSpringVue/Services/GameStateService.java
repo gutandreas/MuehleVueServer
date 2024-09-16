@@ -16,5 +16,7 @@ public class GameStateService {
         gameState.setFinished(true);
     }
 
+    public boolean isGameFinished(GameState gameState) { return gameState.isFinished();}
+
 
 }

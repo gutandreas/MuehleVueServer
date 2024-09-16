@@ -56,8 +56,8 @@ public class BoardService {
     }
 
     @Transactional
-    public void putStone(Board board, Position position, int playerIndex) {
-        setStoneOnPositionInArray(board, position, playerIndex);
+    public void putStone(Board board, Put put, int playerIndex) {
+        setStoneOnPositionInArray(board, put.getPutPosition(), playerIndex);
         saveBoard(board);
     }
 
@@ -77,8 +77,8 @@ public class BoardService {
     }
 
     @Transactional
-    public void killStone(Board board, Position position) {
-        removeStoneFromPositionInArray(board, position);
+    public void killStone(Board board, Kill kill) {
+        removeStoneFromPositionInArray(board, kill.getKillPosition());
         saveBoard(board);
     }
 
