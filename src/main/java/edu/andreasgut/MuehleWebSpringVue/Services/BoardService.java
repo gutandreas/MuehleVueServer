@@ -112,7 +112,6 @@ public class BoardService {
     private void setStoneOnPositionInArray(Board board, Position position, int playerIndex){
         POSITIONSTATE positionstate = playerIndex == 1 ? POSITIONSTATE.PLAYER1 : POSITIONSTATE.PLAYER2;
         board.getBoardPositionsStates()[position.getRing()][position.getField()] = positionstate;
-
     }
 
     public boolean isPositionPartOfMorris(Board board, Position position) {

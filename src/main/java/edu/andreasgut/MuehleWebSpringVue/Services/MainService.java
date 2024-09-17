@@ -78,19 +78,19 @@ public class MainService {
                     Put put = computerService.calculatePut(standardComputerPlayer, game.getBoard(), index);
                     boardService.putStone(game.getBoard(), put, index);
                     playerService.increasePutStones(standardComputerPlayer);
-                    updateStatesAfterPutOrMove(game.getGameState(), game.getBoard(), game.getPairing(), put);
+                    updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
                     break;
                 case MOVE:
                     Move move = computerService.calculateMove(standardComputerPlayer, game.getBoard(), index);
                     boardService.moveStone(game.getBoard(), move, index);
-                    updateStatesAfterPutOrMove(game.getGameState(), game.getBoard(), game.getPairing(), move);
+                    updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), move);
                     break;
                 case KILL:
                     Kill kill = computerService.calculateKill(standardComputerPlayer, game.getBoard(), index);
                     playerService.increaseKilledStones(standardComputerPlayer);
                     playerService.increaseLostStones(enemyPlayer);
                     boardService.killStone(game.getBoard(), kill);
-                    updateStatesAfterPutOrMove(game.getGameState(), game.getBoard(), game.getPairing(), kill);
+                    updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), kill);
                     break;
                 case JUMP:
                     Jump jump = computerService.calculateJump(standardComputerPlayer, game.getBoard(), index);
@@ -127,7 +127,7 @@ public class MainService {
             if (phaseOK && uuidOK && positionOK){
                 boardService.putStone(board, put, pairingService.getCurrentPlayerIndex(pairing));
                 logger.info("Put ausgeführt in GameState " + gameCode);
-                updateStatesAfterPutOrMove(gameState, board, pairing, put);
+                updateStatesAfterGameAction(gameState, board, pairing, put);
                 playerService.increasePutStones(currentPlayer);
             } else {
                 logger.warn("Ungültige Position, Phase oder UUID bei Put in GameState " + gameCode);
@@ -174,7 +174,7 @@ public class MainService {
             if (phaseOK && uuidOK && toPositionFree && fromPositionWithOwnStone && fromPostionAndToPostionAreNeighbours){
                 boardService.moveStone(board, move, pairingService.getCurrentPlayerIndex(pairing));
                 logger.info("Put ausgeführt in GameState " + gameCode);
-                updateStatesAfterPutOrMove(gameState, board, pairing, move);
+                updateStatesAfterGameAction(gameState, board, pairing, move);
             } else {
                 logger.warn("Ungültige Position, Phase oder UUID bei Put in GameState " + gameCode);
             }
@@ -212,7 +212,7 @@ public class MainService {
             if (phaseOK && uuidOK && positionOK){
                 boardService.killStone(board, kill);
                 logger.info("Kill ausgeführt in GameState " + gameCode);
-                updateStatesAfterPutOrMove(gameState, board, pairing, kill);
+                updateStatesAfterGameAction(gameState, board, pairing, kill);
                 playerService.increaseKilledStones(currentPlayer);
             } else {
                 logger.warn("Ungültige Position, Phase oder UUID bei Kill in GameState " + gameCode);
@@ -258,7 +258,7 @@ public class MainService {
         return null;
     }
 
-    private void updateStatesAfterPutOrMove(GameState gameState, Board board, Pairing pairing, GameAction gameAction){
+    private void updateStatesAfterGameAction(GameState gameState, Board board, Pairing pairing, GameAction gameAction){
 
         Position positionToCheck;
         boolean actionBuildsMorris;
