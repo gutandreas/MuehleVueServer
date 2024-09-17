@@ -116,6 +116,7 @@ public class BoardService {
     }
 
     public boolean isPositionPartOfMorris(Board board, Position position) {
+
         boolean cornerField = position.getField() % 2 == 0;
         boolean morris;
         POSITIONSTATE positionstate = board.getBoardPositionsStates()[position.getRing()][position.getField()];

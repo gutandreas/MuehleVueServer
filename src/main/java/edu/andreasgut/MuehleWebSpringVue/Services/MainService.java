@@ -53,7 +53,7 @@ public class MainService {
                 handleMove(jsonObject);
                 break;
             case "KILL":
-                //handleKill(jsonObject);
+                handleKill(jsonObject);
                 break;
             case "JUMP":
                 //handleJump(jsonObject);
@@ -90,6 +90,7 @@ public class MainService {
                     playerService.increaseKilledStones(standardComputerPlayer);
                     playerService.increaseLostStones(enemyPlayer);
                     boardService.killStone(game.getBoard(), kill);
+                    updateStatesAfterPutOrMove(game.getGameState(), game.getBoard(), game.getPairing(), kill);
                     break;
                 case JUMP:
                     Jump jump = computerService.calculateJump(standardComputerPlayer, game.getBoard(), index);
@@ -187,28 +188,43 @@ public class MainService {
         gameRepository.save(game);
     }
 
-    public GameState handleKill(JsonObject jsonObject, String webSocketSessionId) {
-        /*try {
+    public void handleKill(JsonObject jsonObject) {
+        String gameCode = jsonObject.get("gamecode").getAsString();
+        Game game = gameRepository.findByGameCode(gameCode);
+
+        try {
             int ring = jsonObject.get("ring").getAsInt();
             int field = jsonObject.get("field").getAsInt();
             String uuid = jsonObject.get("uuid").getAsString();
-            String gameCode = jsonObject.get("gamecode").getAsString();
 
             Kill kill = new Kill(new Position(ring, field));
-            GameState gameState = gameRepository.findByGameCode(gameCode);
+            Pairing pairing = game.getPairing();
+            Player currentPlayer = pairingService.getCurrentPlayer(pairing);
+            Board board = game.getBoard();
+            GameState gameState = game.getGameState();
+            int index = pairingService.getPlayerIndexByPlayerUuid(pairing, uuid);
+            int enemyIndex = index == 1 ? 2: 1;
 
-            if (gameState.executeKill(kill, uuid)) {
+            boolean phaseOK = playerService.isPlayerInKillPhase(currentPlayer);
+            boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
+            boolean positionOK = boardService.isThisPositionOccupiedByPlayerWithIndex(board, enemyIndex, kill.getKillPosition());
 
-                return gameState;
+            if (phaseOK && uuidOK && positionOK){
+                boardService.killStone(board, kill);
+                logger.info("Kill ausgeführt in GameState " + gameCode);
+                updateStatesAfterPutOrMove(gameState, board, pairing, kill);
+                playerService.increaseKilledStones(currentPlayer);
             } else {
-                logger.warn("Ungültige Position bei Kill in GameState " + gameCode);
+                logger.warn("Ungültige Position, Phase oder UUID bei Kill in GameState " + gameCode);
             }
+
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            logger.warn("Kill konnte nicht ausgeführt werden...");
-        }*/
+            logger.warn("Put konnte nicht ausgeführt werden...");
+        }
 
-        return null;
+        senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
+        gameRepository.save(game);
 
 
     }
@@ -245,15 +261,19 @@ public class MainService {
     private void updateStatesAfterPutOrMove(GameState gameState, Board board, Pairing pairing, GameAction gameAction){
 
         Position positionToCheck;
+        boolean actionBuildsMorris;
 
         if (gameAction instanceof Put){
             positionToCheck = ((Put) gameAction).getPutPosition();
+            actionBuildsMorris = boardService.isPositionPartOfMorris(board, positionToCheck);
+        } else if (gameAction instanceof  Kill) {
+            actionBuildsMorris = false;
         } else {
             positionToCheck = ((Move) gameAction).getTo();
+            actionBuildsMorris = boardService.isPositionPartOfMorris(board, positionToCheck);
         }
 
 
-        boolean actionBuildsMorris = boardService.isPositionPartOfMorris(board, positionToCheck);
         Player currentPlayer = pairingService.getCurrentPlayer(pairing);
         Player enemyPlayer = pairingService.getEnemyOf(pairing, currentPlayer);
         boolean allEnemyStonesInMorris  = boardService.areAllStonesPartOfMorris(board, pairingService.getIndexOfPlayer(pairing, enemyPlayer));
