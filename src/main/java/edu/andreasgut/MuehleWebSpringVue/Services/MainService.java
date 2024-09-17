@@ -164,6 +164,7 @@ public class MainService {
             Board board = game.getBoard();
             GameState gameState = game.getGameState();
             int index = game.getPairing().getCurrentPlayerIndex();
+            int enemyIndex = index == 1 ? 2 : 1;
 
             boolean phaseOK = playerService.isPlayerInMovePhase(currentPlayer);
             boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
@@ -175,6 +176,12 @@ public class MainService {
                 boardService.moveStone(board, move, pairingService.getCurrentPlayerIndex(pairing));
                 logger.info("Put ausgeführt in GameState " + gameCode);
                 updateStatesAfterGameAction(gameState, board, pairing, move);
+                int numberOfMoves = boardService.getPossibleMoves(board, enemyIndex).size();
+                if (numberOfMoves == 0){
+                    gameStateService.finishGame(gameState);
+                    gameStateService.setWinner(gameState, index);
+                }
+
             } else {
                 logger.warn("Ungültige Position, Phase oder UUID bei Move in GameState " + gameCode);
             }
@@ -214,6 +221,12 @@ public class MainService {
                 logger.info("Kill ausgeführt in GameState " + gameCode);
                 updateStatesAfterGameAction(gameState, board, pairing, kill);
                 playerService.increaseKilledStones(currentPlayer);
+                int numberOfEnemysStones = boardService.getNumberOfStonesOfPlayerWithIndex(board, enemyIndex);
+                int round = gameStateService.getRound(gameState);
+                if (round > 18 && numberOfEnemysStones < 3){
+                    gameStateService.finishGame(gameState);
+                    gameStateService.setWinner(gameState, index);
+                }
             } else {
                 logger.warn("Ungültige Position, Phase oder UUID bei Kill in GameState " + gameCode);
             }

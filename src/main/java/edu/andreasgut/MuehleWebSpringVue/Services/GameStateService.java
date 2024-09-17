@@ -18,5 +18,11 @@ public class GameStateService {
 
     public boolean isGameFinished(GameState gameState) { return gameState.isFinished();}
 
+    public int getRound(GameState gameState) { return  gameState.getRound();}
+
+    public void setWinner(GameState gameState, int winnerIndex) {
+        gameState.setWinnerIndex(winnerIndex);
+    }
+
 
 }
