@@ -80,15 +80,7 @@ public class MainServiceTests {
 
         mainService.handleMove(jsonObject);
 
-
-        Assertions.assertEquals(1, 1);
-
-
-
-
-
-
-
+        Assertions.assertEquals(POSITIONSTATE.FREE, game.getBoard().getBoardPositionsStates()[0][1]);
     }
 
 
