@@ -47,7 +47,7 @@ public class GameActionController {
             boolean gameExists = gameManagerService.doesGameExist(gameCode);
 
             if (gameExists) {
-                gameActionService.handleAction(jsonObject, sessionId);
+                gameActionService.handleAction(jsonObject);
                 return ResponseEntity.ok().body("Action wurde ausgeführt...");
             } else {
                 return ResponseEntity.badRequest().body("Gamecode ist ungültig...");

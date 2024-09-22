@@ -40,23 +40,33 @@ public class MainService {
         this.computerService = computerService;
     }
 
-    public void handleAction(JsonObject jsonObject, String webSocketSessionId) {
+    public void handleAction(JsonObject jsonObject) {
         String type = jsonObject.get("type").getAsString();
         String gameCode = jsonObject.get("gamecode").getAsString();
         logger.info("Action in Game " + gameCode + " wird bearbeitet.");
 
+        Game game;
+
         switch (type) {
             case "PUT":
-                 handlePut(jsonObject);
+                 game = handlePut(jsonObject);
+                 senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
+                 gameRepository.save(game);
                  break;
             case "MOVE":
-                handleMove(jsonObject);
+                game = handleMove(jsonObject);
+                senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
+                gameRepository.save(game);
                 break;
             case "KILL":
-                handleKill(jsonObject);
+                game = handleKill(jsonObject);
+                senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
+                gameRepository.save(game);
                 break;
             case "JUMP":
-                handleJump(jsonObject);
+                game = handleJump(jsonObject);
+                senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
+                gameRepository.save(game);
                 break;
             default:
                 logger.warn("Ungültiger Action Type");
@@ -64,7 +74,7 @@ public class MainService {
 
         GameUpdateDto updateAfterHumanPlayer = new GameUpdateDto(gameRepository.findByGameCode(gameCode), LocalDateTime.now());
         senderService.sendGameUpdate(updateAfterHumanPlayer);
-        Game game = gameRepository.findByGameCode(gameCode);
+        game = gameRepository.findByGameCode(gameCode);
 
 
         while (!gameStateService.isGameFinished(game.getGameState()) && pairingService.getCurrentPlayer(game.getPairing()) instanceof StandardComputerPlayer){
@@ -104,7 +114,7 @@ public class MainService {
         }
     }
 
-    private void handlePut(JsonObject jsonObject) {
+    private Game handlePut(JsonObject jsonObject) {
 
         String gameCode = jsonObject.get("gamecode").getAsString();
         Game game = gameRepository.findByGameCode(gameCode);
@@ -138,12 +148,13 @@ public class MainService {
             logger.warn("Put konnte nicht ausgeführt werden...");
         }
 
-        senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
-        gameRepository.save(game);
+        return game;
+
+
 
     }
 
-    public void handleMove(JsonObject jsonObject) {
+    public Game handleMove(JsonObject jsonObject) {
 
         String gameCode = jsonObject.get("gamecode").getAsString();
         Game game = gameRepository.findByGameCode(gameCode);
@@ -191,11 +202,10 @@ public class MainService {
             logger.warn("Move konnte nicht ausgeführt werden...");
         }
 
-        senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
-        gameRepository.save(game);
+        return game;
     }
 
-    public void handleKill(JsonObject jsonObject) {
+    public Game handleKill(JsonObject jsonObject) {
         String gameCode = jsonObject.get("gamecode").getAsString();
         Game game = gameRepository.findByGameCode(gameCode);
 
@@ -236,13 +246,10 @@ public class MainService {
             logger.warn("Kill konnte nicht ausgeführt werden...");
         }
 
-        senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
-        gameRepository.save(game);
-
-
+        return game;
     }
 
-    public void handleJump(JsonObject jsonObject) {
+    public Game handleJump(JsonObject jsonObject) {
         String gameCode = jsonObject.get("gamecode").getAsString();
         Game game = gameRepository.findByGameCode(gameCode);
 
@@ -282,8 +289,7 @@ public class MainService {
             logger.warn("Jump konnte nicht ausgeführt werden...");
         }
 
-        senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
-        gameRepository.save(game);
+        return game;
     }
 
     private void updateStatesAfterGameAction(GameState gameState, Board board, Pairing pairing, GameAction gameAction){
