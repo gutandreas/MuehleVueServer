@@ -41,6 +41,13 @@ public class Board {
         }
     }
 
+    public Board(Board board){
+        this.boardPositionsStates = new POSITIONSTATE[3][8];
+        for (int i = 0; i < board.boardPositionsStates.length; i++) {
+            this.boardPositionsStates[i] = board.boardPositionsStates[i].clone();
+        }
+    }
+
 
 
 

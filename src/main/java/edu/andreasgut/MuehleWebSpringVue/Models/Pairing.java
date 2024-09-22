@@ -73,6 +73,14 @@ public class Pairing {
         return currentPlayerIndex;
     }
 
+    public Player getPlayerByIndex(int index){
+        return index == 1 ? player1 : player2;
+    }
+
+    public Player getCurrentPlayer(){
+        return currentPlayerIndex == 1 ? player1 : player2;
+    }
+
     public void setPlayer2(Player player2) {
         this.player2 = player2;
     }

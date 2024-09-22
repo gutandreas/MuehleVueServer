@@ -1,6 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import edu.andreasgut.MuehleWebSpringVue.Models.Board;
+import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Jump;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
@@ -18,16 +19,64 @@ public class ComputerService {
 
     private static final Logger logger = LoggerFactory.getLogger(ComputerService.class);
     BoardService boardService;
+    MainService mainService;
 
 
-    public ComputerService(BoardService boardService) {
+    public ComputerService(BoardService boardService, MainService mainService) {
         this.boardService = boardService;
+        this.mainService = mainService;
     }
 
-    public Put calculatePut(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex){
-        logger.info("Neuer Put wird berechnet");
-        LinkedList<Put> possiblePuts = boardService.getPossiblePuts(board, playerIndex);
+    public Put calculatePut(Game game, int playerIndex){
+
+        StandardComputerPlayer standardComputerPlayer = (StandardComputerPlayer) game.getPairing().getPlayerByIndex(playerIndex);
+        int level = standardComputerPlayer.getLevel();
+
+        switch (level){
+            case 1:
+                return getRandomPut(game, playerIndex);
+            case 2:
+                return getMinMaxPut(game, playerIndex);
+            default:
+                return null;
+        }
+
+
+    }
+
+    private Put getRandomPut(Game game, int playerIndex){
+        logger.info("Neuer zufälliger Put wird berechnet");
+        LinkedList<Put> possiblePuts = boardService.getPossiblePuts(game.getBoard(), playerIndex);
         return possiblePuts.get(new Random().nextInt(possiblePuts.size()));
+    }
+
+    private Put getMinMaxPut(Game game, int playerIndex){
+        LinkedList<Put> possiblePuts = boardService.getPossiblePuts(game.getBoard(), playerIndex);
+        Put bestPut = null;
+        int bestScore = Integer.MIN_VALUE;
+        for (Put put : possiblePuts){
+            Board board = new Board(game.getBoard());
+            boardService.putStone(board, put, playerIndex);
+            int score = evaluateScore(board, playerIndex);
+            if (score > bestScore){
+                bestScore = score;
+                bestPut = put;
+            }
+        }
+
+        return bestPut;
+
+
+    }
+
+    private int evaluateScore(Board board, int playerIndex){
+        int ownStones = boardService.getNumberOfStonesOfPlayerWithIndex(board, playerIndex);
+        int enemyIndex = playerIndex == 1 ? 2 : 1;
+        int enemyStones = boardService.getNumberOfStonesOfPlayerWithIndex(board, enemyIndex);
+        int score = ownStones - enemyStones;
+
+        return score;
+
     }
 
     public Move calculateMove(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex){

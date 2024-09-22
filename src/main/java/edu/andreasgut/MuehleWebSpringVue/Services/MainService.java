@@ -45,11 +45,17 @@ public class MainService {
         String gameCode = jsonObject.get("gamecode").getAsString();
         logger.info("Action in Game " + gameCode + " wird bearbeitet.");
 
-        Game game;
+        Game game = gameRepository.findByGameCode(gameCode);
 
         switch (type) {
             case "PUT":
-                 game = handlePut(jsonObject);
+                 int ring = jsonObject.get("ring").getAsInt();
+                 int field = jsonObject.get("field").getAsInt();
+                 String uuid = jsonObject.get("uuid").getAsString();
+                 Put put = new Put(new Position(ring, field));
+                 if (isPutAllowed(game, put, uuid)){
+                     handlePut(game, put);
+                 }
                  senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
                  gameRepository.save(game);
                  break;
@@ -85,7 +91,7 @@ public class MainService {
 
             switch (phase){
                 case PUT:
-                    Put put = computerService.calculatePut(standardComputerPlayer, game.getBoard(), index);
+                    Put put = computerService.calculatePut(game, index);
                     boardService.putStone(game.getBoard(), put, index);
                     playerService.increasePutStones(standardComputerPlayer);
                     updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
@@ -114,41 +120,28 @@ public class MainService {
         }
     }
 
-    private Game handlePut(JsonObject jsonObject) {
+    public boolean isPutAllowed(Game game, Put put, String uuid){
 
-        String gameCode = jsonObject.get("gamecode").getAsString();
-        Game game = gameRepository.findByGameCode(gameCode);
+        Pairing pairing = game.getPairing();
+        Player currentPlayer = pairingService.getCurrentPlayer(pairing);
+        Board board = game.getBoard();
+        GameState gameState = game.getGameState();
 
-        try {
-            int ring = jsonObject.get("ring").getAsInt();
-            int field = jsonObject.get("field").getAsInt();
-            String uuid = jsonObject.get("uuid").getAsString();
+        boolean phaseOK = playerService.isPlayerInPutPhase(currentPlayer);
+        boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
+        boolean positionOK = boardService.isPositionFree(board, put.getPutPosition());
 
-            Put put = new Put(new Position(ring, field));
-            Pairing pairing = game.getPairing();
-            Player currentPlayer = pairingService.getCurrentPlayer(pairing);
-            Board board = game.getBoard();
-            GameState gameState = game.getGameState();
+        return phaseOK && uuidOK && positionOK;
 
-            boolean phaseOK = playerService.isPlayerInPutPhase(currentPlayer);
-            boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
-            boolean positionOK = boardService.isPositionFree(board, put.getPutPosition());
+    }
 
-            if (phaseOK && uuidOK && positionOK){
-                boardService.putStone(board, put, pairingService.getCurrentPlayerIndex(pairing));
-                logger.info("Put ausgeführt in GameState " + gameCode);
-                updateStatesAfterGameAction(gameState, board, pairing, put);
-                playerService.increasePutStones(currentPlayer);
-            } else {
-                logger.warn("Ungültige Position, Phase oder UUID bei Put in GameState " + gameCode);
-            }
+    public void handlePut(Game game, Put put) {
 
-        } catch (Exception e) {
-            logger.warn(e.getMessage());
-            logger.warn("Put konnte nicht ausgeführt werden...");
-        }
+        boardService.putStone(game.getBoard(), put, pairingService.getCurrentPlayerIndex(game.getPairing()));
+        logger.info("Put ausgeführt in GameState " + game.getGameCode());
+        updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
+        playerService.increasePutStones(game.getPairing().getCurrentPlayer());
 
-        return game;
 
 
 
