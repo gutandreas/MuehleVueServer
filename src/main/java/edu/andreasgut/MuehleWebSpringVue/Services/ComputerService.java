@@ -19,12 +19,10 @@ public class ComputerService {
 
     private static final Logger logger = LoggerFactory.getLogger(ComputerService.class);
     BoardService boardService;
-    MainService mainService;
 
 
-    public ComputerService(BoardService boardService, MainService mainService) {
+    public ComputerService(BoardService boardService) {
         this.boardService = boardService;
-        this.mainService = mainService;
     }
 
     public Put calculatePut(Game game, int playerIndex){
@@ -58,9 +56,11 @@ public class ComputerService {
             Board board = new Board(game.getBoard());
             boardService.putStone(board, put, playerIndex);
             int score = evaluateScore(board, playerIndex);
+            System.out.println("Aktueller Score bei Put: " + score);
             if (score > bestScore){
                 bestScore = score;
                 bestPut = put;
+                System.out.println("Neuer bester Score bei Put: " + score);
             }
         }
 
