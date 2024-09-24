@@ -87,7 +87,7 @@ public class Player extends Participant implements Cloneable{
 
 
     public PHASE getPhaseIfPutMoveOrJump() {
-        if (numberOfStonesPut > 9){
+        if (numberOfStonesPut < 9){
             return PHASE.PUT;
         } else if (numberOfStonesLost < 6) {
             return PHASE.MOVE;
