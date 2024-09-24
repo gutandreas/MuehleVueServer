@@ -24,7 +24,7 @@ public class Move extends GameAction {
 
     @Override
     public String toString() {
-        return "Zug von Feld " + getFrom().getRing() + "/" + getFrom().getField()
+        return "Move von Positition " + getFrom().getRing() + "/" + getFrom().getField()
                 + " nach " + getTo().getRing() + "/" + getTo().getField();
     }
 }

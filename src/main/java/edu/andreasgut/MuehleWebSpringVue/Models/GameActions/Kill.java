@@ -14,4 +14,9 @@ public class Kill extends GameAction {
     public Position getKillPosition() {
         return killPosition;
     }
+
+    @Override
+    public String toString() {
+        return "Kill auf Position " + killPosition.getRing() + "/" + killPosition.getField();
+    }
 }

@@ -23,7 +23,6 @@ public class Jump extends GameAction {
 
     @Override
     public String toString() {
-        return "Sprung von Feld " + getFrom().getRing() + "/" + getFrom().getField()
-                + " nach " + getTo().getRing() + "/" + getTo().getField();
+        return "Jump auf Position " + from.getRing() + "/" + to.getField();
     }
 }

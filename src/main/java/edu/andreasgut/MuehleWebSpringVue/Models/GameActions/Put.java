@@ -13,4 +13,9 @@ public class Put extends GameAction{
     public Position getPutPosition() {
         return putPosition;
     }
+
+    @Override
+    public String toString() {
+        return "Put auf Position " + putPosition.getRing() + "/" + putPosition.getField();
+    }
 }
