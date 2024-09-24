@@ -77,6 +77,7 @@ public class ComputerService {
 
         recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel, root);
 
+        root.printTree();
 
         return new Put(new Position(2, 2));
     }
@@ -140,9 +141,9 @@ public class ComputerService {
                     GameNode gameNode = new GameNode(clonedGame.getBoard(), currentPlayerIndex, parent, evaluateScore(game.getBoard(), currentPlayerIndex));
                     pairingService.changeTurn(clonedGame.getPairing());
                     gameStateService.increaseRound(clonedGame.getGameState());
-                    pairingService.changeTurn(clonedGame.getPairing());
-                    recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel + 1, gameNode);
+                    playerService.setPhase(currentPlayer, PHASE.WAIT);
                     playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
+                    recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel + 1, gameNode);
                 }
                 break;
 

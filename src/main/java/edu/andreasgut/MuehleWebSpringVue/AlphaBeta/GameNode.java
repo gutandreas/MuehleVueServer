@@ -38,4 +38,22 @@ public class GameNode {
     public void addChildNode(GameNode child){
         children.add(child);
     }
+
+    public void printTree() {
+        printTree("", true);
+    }
+
+    // Rekursive Methode zum Drucken des Baums
+    private void printTree(String prefix, boolean isTail) {
+        // Aktuellen Knoten drucken
+        System.out.println(prefix + (isTail ? "└── " : "├── ") + "Player: " + currentPlayerIndex + ", Score: " + score);
+
+        // Kinderknoten durchlaufen und sie ebenfalls drucken
+        for (int i = 0; i < children.size() - 1; i++) {
+            children.get(i).printTree(prefix + (isTail ? "    " : "│   "), false);
+        }
+        if (children.size() > 0) {
+            children.getLast().printTree(prefix + (isTail ? "    " : "│   "), true);
+        }
+    }
 }
