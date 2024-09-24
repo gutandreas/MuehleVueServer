@@ -7,7 +7,7 @@ import java.util.UUID;
 
 
 @Entity
-public class Pairing {
+public class Pairing implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -95,5 +95,22 @@ public class Pairing {
 
     public void setCurrentPlayerIndex(int currentPlayerIndex) {
         this.currentPlayerIndex = currentPlayerIndex;
+    }
+
+    @Override
+    public Pairing clone() {
+        try {
+            // Shallow copy mit super.clone()
+            Pairing cloned = (Pairing) super.clone();
+
+            // Deep copy der Player-Objekte
+            cloned.player1 = (player1 != null) ? player1.clone() : null;
+            cloned.player2 = (player2 != null) ? player2.clone() : null;
+
+            return cloned;
+
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Cloning not supported", e);
+        }
     }
 }

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 @Entity
-public class GameState {
+public class GameState implements Cloneable {
 
     private static final Logger logger = LoggerFactory.getLogger(GameState.class);
 
@@ -63,6 +63,22 @@ public class GameState {
 
     public int getWinnerIndex() {
         return winnerIndex;
+    }
+
+    @Override
+    public GameState clone() {
+        try {
+            // Aufruf von Object.clone() für die shallow copy
+            GameState cloned = (GameState) super.clone();
+
+            // UUID ist immutable, daher keine Notwendigkeit für eine tiefe Kopie
+            // Andere primitive Typen (round, finished, winnerIndex) werden durch den Aufruf von super.clone() kopiert
+
+            return cloned;
+
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Cloning not supported", e);
+        }
     }
 }
 

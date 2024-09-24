@@ -15,7 +15,7 @@ import java.util.UUID;
 
 
 @Entity
-public class Board {
+public class Board implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -41,12 +41,6 @@ public class Board {
         }
     }
 
-    public Board(Board board){
-        this.boardPositionsStates = new POSITIONSTATE[3][8];
-        for (int i = 0; i < board.boardPositionsStates.length; i++) {
-            this.boardPositionsStates[i] = board.boardPositionsStates[i].clone();
-        }
-    }
 
 
 
@@ -58,5 +52,23 @@ public class Board {
 
     public POSITIONSTATE[][] getBoardPositionsStates() {
         return boardPositionsStates;
+    }
+
+    @Override
+    public Board clone() {
+        try {
+            Board cloned = (Board) super.clone();
+
+            // Tiefes Kopieren des 2D-Arrays für die Positionen
+            cloned.boardPositionsStates = new POSITIONSTATE[boardPositionsStates.length][boardPositionsStates[0].length];
+            for (int i = 0; i < boardPositionsStates.length; i++) {
+                System.arraycopy(boardPositionsStates[i], 0, cloned.boardPositionsStates[i], 0, boardPositionsStates[i].length);
+            }
+
+            return cloned;
+
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Cloning not supported", e);
+        }
     }
 }

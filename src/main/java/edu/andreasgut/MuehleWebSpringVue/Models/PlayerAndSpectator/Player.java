@@ -16,7 +16,7 @@ import java.util.UUID;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // oder JOINED, je nach Modellierung
 @DiscriminatorColumn(name = "player_type", discriminatorType = DiscriminatorType.STRING)
-public class Player extends Participant {
+public class Player extends Participant implements Cloneable{
 
 
     private STONECOLOR stonecolor;
@@ -77,6 +77,20 @@ public class Player extends Participant {
     public void setCurrentPhase(PHASE currentPhase) {
         System.out.println(currentPhase);
         this.currentPhase = currentPhase;
+    }
+
+    @Override
+    public Player clone() {
+        try {
+            Player cloned = (Player) super.clone();
+
+            // Deep copy ist für primitive Typen und Enums nicht notwendig, da sie entweder direkt kopiert werden oder immutable sind
+            // STONECOLOR und PHASE sind Enums und werden einfach kopiert (Enums sind immutable)
+
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Cloning not supported", e);
+        }
     }
 
 

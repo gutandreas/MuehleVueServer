@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 
 @Entity
-public class Game {
+public class Game implements Cloneable {
 
     @Id
     String gameCode;
@@ -56,5 +56,23 @@ public class Game {
 
     public LinkedList<Spectator> getSpectators() {
         return spectators;
+    }
+
+    @Override
+    public Game clone() {
+        try {
+            Game cloned = (Game) super.clone();
+
+            // Deep copy of the mutable objects
+            cloned.gameState = this.gameState != null ? this.gameState.clone() : null;
+            cloned.pairing = this.pairing != null ? this.pairing.clone() : null;
+            cloned.board = this.board != null ? this.board.clone() : null;
+            cloned.spectators = new LinkedList<>();
+
+            return cloned;
+
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Shouldn't happen, since we're Cloneable
+        }
     }
 }

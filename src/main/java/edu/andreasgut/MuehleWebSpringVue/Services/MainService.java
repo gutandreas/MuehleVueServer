@@ -92,7 +92,7 @@ public class MainService {
             switch (phase){
                 case PUT:
                     Put put = computerService.calculatePut(game, index);
-                    boardService.putStone(game.getBoard(), put, index);
+                    boardService.putStoneAndSave(game.getBoard(), put, index);
                     playerService.increasePutStones(standardComputerPlayer);
                     updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
                     break;
@@ -137,7 +137,7 @@ public class MainService {
 
     public void handlePut(Game game, Put put) {
 
-        boardService.putStone(game.getBoard(), put, pairingService.getCurrentPlayerIndex(game.getPairing()));
+        boardService.putStoneAndSave(game.getBoard(), put, pairingService.getCurrentPlayerIndex(game.getPairing()));
         logger.info("Put ausgeführt in GameState " + game.getGameCode());
         updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
         playerService.increasePutStones(game.getPairing().getCurrentPlayer());

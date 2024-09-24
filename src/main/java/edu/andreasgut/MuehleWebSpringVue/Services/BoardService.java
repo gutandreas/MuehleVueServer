@@ -56,10 +56,13 @@ public class BoardService {
     }
 
     @Transactional
-    public void putStone(Board board, Put put, int playerIndex) {
+    public void putStoneAndSave(Board board, Put put, int playerIndex) {
         setStoneOnPositionInArray(board, put.getPutPosition(), playerIndex);
         saveBoard(board);
     }
+
+    public void putStone(Board board, Put put, int playerIndex) {
+        setStoneOnPositionInArray(board, put.getPutPosition(), playerIndex);}
 
 
     @Transactional

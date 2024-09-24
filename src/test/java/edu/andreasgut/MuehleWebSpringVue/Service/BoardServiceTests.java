@@ -8,7 +8,6 @@ import edu.andreasgut.MuehleWebSpringVue.Models.POSITIONSTATE;
 import edu.andreasgut.MuehleWebSpringVue.Models.Position;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.BoardRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.BoardService;
-import edu.andreasgut.MuehleWebSpringVue.Services.MainService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,7 +32,7 @@ public class BoardServiceTests {
 
         when(boardRepository.save(any())).thenReturn(null);
 
-        boardService.putStone(board, new Put(new Position(1,1)), 1);
+        boardService.putStoneAndSave(board, new Put(new Position(1,1)), 1);
         boardService.moveStone(board, new Move(new Position(1, 1), new Position(1, 2)), 1);
 
         POSITIONSTATE positionstate = boardService.getStateOfPosition(board, new Position(1, 2));
@@ -54,8 +53,8 @@ public class BoardServiceTests {
 
         when(boardRepository.save(any())).thenReturn(null);
 
-        boardService.putStone(board, new Put(new Position(1,1)), 1);
-        boardService.putStone(board, new Put(new Position(1,2)), 1);
+        boardService.putStoneAndSave(board, new Put(new Position(1,1)), 1);
+        boardService.putStoneAndSave(board, new Put(new Position(1,2)), 1);
         boardService.killStone(board, new Kill(new Position(1, 1)));
 
         POSITIONSTATE freePositionState = boardService.getStateOfPosition(board, new Position(1, 1));
