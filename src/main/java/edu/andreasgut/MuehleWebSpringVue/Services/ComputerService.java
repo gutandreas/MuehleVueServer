@@ -87,62 +87,64 @@ public class ComputerService {
             return;
         }
 
-        boolean maximize = game.getPairing().getCurrentPlayerIndex() == ownIndex;
-        PHASE currentPhase = game.getPairing().getCurrentPlayer().getCurrentPhase();
-        Player currentPlayer = pairingService.getCurrentPlayer(game.getPairing());
-        Player enemyPlayer = pairingService.getEnemyOf(game.getPairing(), currentPlayer);
-        int currentPlayerIndex = pairingService.getCurrentPlayerIndex(game.getPairing());
+        Game clonedGame = game.clone();
+        boolean maximize = clonedGame.getPairing().getCurrentPlayerIndex() == ownIndex;
+        PHASE currentPhase = clonedGame.getPairing().getCurrentPlayer().getCurrentPhase();
+        Player currentPlayer = pairingService.getCurrentPlayer(clonedGame.getPairing());
+        Player enemyPlayer = pairingService.getEnemyOf(clonedGame.getPairing(), currentPlayer);
+        int currentPlayerIndex = pairingService.getCurrentPlayerIndex(clonedGame.getPairing());
 
 
 
         switch (currentPhase){
             case PUT:
-                LinkedList<Put> possiblePuts = boardService.getPossiblePuts(game.getBoard(), currentPlayerIndex);
+                LinkedList<Put> possiblePuts = boardService.getPossiblePuts(clonedGame.getBoard(), currentPlayerIndex);
                 for (Put put : possiblePuts){
-                    Board board = game.getBoard().clone();
+                    Board board = clonedGame.getBoard().clone();
                     boardService.putStone(board, put, currentPlayerIndex);
                     GameNode gameNode = new GameNode(board, put, currentPlayerIndex, parent, evaluateScore(board, currentPlayerIndex));
                     playerService.increasePutStones(currentPlayer);
                     if (!boardService.isPositionPartOfMorris(board, put.getPutPosition())){
-                        gameStateService.increaseRound(game.getGameState());
-                        pairingService.changeTurn(game.getPairing());
+                        gameStateService.increaseRound(clonedGame.getGameState());
+                        pairingService.changeTurn(clonedGame.getPairing());
                         playerService.changeToWaitPhase(currentPlayer);
                         playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
                     } else {
                         playerService.changeToKillPhase(currentPlayer);
-
                     }
-                    recursiveAlphaBeta(game, ownIndex, maxLevel, currentLevel + 1, gameNode);
+                    recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel + 1, gameNode);
                 }
                 break;
             case MOVE:
-                LinkedList<Move> possibleMoves = boardService.getPossibleMoves(game.getBoard(), currentPlayerIndex);
+                LinkedList<Move> possibleMoves = boardService.getPossibleMoves(clonedGame.getBoard(), currentPlayerIndex);
                 for (Move move : possibleMoves){
-                    Board board = game.getBoard().clone();
+                    Board board = clonedGame.getBoard().clone();
                     boardService.moveStone(board, move, currentPlayerIndex);
                     GameNode gameNode = new GameNode(board, move, currentPlayerIndex, parent, evaluateScore(board, currentPlayerIndex));
                     if (!boardService.isPositionPartOfMorris(board, move.getTo())){
-                        gameStateService.increaseRound(game.getGameState());
-                        pairingService.changeTurn(game.getPairing());
+                        gameStateService.increaseRound(clonedGame.getGameState());
+                        pairingService.changeTurn(clonedGame.getPairing());
                         playerService.changeToWaitPhase(currentPlayer);
                         playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
                     } else {
                         playerService.changeToKillPhase(currentPlayer);
                     }
-                    recursiveAlphaBeta(game, ownIndex, maxLevel, currentLevel + 1, gameNode);
+                    recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel + 1, gameNode);
                 }
                 break;
             case KILL:
-                LinkedList<Kill> possibleKills = boardService.getPossibleKills(game.getBoard(), currentPlayerIndex);
+                LinkedList<Kill> possibleKills = boardService.getPossibleKills(clonedGame.getBoard(), currentPlayerIndex);
                 for (Kill kill : possibleKills){
-                    Board board = game.getBoard().clone();
+                    Board board = clonedGame.getBoard().clone();
                     boardService.killStone(board, kill);
                     GameNode gameNode = new GameNode(board, kill, currentPlayerIndex, parent, evaluateScore(board, currentPlayerIndex));
-                    pairingService.changeTurn(game.getPairing());
-                    gameStateService.increaseRound(game.getGameState());
+                    pairingService.changeTurn(clonedGame.getPairing());
+                    gameStateService.increaseRound(clonedGame.getGameState());
                     playerService.setPhase(currentPlayer, PHASE.WAIT);
+                    playerService.increaseKilledStones(currentPlayer);
                     playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
-                    recursiveAlphaBeta(game, ownIndex, maxLevel, currentLevel + 1, gameNode);
+                    playerService.increaseLostStones(enemyPlayer);
+                    recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel + 1, gameNode);
                 }
                 break;
 
