@@ -81,6 +81,7 @@ public class Pairing implements Cloneable {
         return currentPlayerIndex == 1 ? player1 : player2;
     }
 
+
     public void setPlayer2(Player player2) {
         this.player2 = player2;
     }

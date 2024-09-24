@@ -41,6 +41,10 @@ public class PlayerService {
     public void changeToJumpPhase(Player player) { player.setCurrentPhase(PHASE.JUMP);}
     public void changeToWaitPhase(Player player) { player.setCurrentPhase(PHASE.WAIT);}
 
+    public void setPhase(Player player, PHASE phase){
+        player.setCurrentPhase(phase);
+    }
+
     public PHASE getPhase(Player player) {return player.getCurrentPhase();}
 
     public int getNumerOfPutStones(Player player){
@@ -75,6 +79,10 @@ public class PlayerService {
 
     private void savePlayer(Player player) {
         playerRepository.save(player);
+    }
+
+    public PHASE getPhaseIfPutMoveOrJump(Player player){
+        return player.getPhaseIfPutMoveOrJump();
     }
 
 }

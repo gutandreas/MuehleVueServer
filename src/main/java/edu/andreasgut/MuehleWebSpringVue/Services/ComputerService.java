@@ -89,6 +89,7 @@ public class ComputerService {
         boolean maximize = game.getPairing().getCurrentPlayerIndex() == ownIndex;
         PHASE currentPhase = game.getPairing().getCurrentPlayer().getCurrentPhase();
         Player currentPlayer = pairingService.getCurrentPlayer(game.getPairing());
+        Player enemyPlayer = pairingService.getEnemyOf(game.getPairing(), currentPlayer);
         int currentPlayerIndex = pairingService.getCurrentPlayerIndex(game.getPairing());
         System.out.println("Berechne Zug auf Level " + currentLevel);
 
@@ -105,6 +106,11 @@ public class ComputerService {
                     if (!boardService.isPositionPartOfMorris(clonedGame.getBoard(), put.getPutPosition())){
                         gameStateService.increaseRound(clonedGame.getGameState());
                         pairingService.changeTurn(clonedGame.getPairing());
+                        playerService.changeToWaitPhase(currentPlayer);
+                        playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
+                    } else {
+                        playerService.changeToKillPhase(currentPlayer);
+
                     }
                     recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel + 1, gameNode);
                 }
@@ -118,6 +124,10 @@ public class ComputerService {
                     if (!boardService.isPositionPartOfMorris(clonedGame.getBoard(), move.getTo())){
                         gameStateService.increaseRound(clonedGame.getGameState());
                         pairingService.changeTurn(clonedGame.getPairing());
+                        playerService.changeToWaitPhase(currentPlayer);
+                        playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
+                    } else {
+                        playerService.changeToKillPhase(currentPlayer);
                     }
                     recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel + 1, gameNode);
                 }
@@ -132,6 +142,7 @@ public class ComputerService {
                     gameStateService.increaseRound(clonedGame.getGameState());
                     pairingService.changeTurn(clonedGame.getPairing());
                     recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel + 1, gameNode);
+                    playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
                 }
                 break;
 

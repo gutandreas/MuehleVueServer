@@ -29,7 +29,6 @@ public class PairingService {
     }
 
 
-
     public int getCurrentPlayerIndex(Pairing pairing) {
         return pairing.getCurrentPlayerIndex();
     }

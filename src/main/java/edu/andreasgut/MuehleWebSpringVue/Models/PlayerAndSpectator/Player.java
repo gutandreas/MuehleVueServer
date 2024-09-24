@@ -1,16 +1,9 @@
 package edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator;
 
 
-import edu.andreasgut.MuehleWebSpringVue.Models.Board;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Kill;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Move;
-import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.Put;
 import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
-import edu.andreasgut.MuehleWebSpringVue.Models.Position;
 import edu.andreasgut.MuehleWebSpringVue.Models.STONECOLOR;
 import jakarta.persistence.*;
-
-import java.util.UUID;
 
 
 @Entity
@@ -75,7 +68,6 @@ public class Player extends Participant implements Cloneable{
     }
 
     public void setCurrentPhase(PHASE currentPhase) {
-        System.out.println(currentPhase);
         this.currentPhase = currentPhase;
     }
 
@@ -94,5 +86,13 @@ public class Player extends Participant implements Cloneable{
     }
 
 
-
+    public PHASE getPhaseIfPutMoveOrJump() {
+        if (numberOfStonesPut > 9){
+            return PHASE.PUT;
+        } else if (numberOfStonesLost < 6) {
+            return PHASE.MOVE;
+        } else {
+            return PHASE.JUMP;
+        }
+    }
 }
