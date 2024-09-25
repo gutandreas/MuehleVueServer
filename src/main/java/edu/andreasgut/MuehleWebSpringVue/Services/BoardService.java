@@ -168,7 +168,7 @@ public class BoardService {
                 && positionstate == board.getBoardPositionsStates()[(position.getRing() + 2) % 3][position.getField()];
     }
 
-    public LinkedList<Put> getPossiblePuts(Board board, int playerIndex) {
+    public LinkedList<Put> getPossiblePuts(Board board) {
         LinkedList<Put> possiblePuts = new LinkedList<>();
         for (int ring = 0; ring < 3; ring++) {
             for (int field = 0; field < 8; field++) {
