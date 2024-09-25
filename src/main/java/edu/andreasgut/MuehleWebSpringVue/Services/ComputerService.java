@@ -51,7 +51,7 @@ public class ComputerService {
             case 0:
                 return getRandomPut(game);
             case 1:
-                return (Put) executeAlphaBeta(game, playerIndex, 5);
+                return (Put) executeAlphaBeta(game, playerIndex, 2);
             default:
                 return null;
         }
@@ -73,13 +73,15 @@ public class ComputerService {
 
         int currentLevel = 0;
 
-        GameNode root = new GameNode(clonedGame.getBoard(), null, ownIndex, null, 0);
+
+        GameNode root = new GameNode(clonedGame.getBoard(), null, 0, null, 0);
         PHASE currentPhase = playerService.getPhase(pairingService.getCurrentPlayer(game.getPairing()));
 
         recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel, currentPhase, root, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
 
         root.printTree();
 
+        System.out.println("Erreichter Score: " + root.getScore());
         return root.getBestAction();
     }
 
@@ -100,16 +102,13 @@ public class ComputerService {
         for (GameAction action : possibleActions) {
             Game clonedGame = game.clone();  // Spiel klonen, um Änderungen lokal zu halten
             executeGameAction(clonedGame, action, currentPhase);  // Führe die Aktion aus
-
             updateGameStateAfterAction(clonedGame, action, currentPhase);
             boolean maximizing = pairingService.getCurrentPlayerIndex(game.getPairing()) == ownIndex;
-
-            // Nächste Phase bestimmen
-
             PHASE nextPhase = playerService.getPhase(pairingService.getCurrentPlayer(clonedGame.getPairing()));
 
             GameNode child = new GameNode(game.getBoard(), action, pairingService.getCurrentPlayerIndex(game.getPairing()), node, 0);
-            int score = recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel + 1, nextPhase, child, alpha, beta, maximizing);
+            int nextLevel = nextPhase == PHASE.KILL ? currentLevel : currentLevel+1;
+            int score = recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, nextLevel, nextPhase, child, alpha, beta, maximizing);
 
             if (isMaximizingPlayer) {
                 if (score > bestScore) {
