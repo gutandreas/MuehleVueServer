@@ -51,7 +51,7 @@ public class ComputerService {
             case 0:
                 return getRandomPut(game);
             case 1:
-                return (Put) executeAlphaBeta(game, playerIndex, 3);
+                return (Put) executeAlphaBeta(game, playerIndex, 5);
             default:
                 return null;
         }
@@ -76,136 +76,170 @@ public class ComputerService {
         GameNode root = new GameNode(clonedGame.getBoard(), null, ownIndex, null, 0);
         PHASE currentPhase = playerService.getPhase(pairingService.getCurrentPlayer(game.getPairing()));
 
-        recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel, currentPhase, root);
+        recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel, currentPhase, root, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
 
         root.printTree();
 
-        return new Put(new Position(2, 2));
+        return root.getBestAction();
     }
 
-    private void recursiveAlphaBeta(Game game, int ownIndex, int maxLevel, int currentLevel, PHASE currentPhase, GameNode parent){
-        if (currentLevel == maxLevel){
-            return;
+    private int recursiveAlphaBeta(Game game, int ownIndex, int maxLevel, int currentLevel, PHASE currentPhase, GameNode node, int alpha, int beta, boolean isMaximizingPlayer) {
+        // Basisfall: Maximale Suchtiefe erreicht
+        if (currentLevel == maxLevel) {
+            int score = evaluateScore(game.getBoard(), ownIndex);  // Bewertungsfunktion
+            node.setScore(score);  // Setze den Wert im Knoten
+            return score;
+        }
+
+        // Behandle alle möglichen Aktionen basierend auf der Phase
+        LinkedList<? extends GameAction> possibleActions = getPossibleActionsForPhase(game, currentPhase);
+
+        GameAction bestAction = null;  // Hier wird der beste Zug gespeichert
+        int bestScore = isMaximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+        for (GameAction action : possibleActions) {
+            Game clonedGame = game.clone();  // Spiel klonen, um Änderungen lokal zu halten
+            executeGameAction(clonedGame, action, currentPhase);  // Führe die Aktion aus
+
+            updateGameStateAfterAction(clonedGame, action, currentPhase);
+            boolean maximizing = pairingService.getCurrentPlayerIndex(game.getPairing()) == ownIndex;
+
+            // Nächste Phase bestimmen
+
+            PHASE nextPhase = playerService.getPhase(pairingService.getCurrentPlayer(clonedGame.getPairing()));
+
+            GameNode child = new GameNode(game.getBoard(), action, pairingService.getCurrentPlayerIndex(game.getPairing()), node, 0);
+            int score = recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, currentLevel + 1, nextPhase, child, alpha, beta, maximizing);
+
+            if (isMaximizingPlayer) {
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestAction = action;  // Speichere die beste Aktion
+                }
+                alpha = Math.max(alpha, score);
+            } else {
+                if (score < bestScore) {
+                    bestScore = score;
+                    bestAction = action;  // Speichere die beste Aktion
+                }
+                beta = Math.min(beta, score);
+            }
+
+            // Alpha-Beta-Pruning: Abbrechen, wenn alpha >= beta
+            if (alpha >= beta) {
+                break;
+            }
+
         }
 
 
 
+        node.setScore(bestScore);  // Setze den besten Wert für diesen Knoten
+        node.setBestAction(bestAction);  // Speichere die beste Aktion im Knoten
 
-        switch (currentPhase){
+        return bestScore;
+    }
+
+    private void updateGameStateAfterAction(Game game, GameAction action, PHASE currentPhase) {
+        // Aktualisiert den Spielzustand nach einer Aktion und bereitet das Spiel für die nächste Phase vor
+        Player currentPlayer = pairingService.getCurrentPlayer(game.getPairing());
+        Player enemyPlayer = pairingService.getEnemyOf(game.getPairing(), currentPlayer);
+
+        switch (currentPhase) {
             case PUT:
-                LinkedList<Put> possiblePuts = boardService.getPossiblePuts(game.getBoard());
-                for (Put put : possiblePuts){
-                    Game clonedGame = game.clone();
-                    boolean maximize = clonedGame.getPairing().getCurrentPlayerIndex() == ownIndex;
-                    Player currentPlayer = pairingService.getCurrentPlayer(clonedGame.getPairing());
-                    Player enemyPlayer = pairingService.getEnemyOf(clonedGame.getPairing(), currentPlayer);
-                    int currentPlayerIndex = pairingService.getCurrentPlayerIndex(clonedGame.getPairing());
-                    boardService.putStone(clonedGame.getBoard(), put, currentPlayerIndex);
-                    System.out.println(clonedGame.getBoard());
-                    GameNode gameNode = new GameNode(clonedGame.getBoard(), put, currentPlayerIndex, parent, evaluateScore(clonedGame.getBoard(), currentPlayerIndex));
-                    playerService.increasePutStones(currentPlayer);
-                    if (!boardService.isPositionPartOfMorris(clonedGame.getBoard(), put.getPutPosition())){
-                        gameStateService.increaseRound(clonedGame.getGameState());
-                        pairingService.changeTurn(clonedGame.getPairing());
-                        playerService.changeToWaitPhase(currentPlayer);
-                        playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
-                    } else {
-                        playerService.changeToKillPhase(currentPlayer);
-                    }
-                    PHASE nextPhase = playerService.getPhase(pairingService.getCurrentPlayer(clonedGame.getPairing()));
-                    recursiveAlphaBeta(clonedGame, ownIndex, maxLevel,  currentLevel + 1, nextPhase, gameNode);
+                if (!boardService.isPositionPartOfMorris(game.getBoard(), ((Put) action).getPutPosition())) {
+                    gameStateService.increaseRound(game.getGameState());
+                    pairingService.changeTurn(game.getPairing());
+                    playerService.changeToWaitPhase(currentPlayer);
+                    playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
+                } else {
+                    playerService.changeToKillPhase(currentPlayer);  // Spieler darf einen Stein schlagen
                 }
                 break;
             case MOVE:
-                LinkedList<Move> possibleMoves = boardService.getPossibleMoves(game.getBoard(), pairingService.getCurrentPlayerIndex(game.getPairing()));
-                for (Move move : possibleMoves){
-                    Game clonedGame = game.clone();
-                    boolean maximize = clonedGame.getPairing().getCurrentPlayerIndex() == ownIndex;
-                    Player currentPlayer = pairingService.getCurrentPlayer(clonedGame.getPairing());
-                    Player enemyPlayer = pairingService.getEnemyOf(clonedGame.getPairing(), currentPlayer);
-                    int currentPlayerIndex = pairingService.getCurrentPlayerIndex(clonedGame.getPairing());
-                    boardService.moveStone(clonedGame.getBoard(), move, currentPlayerIndex);
-                    System.out.println(clonedGame.getBoard());
-                    GameNode gameNode = new GameNode(clonedGame.getBoard(), move, currentPlayerIndex, parent, evaluateScore(clonedGame.getBoard(), currentPlayerIndex));
-                    playerService.increasePutStones(currentPlayer);
-                    if (!boardService.isPositionPartOfMorris(clonedGame.getBoard(), move.getTo())){
-                        gameStateService.increaseRound(clonedGame.getGameState());
-                        pairingService.changeTurn(clonedGame.getPairing());
-                        playerService.changeToWaitPhase(currentPlayer);
-                        playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
-                    } else {
-                        playerService.changeToKillPhase(currentPlayer);
-                    }
-                    PHASE nextPhase = playerService.getPhase(pairingService.getCurrentPlayer(clonedGame.getPairing()));
-                    recursiveAlphaBeta(clonedGame, ownIndex, maxLevel,  currentLevel + 1, nextPhase, gameNode);
+                if (!boardService.isPositionPartOfMorris(game.getBoard(), ((Move) action).getTo())) {
+                    gameStateService.increaseRound(game.getGameState());
+                    pairingService.changeTurn(game.getPairing());
+                    playerService.changeToWaitPhase(currentPlayer);
+                    playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
+                } else {
+                    playerService.changeToKillPhase(currentPlayer);  // Spieler darf einen Stein schlagen
                 }
                 break;
             case KILL:
-                LinkedList<Kill> possibleKills = boardService.getPossibleKills(game.getBoard(), pairingService.getCurrentPlayerIndex(game.getPairing()));
-                for (Kill kill : possibleKills){
-                    Game clonedGame = game.clone();
-                    boolean maximize = clonedGame.getPairing().getCurrentPlayerIndex() == ownIndex;
-                    Player currentPlayer = pairingService.getCurrentPlayer(clonedGame.getPairing());
-                    Player enemyPlayer = pairingService.getEnemyOf(clonedGame.getPairing(), currentPlayer);
-                    int currentPlayerIndex = pairingService.getCurrentPlayerIndex(clonedGame.getPairing());
-                    boardService.killStone(clonedGame.getBoard(), kill);
-                    System.out.println(clonedGame.getBoard());
-                    GameNode gameNode = new GameNode(clonedGame.getBoard(), kill, currentPlayerIndex, parent, evaluateScore(clonedGame.getBoard(), currentPlayerIndex));
-                    playerService.increasePutStones(currentPlayer);
-                    if (!boardService.isPositionPartOfMorris(clonedGame.getBoard(), kill.getKillPosition())){
-                        gameStateService.increaseRound(clonedGame.getGameState());
-                        pairingService.changeTurn(clonedGame.getPairing());
-                        playerService.changeToWaitPhase(currentPlayer);
-                        playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
-                    } else {
-                        playerService.changeToKillPhase(currentPlayer);
-                    }
-                    PHASE nextPhase = playerService.getPhase(pairingService.getCurrentPlayer(clonedGame.getPairing()));
-                    recursiveAlphaBeta(clonedGame, ownIndex, maxLevel,  currentLevel + 1, nextPhase, gameNode);
-                }
+                gameStateService.increaseRound(game.getGameState());
+                pairingService.changeTurn(game.getPairing());
+                playerService.changeToWaitPhase(currentPlayer);
+                playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
                 break;
         }
-
-
-
-
     }
 
+    private LinkedList<? extends GameAction> getPossibleActionsForPhase(Game game, PHASE currentPhase) {
+        // Gib die möglichen Züge basierend auf der Phase zurück
+        switch (currentPhase) {
+            case PUT:
+                return boardService.getPossiblePuts(game.getBoard());
+            case MOVE:
+                return boardService.getPossibleMoves(game.getBoard(), pairingService.getCurrentPlayerIndex(game.getPairing()));
+            case KILL:
+                return boardService.getPossibleKills(game.getBoard(), pairingService.getCurrentPlayerIndex(game.getPairing()));
+            default:
+                return new LinkedList<>();
+        }
+    }
 
+    private void executeGameAction(Game game, GameAction action, PHASE currentPhase) {
+        // Führt die entsprechende Aktion auf dem Spielbrett aus (Put, Move, Kill)
+        int currentPlayerIndex = pairingService.getCurrentPlayerIndex(game.getPairing());
 
+        switch (currentPhase) {
+            case PUT:
+                boardService.putStone(game.getBoard(), (Put) action, currentPlayerIndex);
+                break;
+            case MOVE:
+                boardService.moveStone(game.getBoard(), (Move) action, currentPlayerIndex);
+                break;
+            case KILL:
+                boardService.killStone(game.getBoard(), (Kill) action);
+                break;
+        }
+    }
 
-    private int evaluateScore(Board board, int playerIndex){
+    private int evaluateScore(Board board, int playerIndex) {
         int stonesWeight = 100;
         int movesWeight = 1;
+
+        // Anzahl der Steine und Züge für den eigenen Spieler
         int ownStones = boardService.getNumberOfStonesOfPlayerWithIndex(board, playerIndex);
         int ownMoves = boardService.getPossibleMoves(board, playerIndex).size();
+
+        // Anzahl der Steine und Züge für den Gegner
         int enemyIndex = playerIndex == 1 ? 2 : 1;
         int enemyStones = boardService.getNumberOfStonesOfPlayerWithIndex(board, enemyIndex);
         int enemyMoves = boardService.getPossibleMoves(board, enemyIndex).size();
-        int score = stonesWeight * (ownStones - enemyStones) + movesWeight * (ownMoves - enemyMoves);
 
-        return score;
-
+        // Berechnung der Punktzahl
+        return stonesWeight * (ownStones - enemyStones) + movesWeight * (ownMoves - enemyMoves);
     }
 
-    public Move calculateMove(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex){
+    public Move calculateMove(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex) {
         logger.info("Neuer Move wird berechnet");
         LinkedList<Move> possibleMoves = boardService.getPossibleMoves(board, playerIndex);
         return possibleMoves.get(new Random().nextInt(possibleMoves.size()));
     }
 
-    public Jump calculateJump(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex){
+    public Jump calculateJump(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex) {
         logger.info("Neuer Jump wird berechnet");
         LinkedList<Jump> possibleJumps = boardService.getPossibleJumps(board, playerIndex);
         return possibleJumps.get(new Random().nextInt(possibleJumps.size()));
     }
 
-    public Kill calculateKill(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex){
+    public Kill calculateKill(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex) {
         logger.info("Neuer Kill wird berechnet");
         LinkedList<Kill> possibleKills = boardService.getPossibleKills(board, playerIndex);
         return possibleKills.get(new Random().nextInt(possibleKills.size()));
     }
-
 
 
 }

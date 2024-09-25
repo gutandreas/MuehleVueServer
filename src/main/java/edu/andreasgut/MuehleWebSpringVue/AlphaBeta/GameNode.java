@@ -12,8 +12,8 @@ public class GameNode {
     private int currentPlayerIndex;
     private GameNode parent;
     private LinkedList<GameNode> children;
-
-    int score;
+    private int score;
+    private GameAction bestAction;
 
     public GameNode(Board board, GameAction gameAction, int currentPlayerIndex, GameNode parent, int score) {
         this.board = board;
@@ -29,6 +29,18 @@ public class GameNode {
 
     public Board getBoard() {
         return board;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public GameAction getBestAction() {
+        return bestAction;
+    }
+
+    public void setBestAction(GameAction bestAction) {
+        this.bestAction = bestAction;
     }
 
     public int getCurrentPlayerIndex() {

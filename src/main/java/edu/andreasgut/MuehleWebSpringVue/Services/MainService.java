@@ -93,7 +93,6 @@ public class MainService {
                 case PUT:
                     Put put = computerService.calculatePut(game, index);
                     boardService.putStoneAndSave(game.getBoard(), put, index);
-                    playerService.increasePutStones(standardComputerPlayer);
                     updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
                     break;
                 case MOVE:
@@ -140,10 +139,6 @@ public class MainService {
         boardService.putStoneAndSave(game.getBoard(), put, pairingService.getCurrentPlayerIndex(game.getPairing()));
         logger.info("Put ausgeführt in GameState " + game.getGameCode());
         updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
-        playerService.increasePutStones(game.getPairing().getCurrentPlayer());
-
-
-
 
     }
 
@@ -288,9 +283,12 @@ public class MainService {
     private void updateStatesAfterGameAction(GameState gameState, Board board, Pairing pairing, GameAction gameAction){
 
         Position positionToCheck;
-        boolean actionBuildsMorris;
+        boolean actionBuildsMorris = false;
+        Player currentPlayer = pairingService.getCurrentPlayer(pairing);
+        Player enemyPlayer = pairingService.getEnemyOf(pairing, currentPlayer);
 
         if (gameAction instanceof Put){
+            playerService.increasePutStones(currentPlayer);
             positionToCheck = ((Put) gameAction).getPutPosition();
             actionBuildsMorris = boardService.isPositionPartOfMorris(board, positionToCheck);
         } else if (gameAction instanceof  Move) {
@@ -299,27 +297,23 @@ public class MainService {
         } else if (gameAction instanceof  Jump) {
             positionToCheck = ((Jump) gameAction).getTo();
             actionBuildsMorris = boardService.isPositionPartOfMorris(board, positionToCheck);
-        }else {
+        } else if (gameAction instanceof  Kill){
+            playerService.increaseKilledStones(currentPlayer);
+            playerService.increaseLostStones(enemyPlayer);
             actionBuildsMorris = false;
-
+        } else {
+            logger.error("Ungültige GameAction");
         }
 
 
-        Player currentPlayer = pairingService.getCurrentPlayer(pairing);
-        Player enemyPlayer = pairingService.getEnemyOf(pairing, currentPlayer);
+
         boolean allEnemyStonesInMorris  = boardService.areAllStonesPartOfMorris(board, pairingService.getIndexOfPlayer(pairing, enemyPlayer));
         if (actionBuildsMorris && !allEnemyStonesInMorris){
             playerService.changeToKillPhase(currentPlayer);
             playerService.changeToWaitPhase(enemyPlayer);
         } else {
             playerService.changeToWaitPhase(currentPlayer);
-            if (playerService.getNumerOfPutStones(enemyPlayer) < 9){
-                playerService.changeToPutPhase(enemyPlayer);
-            } else if (playerService.getNumerOfLostStones(enemyPlayer) < 6){
-                playerService.changeToMovePhase(enemyPlayer);
-            } else {
-                playerService.changeToJumpPhase(enemyPlayer);
-            }
+            playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
             pairingService.changeTurn(pairing);
             logger.info("Neuer Aktueller Spieler: " + pairingService.getCurrentPlayer(pairing).getName());
             gameStateService.increaseRound(gameState);
