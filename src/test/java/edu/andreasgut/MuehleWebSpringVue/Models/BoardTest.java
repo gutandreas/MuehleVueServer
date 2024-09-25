@@ -16,14 +16,26 @@ public class BoardTest {
     @Test
     public void Board_toString(){
 
-        Board board = new Board();
 
-        boardService.putStone(board, new Put(new Position(0, 6)), 1);
-        boardService.putStone(board, new Put(new Position(2, 2)), 1);
-        boardService.putStone(board, new Put(new Position(1, 4)), 1);
-        boardService.putStone(board, new Put(new Position(1, 6)), 2);
-        boardService.putStone(board, new Put(new Position(0, 2)), 2);
-        boardService.putStone(board, new Put(new Position(2, 4)), 2);
+        POSITIONSTATE[][] positionstates = new POSITIONSTATE[3][8];
+
+        for (int ring = 0; ring < 3; ring++) {
+            for (int field = 0; field < 8; field++) {
+                positionstates[ring][field] = POSITIONSTATE.FREE;
+
+            }
+
+        }
+        positionstates[0][2] = POSITIONSTATE.PLAYER1;
+        positionstates[2][2] = POSITIONSTATE.PLAYER1;
+        positionstates[1][4] = POSITIONSTATE.PLAYER1;
+        positionstates[0][7] = POSITIONSTATE.PLAYER1;
+        positionstates[1][2] = POSITIONSTATE.PLAYER2;
+        positionstates[2][5] = POSITIONSTATE.PLAYER2;
+        positionstates[0][4] = POSITIONSTATE.PLAYER2;
+        positionstates[2][7] = POSITIONSTATE.PLAYER2;
+        Board board = new Board(positionstates);
+
         System.out.println(board);
     }
 }
