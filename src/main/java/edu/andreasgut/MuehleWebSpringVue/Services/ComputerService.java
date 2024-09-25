@@ -51,7 +51,7 @@ public class ComputerService {
             case 0:
                 return getRandomPut(game);
             case 1:
-                return (Put) executeAlphaBeta(game, playerIndex, 2);
+                return (Put) executeAlphaBeta(game, playerIndex, 3);
             default:
                 return null;
         }
@@ -175,10 +175,14 @@ public class ComputerService {
 
 
     private int evaluateScore(Board board, int playerIndex){
+        int stonesWeight = 100;
+        int movesWeight = 1;
         int ownStones = boardService.getNumberOfStonesOfPlayerWithIndex(board, playerIndex);
+        int ownMoves = boardService.getPossibleMoves(board, playerIndex).size();
         int enemyIndex = playerIndex == 1 ? 2 : 1;
         int enemyStones = boardService.getNumberOfStonesOfPlayerWithIndex(board, enemyIndex);
-        int score = ownStones - enemyStones;
+        int enemyMoves = boardService.getPossibleMoves(board, enemyIndex).size();
+        int score = stonesWeight * (ownStones - enemyStones) + movesWeight * (ownMoves - enemyMoves);
 
         return score;
 
