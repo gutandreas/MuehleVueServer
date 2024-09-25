@@ -60,10 +60,12 @@ public class Board implements Cloneable {
             Board cloned = (Board) super.clone();
 
             // Tiefes Kopieren des 2D-Arrays für die Positionen
-            cloned.boardPositionsStates = new POSITIONSTATE[boardPositionsStates.length][boardPositionsStates[0].length];
+            cloned.boardPositionsStates = new POSITIONSTATE[boardPositionsStates.length][];
             for (int i = 0; i < boardPositionsStates.length; i++) {
-                System.arraycopy(boardPositionsStates[i], 0, cloned.boardPositionsStates[i], 0, boardPositionsStates[i].length);
+                cloned.boardPositionsStates[i] = boardPositionsStates[i].clone();
             }
+
+            // Falls du weitere tiefe Kopien benötigst, hier ergänzen
 
             return cloned;
 

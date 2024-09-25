@@ -58,6 +58,10 @@ public class Game implements Cloneable {
         return spectators;
     }
 
+    public void setBoard(Board board) {
+        this.board = board;
+    }
+
     @Override
     public Game clone() {
         try {
