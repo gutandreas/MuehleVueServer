@@ -185,8 +185,12 @@ public class BoardService {
         int enemyIndex = playerIndex == 1 ? 2 : 1;
         for (int ring = 0; ring < 3; ring++) {
             for (int field = 0; field < 8; field++) {
-                if (isThisPositionOccupiedByPlayerWithIndex(board, enemyIndex, new Position(ring, field))) {
-                    possibleKills.add(new Kill(new Position(ring, field)));
+                Position killposition = new Position(ring, field);
+                boolean enemyPosition = isThisPositionOccupiedByPlayerWithIndex(board, enemyIndex, killposition);
+                boolean inMorris = isPositionPartOfMorris(board, killposition);
+                boolean allStonesInMorris = areAllStonesPartOfMorris(board, enemyIndex);
+                if (enemyPosition && (!inMorris || allStonesInMorris)) {
+                    possibleKills.add(new Kill(killposition));
                 }
             }
         }
