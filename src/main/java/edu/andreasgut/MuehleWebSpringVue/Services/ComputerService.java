@@ -48,7 +48,7 @@ public class ComputerService {
             case 0:
                 return caclutaRandomPut(game.getBoard());
             case 1:
-                return (Put) executeAlphaBeta(game, playerIndex, 2);
+                return (Put) executeAlphaBeta(game, playerIndex, 3);
             default:
                 return null;
         }
@@ -65,7 +65,7 @@ public class ComputerService {
             case 0:
                 return calculateRandomMove(game.getBoard(), playerIndex);
             case 1:
-                return (Move) executeAlphaBeta(game, playerIndex, 2);
+                return (Move) executeAlphaBeta(game, playerIndex, 3);
             default:
                 return null;
         }
