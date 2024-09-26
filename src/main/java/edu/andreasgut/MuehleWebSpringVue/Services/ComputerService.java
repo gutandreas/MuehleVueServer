@@ -7,7 +7,6 @@ import edu.andreasgut.MuehleWebSpringVue.Models.GameActions.*;
 import edu.andreasgut.MuehleWebSpringVue.Models.PHASE;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardComputerPlayer;
-import edu.andreasgut.MuehleWebSpringVue.Models.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,9 +34,7 @@ public class ComputerService {
         this.pairingService = pairingService;
     }
 
-    public void triggerComputer() {
 
-    }
 
 
 
@@ -49,7 +46,7 @@ public class ComputerService {
 
         switch (level){
             case 0:
-                return getRandomPut(game);
+                return caclutaRandomPut(game.getBoard());
             case 1:
                 return (Put) executeAlphaBeta(game, playerIndex, 2);
             default:
@@ -59,11 +56,52 @@ public class ComputerService {
 
     }
 
-    private Put getRandomPut(Game game){
-        logger.info("Neuer zufälliger Put wird berechnet");
-        LinkedList<Put> possiblePuts = boardService.getPossiblePuts(game.getBoard());
-        return possiblePuts.get(new Random().nextInt(possiblePuts.size()));
+    public Move calculateMove(Game game, int playerIndex){
+        StandardComputerPlayer standardComputerPlayer = (StandardComputerPlayer) game.getPairing().getPlayerByIndex(playerIndex);
+        int level = standardComputerPlayer.getLevel();
+
+
+        switch (level){
+            case 0:
+                return calculateRandomMove(game.getBoard(), playerIndex);
+            case 1:
+                return (Move) executeAlphaBeta(game, playerIndex, 2);
+            default:
+                return null;
+        }
     }
+
+    public Kill calculateKill(Game game, int playerIndex){
+        StandardComputerPlayer standardComputerPlayer = (StandardComputerPlayer) game.getPairing().getPlayerByIndex(playerIndex);
+        int level = standardComputerPlayer.getLevel();
+
+
+        switch (level){
+            case 0:
+                return calculateRandomKill(game.getBoard(), playerIndex);
+            case 1:
+                return (Kill) executeAlphaBeta(game, playerIndex, 2);
+            default:
+                return null;
+        }
+    }
+
+    public Jump calculateJump(Game game, int playerIndex){
+        StandardComputerPlayer standardComputerPlayer = (StandardComputerPlayer) game.getPairing().getPlayerByIndex(playerIndex);
+        int level = standardComputerPlayer.getLevel();
+
+
+        switch (level){
+            case 0:
+                return calculateRandomJump(game.getBoard(), playerIndex);
+            case 1:
+                return (Jump) executeAlphaBeta(game, playerIndex, 2);
+            default:
+                return null;
+        }
+    }
+
+
 
 
 
@@ -96,12 +134,12 @@ public class ComputerService {
         // Behandle alle möglichen Aktionen basierend auf der Phase
         LinkedList<? extends GameAction> possibleActions = getPossibleActionsForPhase(game, currentPhase);
 
-        GameAction bestAction = null;  // Hier wird der beste Zug gespeichert
+        GameAction bestAction = null;
         int bestScore = isMaximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         for (GameAction action : possibleActions) {
-            Game clonedGame = game.clone();  // Spiel klonen, um Änderungen lokal zu halten
-            executeGameAction(clonedGame, action, currentPhase);  // Führe die Aktion aus
+            Game clonedGame = game.clone();
+            executeGameAction(clonedGame, action, currentPhase);
             updateGameStateAfterAction(clonedGame, action, currentPhase);
             boolean maximizing = pairingService.getCurrentPlayerIndex(game.getPairing()) == ownIndex;
             PHASE nextPhase = playerService.getPhase(pairingService.getCurrentPlayer(clonedGame.getPairing()));
@@ -113,28 +151,25 @@ public class ComputerService {
             if (isMaximizingPlayer) {
                 if (score > bestScore) {
                     bestScore = score;
-                    bestAction = action;  // Speichere die beste Aktion
+                    bestAction = action;
                 }
                 alpha = Math.max(alpha, score);
             } else {
                 if (score < bestScore) {
                     bestScore = score;
-                    bestAction = action;  // Speichere die beste Aktion
+                    bestAction = action;
                 }
                 beta = Math.min(beta, score);
             }
 
-            // Alpha-Beta-Pruning: Abbrechen, wenn alpha >= beta
             if (alpha >= beta) {
                 break;
             }
 
         }
 
-
-
-        node.setScore(bestScore);  // Setze den besten Wert für diesen Knoten
-        node.setBestAction(bestAction);  // Speichere die beste Aktion im Knoten
+        node.setScore(bestScore);
+        node.setBestAction(bestAction);
 
         return bestScore;
     }
@@ -222,19 +257,25 @@ public class ComputerService {
         return stonesWeight * (ownStones - enemyStones) + movesWeight * (ownMoves - enemyMoves);
     }
 
-    public Move calculateMove(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex) {
+    private Put caclutaRandomPut(Board board){
+        logger.info("Neuer zufälliger Put wird berechnet");
+        LinkedList<Put> possiblePuts = boardService.getPossiblePuts(board);
+        return possiblePuts.get(new Random().nextInt(possiblePuts.size()));
+    }
+
+    public Move calculateRandomMove(Board board, int playerIndex) {
         logger.info("Neuer Move wird berechnet");
         LinkedList<Move> possibleMoves = boardService.getPossibleMoves(board, playerIndex);
         return possibleMoves.get(new Random().nextInt(possibleMoves.size()));
     }
 
-    public Jump calculateJump(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex) {
+    public Jump calculateRandomJump(Board board, int playerIndex) {
         logger.info("Neuer Jump wird berechnet");
         LinkedList<Jump> possibleJumps = boardService.getPossibleJumps(board, playerIndex);
         return possibleJumps.get(new Random().nextInt(possibleJumps.size()));
     }
 
-    public Kill calculateKill(StandardComputerPlayer standardComputerPlayer, Board board, int playerIndex) {
+    public Kill calculateRandomKill(Board board, int playerIndex) {
         logger.info("Neuer Kill wird berechnet");
         LinkedList<Kill> possibleKills = boardService.getPossibleKills(board, playerIndex);
         return possibleKills.get(new Random().nextInt(possibleKills.size()));

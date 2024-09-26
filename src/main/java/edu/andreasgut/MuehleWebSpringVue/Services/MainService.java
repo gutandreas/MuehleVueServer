@@ -96,19 +96,19 @@ public class MainService {
                     updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
                     break;
                 case MOVE:
-                    Move move = computerService.calculateMove(standardComputerPlayer, game.getBoard(), index);
+                    Move move = computerService.calculateMove(game, index);
                     boardService.moveStone(game.getBoard(), move, index);
                     updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), move);
                     break;
                 case KILL:
-                    Kill kill = computerService.calculateKill(standardComputerPlayer, game.getBoard(), index);
+                    Kill kill = computerService.calculateKill(game, index);
                     playerService.increaseKilledStones(standardComputerPlayer);
                     playerService.increaseLostStones(enemyPlayer);
                     boardService.killStone(game.getBoard(), kill);
                     updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), kill);
                     break;
                 case JUMP:
-                    Jump jump = computerService.calculateJump(standardComputerPlayer, game.getBoard(), index);
+                    Jump jump = computerService.calculateJump(game, index);
                     boardService.jumpStone(game.getBoard(), jump, index);
                     break;
 
