@@ -66,23 +66,40 @@ public class BoardService {
 
 
     @Transactional
-    public void moveStone(Board board, Move move, int playerIndex) {
+    public void moveStoneAndSave(Board board, Move move, int playerIndex) {
         setStoneOnPositionInArray(board, move.getTo(), playerIndex);
         removeStoneFromPositionInArray(board, move.getFrom());
         saveBoard(board);
     }
 
+    public void moveStone(Board board, Move move, int playerIndex) {
+        setStoneOnPositionInArray(board, move.getTo(), playerIndex);
+        removeStoneFromPositionInArray(board, move.getFrom());
+    }
+
     @Transactional
-    public void jumpStone(Board board, Jump jump, int playerIndex) {
+    public void jumpStoneAndSave(Board board, Jump jump, int playerIndex) {
         setStoneOnPositionInArray(board, jump.getTo(), playerIndex);
         removeStoneFromPositionInArray(board, jump.getFrom());
         saveBoard(board);
     }
 
+
+    public void jumpStone(Board board, Jump jump, int playerIndex) {
+        setStoneOnPositionInArray(board, jump.getTo(), playerIndex);
+        removeStoneFromPositionInArray(board, jump.getFrom());
+
+    }
+
     @Transactional
-    public void killStone(Board board, Kill kill) {
+    public void killStoneAndSave(Board board, Kill kill) {
         removeStoneFromPositionInArray(board, kill.getKillPosition());
         saveBoard(board);
+    }
+
+
+    public void killStone(Board board, Kill kill) {
+        removeStoneFromPositionInArray(board, kill.getKillPosition());
     }
 
     private void saveBoard(Board board){

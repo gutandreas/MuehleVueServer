@@ -48,7 +48,7 @@ public class ComputerService {
             case 0:
                 return caclutaRandomPut(game.getBoard());
             case 1:
-                return (Put) executeAlphaBeta(game, playerIndex, 3);
+                return (Put) executeAlphaBeta(game, playerIndex, 4);
             default:
                 return null;
         }
@@ -65,7 +65,7 @@ public class ComputerService {
             case 0:
                 return calculateRandomMove(game.getBoard(), playerIndex);
             case 1:
-                return (Move) executeAlphaBeta(game, playerIndex, 3);
+                return (Move) executeAlphaBeta(game, playerIndex, 2);
             default:
                 return null;
         }
@@ -141,12 +141,12 @@ public class ComputerService {
             Game clonedGame = game.clone();
             executeGameAction(clonedGame, action, currentPhase);
             updateGameStateAfterAction(clonedGame, action, currentPhase);
-            boolean maximizing = pairingService.getCurrentPlayerIndex(game.getPairing()) == ownIndex;
+            boolean maximizing = pairingService.getCurrentPlayerIndex(clonedGame.getPairing()) == ownIndex;
             PHASE nextPhase = playerService.getPhase(pairingService.getCurrentPlayer(clonedGame.getPairing()));
 
-            GameNode child = new GameNode(game.getBoard(), action, pairingService.getCurrentPlayerIndex(game.getPairing()), node, 0);
-            int nextLevel = nextPhase == PHASE.KILL ? currentLevel : currentLevel+1;
-            int score = recursiveAlphaBeta(clonedGame, ownIndex, maxLevel, nextLevel, nextPhase, child, alpha, beta, maximizing);
+            GameNode child = new GameNode(clonedGame.getBoard(), action, pairingService.getCurrentPlayerIndex(clonedGame.getPairing()), node, 0);
+            int nextMaxLevel = nextPhase == PHASE.KILL ? maxLevel + 1 : maxLevel;
+            int score = recursiveAlphaBeta(clonedGame, ownIndex, nextMaxLevel, currentLevel + 1, nextPhase, child, alpha, beta, maximizing);
 
             if (isMaximizingPlayer) {
                 if (score > bestScore) {

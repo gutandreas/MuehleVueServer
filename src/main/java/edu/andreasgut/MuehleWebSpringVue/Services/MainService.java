@@ -97,19 +97,19 @@ public class MainService {
                     break;
                 case MOVE:
                     Move move = computerService.calculateMove(game, index);
-                    boardService.moveStone(game.getBoard(), move, index);
+                    boardService.moveStoneAndSave(game.getBoard(), move, index);
                     updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), move);
                     break;
                 case KILL:
                     Kill kill = computerService.calculateKill(game, index);
                     playerService.increaseKilledStones(standardComputerPlayer);
                     playerService.increaseLostStones(enemyPlayer);
-                    boardService.killStone(game.getBoard(), kill);
+                    boardService.killStoneAndSave(game.getBoard(), kill);
                     updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), kill);
                     break;
                 case JUMP:
                     Jump jump = computerService.calculateJump(game, index);
-                    boardService.jumpStone(game.getBoard(), jump, index);
+                    boardService.jumpStoneAndSave(game.getBoard(), jump, index);
                     break;
 
             }
@@ -172,7 +172,7 @@ public class MainService {
             boolean fromPostionAndToPostionAreNeighbours = boardService.arePositionsNeighbours(move.getFrom(), move.getTo());
 
             if (phaseOK && uuidOK && toPositionFree && fromPositionWithOwnStone && fromPostionAndToPostionAreNeighbours){
-                boardService.moveStone(board, move, pairingService.getCurrentPlayerIndex(pairing));
+                boardService.moveStoneAndSave(board, move, pairingService.getCurrentPlayerIndex(pairing));
                 logger.info("Put ausgeführt in GameState " + gameCode);
                 updateStatesAfterGameAction(gameState, board, pairing, move);
                 int numberOfMoves = boardService.getPossibleMoves(board, enemyIndex).size();
@@ -215,7 +215,7 @@ public class MainService {
             boolean positionOK = boardService.isThisPositionOccupiedByPlayerWithIndex(board, enemyIndex, kill.getKillPosition());
 
             if (phaseOK && uuidOK && positionOK){
-                boardService.killStone(board, kill);
+                boardService.killStoneAndSave(board, kill);
                 logger.info("Kill ausgeführt in GameState " + gameCode);
                 updateStatesAfterGameAction(gameState, board, pairing, kill);
                 playerService.increaseKilledStones(currentPlayer);

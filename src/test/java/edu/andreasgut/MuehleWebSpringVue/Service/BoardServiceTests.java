@@ -33,12 +33,12 @@ public class BoardServiceTests {
         when(boardRepository.save(any())).thenReturn(null);
 
         boardService.putStoneAndSave(board, new Put(new Position(1,1)), 1);
-        boardService.moveStone(board, new Move(new Position(1, 1), new Position(1, 2)), 1);
+        boardService.moveStoneAndSave(board, new Move(new Position(1, 1), new Position(1, 2)), 1);
 
         POSITIONSTATE positionstate = boardService.getStateOfPosition(board, new Position(1, 2));
 
         Assertions.assertEquals(POSITIONSTATE.PLAYER1, positionstate);
-        boardService.moveStone(board, new Move(new Position(1, 2), new Position(1, 1)), 1);
+        boardService.moveStoneAndSave(board, new Move(new Position(1, 2), new Position(1, 1)), 1);
 
         positionstate = boardService.getStateOfPosition(board, new Position(1, 1));
 

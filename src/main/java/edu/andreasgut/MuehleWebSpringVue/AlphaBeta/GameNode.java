@@ -62,7 +62,7 @@ public class GameNode {
     // Rekursive Methode zum Drucken des Baums
     private void printTree(String prefix, boolean isTail) {
         // Aktuellen Knoten drucken
-        System.out.println(prefix + (isTail ? "└── " : "├── ") + "Player: " + currentPlayerIndex + ", Zug: " + gameAction +  ", Score: " + score);
+        System.out.println(prefix + (isTail ? "└── " : "├── ") + "Player: " + currentPlayerIndex + ", Zug: " + gameAction +  ", Score: " + score );
 
         // Kinderknoten durchlaufen und sie ebenfalls drucken
         for (int i = 0; i < children.size() - 1; i++) {
