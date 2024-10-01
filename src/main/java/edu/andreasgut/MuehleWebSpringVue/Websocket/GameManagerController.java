@@ -104,9 +104,8 @@ public class GameManagerController {
             senderService.sendAddGameToAdmin(gameSetupDto);
             return gameSetupDto;
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.warn("GameState konnte nicht erstellt werden");
-            return new GameSetupDto(null, 0, false);
+            logger.warn("Verschickte Fehlermeldung: " + e.getMessage());
+            return new GameSetupDto(null, 0, false, e.getMessage());
         }
     }
 
@@ -124,9 +123,8 @@ public class GameManagerController {
             senderService.sendGameUpdate(gameUpdateDto);
             return new GameSetupDto(gameJoin, 2, true);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.warn("GameState konnte nicht erstellt werden");
-            return new GameSetupDto(null, 0, false);
+            logger.warn("Verschickte Fehlermeldung: " + e.getMessage());
+            return new GameSetupDto(null, 0, false, e.getMessage());
         }
     }
 

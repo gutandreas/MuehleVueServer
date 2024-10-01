@@ -1,10 +1,10 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import com.google.gson.JsonObject;
+import edu.andreasgut.MuehleWebSpringVue.Exceptions.InvalidSetupException;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.*;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
-import edu.andreasgut.MuehleWebSpringVue.Websocket.GameManagerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,10 +65,14 @@ public class GameManagerService {
         Pairing pairing = new Pairing(humanPlayerStart, startPlayerIndex);
 
         Game gameStart = new Game(gameCode, new GameState(), pairing, new Board());
-        gameRepository.save(gameStart);
-        logger.info("Neues Logingame (start) erstellt");
-        return gameStart;
 
+        if (gameRepository.existsByGameCode(gameCode)){
+            throw new InvalidSetupException("Ein Game mit Gamecode " + gameCode + " existiert bereits. Wähle einen anderen Gamecode!");
+        } else {
+            gameRepository.save(gameStart);
+            logger.info("Neues Logingame (start) erstellt");
+            return gameStart;
+        }
     }
 
 
@@ -76,17 +80,22 @@ public class GameManagerService {
 
         System.out.println(getClass().getSimpleName() + "- Logingame (join) beigetreten");
         String gameCode = jsonRequest.get("gamecode").getAsString();
-        Game game = gameRepository.findByGameCode(gameCode);
-        Pairing pairing = game.getPairing();
+        if (!gameRepository.existsByGameCode(gameCode)) {
+            throw new InvalidSetupException("Es existiert kein Game mit dem Gamecode " + gameCode + ". Kontrolliere den Gamecode oder eröffne ein neues Spiel.");
+        } else if (gameRepository.findByGameCode(gameCode).getPairing().isComplete()) {
+            throw new InvalidSetupException("Das Game mit dem Gamecode " + gameCode + " ist bereits komplett. Ein Beitreten ist darum nicht erlaubt.");
+        } else {
+            Game game = gameRepository.findByGameCode(gameCode);
+            Pairing pairing = game.getPairing();
 
-        STONECOLOR playerStonecolorJoin = game.getPairing().getPlayer1().getStonecolor() == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
-        PHASE phase = game.getPairing().getCurrentPlayerIndex() == 2 ? PHASE.PUT : PHASE.WAIT;
-        Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolorJoin, webSocketSessionId, phase);
-        pairingService.addSecondPlayer(pairing, humanPlayerJoin);
-        gameRepository.save(game);
-        logger.info("Neues Logingame (join) erstellt");
-        return game;
-
+            STONECOLOR playerStonecolorJoin = game.getPairing().getPlayer1().getStonecolor() == STONECOLOR.BLACK ? STONECOLOR.WHITE : STONECOLOR.BLACK;
+            PHASE phase = game.getPairing().getCurrentPlayerIndex() == 2 ? PHASE.PUT : PHASE.WAIT;
+            Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolorJoin, webSocketSessionId, phase);
+            pairingService.addSecondPlayer(pairing, humanPlayerJoin);
+            gameRepository.save(game);
+            logger.info("Neues Logingame (join) erstellt");
+            return game;
+        }
     }
 
     public Game setupComputerGame(JsonObject jsonRequest, String webSocketSessionId) {
