@@ -42,6 +42,7 @@ public class SenderService {
 
 
     public void sendGameUpdate(GameUpdateDto gameUpdateDto){
+        sendUpdateGameToAdmin(gameUpdateDto);
         logger.info("Update in Game " + gameUpdateDto.getGame().getGameCode() + " versandt.");
         String gameCode = gameUpdateDto.getGame().getGameCode();
         String path = "/topic/game/" + gameCode + "/gameupdate";
