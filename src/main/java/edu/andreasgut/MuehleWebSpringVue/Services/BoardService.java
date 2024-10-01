@@ -244,6 +244,10 @@ public class BoardService {
         return possibleMoves;
     }
 
+    public boolean hasPlayerNoPossibilitiesToMove(Board board, int playerIndex){
+        return getPossibleMoves(board, playerIndex).size() == 0;
+    }
+
     public  LinkedList<Jump> getPossibleJumps(Board board, int playerIndex) {
         LinkedList<Jump> possibleJumps = new LinkedList<>();
 

@@ -1,8 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
-import edu.andreasgut.MuehleWebSpringVue.Models.Board;
-import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Models.GameState;
+import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,6 +21,10 @@ public class GameStateService {
 
     public void setWinner(GameState gameState, int winnerIndex) {
         gameState.setWinnerIndex(winnerIndex);
+    }
+
+    public int getWinnerIndex(GameState gameState){
+        return gameState.getWinnerIndex();
     }
 
 

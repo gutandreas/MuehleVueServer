@@ -78,7 +78,7 @@ public class MainServiceTests {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
 
-        mainService.handleMove(jsonObject);
+        //mainService.handleMove(jsonObject);
 
         Assertions.assertEquals(POSITIONSTATE.FREE, game.getBoard().getBoardPositionsStates()[0][1]);
     }

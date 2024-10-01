@@ -46,238 +46,210 @@ public class MainService {
         logger.info("Action in Game " + gameCode + " wird bearbeitet.");
 
         Game game = gameRepository.findByGameCode(gameCode);
+        String uuid = jsonObject.get("uuid").getAsString();
 
-        switch (type) {
-            case "PUT":
-                 int ring = jsonObject.get("ring").getAsInt();
-                 int field = jsonObject.get("field").getAsInt();
-                 String uuid = jsonObject.get("uuid").getAsString();
-                 Put put = new Put(new Position(ring, field));
-                 if (isPutAllowed(game, put, uuid)){
-                     handlePut(game, put);
-                 }
-                 senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
-                 gameRepository.save(game);
-                 break;
-            case "MOVE":
-                game = handleMove(jsonObject);
-                senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
-                gameRepository.save(game);
-                break;
-            case "KILL":
-                game = handleKill(jsonObject);
-                senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
-                gameRepository.save(game);
-                break;
-            case "JUMP":
-                game = handleJump(jsonObject);
-                senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
-                gameRepository.save(game);
-                break;
-            default:
-                logger.warn("Ungültiger Action Type");
+        executeActionIfAllowed(jsonObject, type, game, uuid);
+
+        if (isGameOver(game)){
+            gameStateService.finishGame(game.getGameState());
+            gameStateService.setWinner(game.getGameState(), pairingService.getPlayerIndexByPlayerUuid(game.getPairing(), uuid));
+            String winnerName = pairingService.getPlayerByIndex(game.getPairing(),gameStateService.getWinnerIndex(game.getGameState())).getName();
+            logger.info("Spiel " + gameCode + " wurde gewonnen von " +  winnerName);
         }
 
-        GameUpdateDto updateAfterHumanPlayer = new GameUpdateDto(gameRepository.findByGameCode(gameCode), LocalDateTime.now());
-        senderService.sendGameUpdate(updateAfterHumanPlayer);
-        game = gameRepository.findByGameCode(gameCode);
+        senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
+        gameRepository.save(game);
 
 
         while (!gameStateService.isGameFinished(game.getGameState()) && pairingService.getCurrentPlayer(game.getPairing()) instanceof StandardComputerPlayer){
-            StandardComputerPlayer standardComputerPlayer = (StandardComputerPlayer) pairingService.getCurrentPlayer(game.getPairing());
-            Player enemyPlayer = pairingService.getEnemyOf(game.getPairing(), standardComputerPlayer);
-            int index = pairingService.getIndexOfPlayer(game.getPairing(), standardComputerPlayer);
-            PHASE phase = playerService.getPhase(standardComputerPlayer);
-
-            switch (phase){
-                case PUT:
-                    Put put = computerService.calculatePut(game, index);
-                    boardService.putStoneAndSave(game.getBoard(), put, index);
-                    updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
-                    break;
-                case MOVE:
-                    Move move = computerService.calculateMove(game, index);
-                    boardService.moveStoneAndSave(game.getBoard(), move, index);
-                    updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), move);
-                    break;
-                case KILL:
-                    Kill kill = computerService.calculateKill(game, index);
-                    playerService.increaseKilledStones(standardComputerPlayer);
-                    playerService.increaseLostStones(enemyPlayer);
-                    boardService.killStoneAndSave(game.getBoard(), kill);
-                    updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), kill);
-                    break;
-                case JUMP:
-                    Jump jump = computerService.calculateJump(game, index);
-                    boardService.jumpStoneAndSave(game.getBoard(), jump, index);
-                    break;
-
-            }
+            triggerComputerPlayer(gameCode, game);
 
             gameRepository.save(game);
             senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
         }
     }
 
+    private void triggerComputerPlayer(String gameCode, Game game) {
+        StandardComputerPlayer standardComputerPlayer = (StandardComputerPlayer) pairingService.getCurrentPlayer(game.getPairing());
+        int index = pairingService.getIndexOfPlayer(game.getPairing(), standardComputerPlayer);
+        PHASE phase = playerService.getPhase(standardComputerPlayer);
+
+        switch (phase){
+            case PUT:
+                Put put = computerService.calculatePut(game, index);
+                boardService.putStoneAndSave(game.getBoard(), put, index);
+                updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
+                break;
+            case MOVE:
+                Move move = computerService.calculateMove(game, index);
+                boardService.moveStoneAndSave(game.getBoard(), move, index);
+                updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), move);
+                break;
+            case KILL:
+                Kill kill = computerService.calculateKill(game, index);
+                boardService.killStoneAndSave(game.getBoard(), kill);
+                updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), kill);
+                break;
+            case JUMP:
+                Jump jump = computerService.calculateJump(game, index);
+                boardService.jumpStoneAndSave(game.getBoard(), jump, index);
+                updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), jump);
+                break;
+        }
+
+        if (isGameOver(game)){
+            gameStateService.finishGame(game.getGameState());
+            gameStateService.setWinner(game.getGameState(), pairingService.getIndexOfPlayer(game.getPairing(), standardComputerPlayer));
+            String winnerName = pairingService.getPlayerByIndex(game.getPairing(),gameStateService.getWinnerIndex(game.getGameState())).getName();
+            logger.info("Spiel " + gameCode + " wurde gewonnen von " +  winnerName);
+        }
+    }
+
+    private void executeActionIfAllowed(JsonObject jsonObject, String type, Game game, String uuid) {
+        switch (type) {
+            case "PUT":
+                 int putRing = jsonObject.get("ring").getAsInt();
+                 int putField = jsonObject.get("field").getAsInt();
+                 Put put = new Put(new Position(putRing, putField));
+                 if (isPutAllowed(game, put, uuid)){
+                     handlePut(game, put);
+                 }
+                 break;
+            case "MOVE":
+                JsonObject fromObject = jsonObject.getAsJsonObject("from");
+                int fromRing = fromObject.get("ring").getAsInt();
+                int fromField = fromObject.get("field").getAsInt();
+                JsonObject toObject = jsonObject.getAsJsonObject("to");
+                int toRing = toObject.get("ring").getAsInt();
+                int toField = toObject.get("field").getAsInt();
+                Move move = new Move(new Position(fromRing, fromField), new Position(toRing, toField));
+
+                if (isMoveAllowed(game, move, uuid)){
+                    handleMove(game, move);
+                }
+                break;
+            case "KILL":
+                int killRing = jsonObject.get("ring").getAsInt();
+                int killField = jsonObject.get("field").getAsInt();
+                Kill kill = new Kill(new Position(killRing, killField));
+                if (isKillAllowed(game, kill, uuid)){
+                    handleKill(game, kill);
+                }
+                break;
+            case "JUMP":
+                JsonObject jumpFromObject = jsonObject.getAsJsonObject("from");
+                int jumpFromRing = jumpFromObject.get("ring").getAsInt();
+                int jumpFromField = jumpFromObject.get("field").getAsInt();
+                JsonObject jumpToObject = jsonObject.getAsJsonObject("to");
+                int jumptToRing = jumpToObject.get("ring").getAsInt();
+                int jumptToField = jumpToObject.get("field").getAsInt();
+                Jump jump = new Jump(new Position(jumpFromRing, jumpFromField), new Position(jumptToRing, jumptToField));
+
+                if (isJumpAllowed(game, jump, uuid)){
+                    handleJump(game, jump);
+                }
+                break;
+            default:
+                logger.warn("Ungültiger Action Type");
+        }
+    }
+
+    private boolean isGameOver(Game game){
+        int numberOfEnemysStones = boardService.getNumberOfStonesOfPlayerWithIndex(game.getBoard(), game.getPairing().getCurrentPlayerIndex());
+        int round = gameStateService.getRound(game.getGameState());
+        boolean lostBeacauseOfNumberOfStones = round > 18 && numberOfEnemysStones < 3;
+        boolean lostBeacauseOfLockedIn = playerService.isPlayerInMovePhase(game.getPairing().getCurrentPlayer()) && boardService.hasPlayerNoPossibilitiesToMove(game.getBoard(), game.getPairing().getCurrentPlayerIndex());
+        return lostBeacauseOfNumberOfStones || lostBeacauseOfLockedIn;
+
+    }
+
+
     public boolean isPutAllowed(Game game, Put put, String uuid){
 
         Pairing pairing = game.getPairing();
         Player currentPlayer = pairingService.getCurrentPlayer(pairing);
         Board board = game.getBoard();
-        GameState gameState = game.getGameState();
 
         boolean phaseOK = playerService.isPlayerInPutPhase(currentPlayer);
         boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
         boolean positionOK = boardService.isPositionFree(board, put.getPutPosition());
 
         return phaseOK && uuidOK && positionOK;
+    }
 
+    public boolean isMoveAllowed(Game game, Move move, String uuid){
+        Pairing pairing = game.getPairing();
+        Player currentPlayer = pairingService.getCurrentPlayer(pairing);
+        int playerIndex = pairingService.getIndexOfPlayer(pairing, currentPlayer);
+        Board board = game.getBoard();
+
+
+        boolean phaseOK = playerService.isPlayerInMovePhase(currentPlayer);
+        boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
+        boolean toPositionFree = boardService.isPositionFree(board, move.getTo());
+        boolean fromPositionWithOwnStone = boardService.isThisPositionOccupiedByPlayerWithIndex(board, playerIndex, move.getFrom());
+        boolean fromPostionAndToPostionAreNeighbours = boardService.arePositionsNeighbours(move.getFrom(), move.getTo());
+
+        return phaseOK && uuidOK && toPositionFree && fromPositionWithOwnStone && fromPostionAndToPostionAreNeighbours;
+    }
+
+    public boolean isKillAllowed(Game game, Kill kill, String uuid){
+        Pairing pairing = game.getPairing();
+        Player currentPlayer = pairingService.getCurrentPlayer(pairing);
+        int playerIndex = pairingService.getIndexOfPlayer(pairing, currentPlayer);
+        int enemyIndex = playerIndex == 1 ? 2 : 1;
+        Board board = game.getBoard();
+
+        boolean phaseOK = playerService.isPlayerInKillPhase(currentPlayer);
+        boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
+        boolean positionOK = boardService.isThisPositionOccupiedByPlayerWithIndex(board, enemyIndex, kill.getKillPosition());
+
+        return phaseOK && uuidOK && positionOK;
+    }
+
+    public boolean isJumpAllowed(Game game, Jump jump, String uuid){
+        Pairing pairing = game.getPairing();
+        Player currentPlayer = pairingService.getCurrentPlayer(pairing);
+        int playerIndex = pairingService.getIndexOfPlayer(pairing, currentPlayer);
+        Board board = game.getBoard();
+
+        boolean phaseOK = playerService.isPlayerInJumpPhase(currentPlayer);
+        boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
+        boolean toPositionFree = boardService.isPositionFree(board, jump.getTo());
+        boolean fromPositionWithOwnStone = boardService.isThisPositionOccupiedByPlayerWithIndex(board, playerIndex, jump.getFrom());
+
+        return phaseOK && uuidOK && toPositionFree && fromPositionWithOwnStone;
     }
 
     public void handlePut(Game game, Put put) {
 
         boardService.putStoneAndSave(game.getBoard(), put, pairingService.getCurrentPlayerIndex(game.getPairing()));
-        logger.info("Put ausgeführt in GameState " + game.getGameCode());
+        logger.info("Put ausgeführt in Game " + game.getGameCode());
         updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), put);
 
     }
 
-    public Game handleMove(JsonObject jsonObject) {
+    public void handleMove(Game game, Move move) {
 
-        String gameCode = jsonObject.get("gamecode").getAsString();
-        Game game = gameRepository.findByGameCode(gameCode);
+        boardService.moveStone(game.getBoard(), move, pairingService.getCurrentPlayerIndex(game.getPairing()));
+        logger.info("Move ausgeführt in Game " + game.getGameCode());
+        updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), move);
 
-        try {
-            JsonObject fromObject = jsonObject.getAsJsonObject("from");
-            int fromRing = fromObject.get("ring").getAsInt();
-            int fromField = fromObject.get("field").getAsInt();
 
-            JsonObject toObject = jsonObject.getAsJsonObject("to");
-            int toRing = toObject.get("ring").getAsInt();
-            int toField = toObject.get("field").getAsInt();
-
-            String uuid = jsonObject.get("uuid").getAsString();
-            Move move = new Move(new Position(fromRing, fromField), new Position(toRing, toField));
-            Pairing pairing = game.getPairing();
-            Player currentPlayer = pairingService.getCurrentPlayer(pairing);
-            Board board = game.getBoard();
-            GameState gameState = game.getGameState();
-            int index = game.getPairing().getCurrentPlayerIndex();
-            int enemyIndex = index == 1 ? 2 : 1;
-
-            boolean phaseOK = playerService.isPlayerInMovePhase(currentPlayer);
-            boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
-            boolean toPositionFree = boardService.isPositionFree(board, move.getTo());
-            boolean fromPositionWithOwnStone = boardService.isThisPositionOccupiedByPlayerWithIndex(board, index, move.getFrom());
-            boolean fromPostionAndToPostionAreNeighbours = boardService.arePositionsNeighbours(move.getFrom(), move.getTo());
-
-            if (phaseOK && uuidOK && toPositionFree && fromPositionWithOwnStone && fromPostionAndToPostionAreNeighbours){
-                boardService.moveStoneAndSave(board, move, pairingService.getCurrentPlayerIndex(pairing));
-                logger.info("Put ausgeführt in GameState " + gameCode);
-                updateStatesAfterGameAction(gameState, board, pairing, move);
-                int numberOfMoves = boardService.getPossibleMoves(board, enemyIndex).size();
-                if (numberOfMoves == 0){
-                    gameStateService.finishGame(gameState);
-                    gameStateService.setWinner(gameState, index);
-                }
-
-            } else {
-                logger.warn("Ungültige Position, Phase oder UUID bei Move in GameState " + gameCode);
-            }
-
-        } catch (Exception e) {
-            logger.warn(e.getMessage());
-            logger.warn("Move konnte nicht ausgeführt werden...");
-        }
-
-        return game;
     }
 
-    public Game handleKill(JsonObject jsonObject) {
-        String gameCode = jsonObject.get("gamecode").getAsString();
-        Game game = gameRepository.findByGameCode(gameCode);
+    public void handleKill(Game game, Kill kill) {
 
-        try {
-            int ring = jsonObject.get("ring").getAsInt();
-            int field = jsonObject.get("field").getAsInt();
-            String uuid = jsonObject.get("uuid").getAsString();
-
-            Kill kill = new Kill(new Position(ring, field));
-            Pairing pairing = game.getPairing();
-            Player currentPlayer = pairingService.getCurrentPlayer(pairing);
-            Board board = game.getBoard();
-            GameState gameState = game.getGameState();
-            int index = pairingService.getPlayerIndexByPlayerUuid(pairing, uuid);
-            int enemyIndex = index == 1 ? 2: 1;
-
-            boolean phaseOK = playerService.isPlayerInKillPhase(currentPlayer);
-            boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
-            boolean positionOK = boardService.isThisPositionOccupiedByPlayerWithIndex(board, enemyIndex, kill.getKillPosition());
-
-            if (phaseOK && uuidOK && positionOK){
-                boardService.killStoneAndSave(board, kill);
-                logger.info("Kill ausgeführt in GameState " + gameCode);
-                updateStatesAfterGameAction(gameState, board, pairing, kill);
-                playerService.increaseKilledStones(currentPlayer);
-                int numberOfEnemysStones = boardService.getNumberOfStonesOfPlayerWithIndex(board, enemyIndex);
-                int round = gameStateService.getRound(gameState);
-                if (round > 18 && numberOfEnemysStones < 3){
-                    gameStateService.finishGame(gameState);
-                    gameStateService.setWinner(gameState, index);
-                }
-            } else {
-                logger.warn("Ungültige Position, Phase oder UUID bei Kill in GameState " + gameCode);
-            }
-
-        } catch (Exception e) {
-            logger.warn(e.getMessage());
-            logger.warn("Kill konnte nicht ausgeführt werden...");
-        }
-
-        return game;
+        boardService.killStone(game.getBoard(), kill);
+        logger.info("Kill ausgeführt in Game " + game.getGameCode());
+        updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), kill);
     }
 
-    public Game handleJump(JsonObject jsonObject) {
-        String gameCode = jsonObject.get("gamecode").getAsString();
-        Game game = gameRepository.findByGameCode(gameCode);
+    public void handleJump(Game game, Jump jump) {
 
-        try {
-            JsonObject fromObject = jsonObject.getAsJsonObject("from");
-            int fromRing = fromObject.get("ring").getAsInt();
-            int fromField = fromObject.get("field").getAsInt();
-
-            JsonObject toObject = jsonObject.getAsJsonObject("to");
-            int toRing = toObject.get("ring").getAsInt();
-            int toField = toObject.get("field").getAsInt();
-
-            String uuid = jsonObject.get("uuid").getAsString();
-            Jump jump = new Jump(new Position(fromRing, fromField), new Position(toRing, toField));
-            Pairing pairing = game.getPairing();
-            Player currentPlayer = pairingService.getCurrentPlayer(pairing);
-            Board board = game.getBoard();
-            GameState gameState = game.getGameState();
-            int index = game.getPairing().getCurrentPlayerIndex();
-
-            boolean phaseOK = playerService.isPlayerInJumpPhase(currentPlayer);
-            boolean uuidOK = pairingService.getPlayerByPlayerUuid(pairing, uuid).equals(pairingService.getCurrentPlayer(pairing));
-            boolean toPositionFree = boardService.isPositionFree(board, jump.getTo());
-            boolean fromPositionWithOwnStone = boardService.isThisPositionOccupiedByPlayerWithIndex(board, index, jump.getFrom());
-
-
-            if (phaseOK && uuidOK && toPositionFree && fromPositionWithOwnStone){
-                boardService.jumpStone(board, jump, pairingService.getCurrentPlayerIndex(pairing));
-                logger.info("Put ausgeführt in GameState " + gameCode);
-                updateStatesAfterGameAction(gameState, board, pairing, jump);
-            } else {
-                logger.warn("Ungültige Position, Phase oder UUID bei Jump in GameState " + gameCode);
-            }
-
-        } catch (Exception e) {
-            logger.warn(e.getMessage());
-            logger.warn("Jump konnte nicht ausgeführt werden...");
-        }
-
-        return game;
+        boardService.jumpStone(game.getBoard(), jump, pairingService.getCurrentPlayerIndex(game.getPairing()));
+        logger.info("Jump ausgeführt in Game " + game.getGameCode());
+        updateStatesAfterGameAction(game.getGameState(), game.getBoard(), game.getPairing(), jump);
     }
 
     private void updateStatesAfterGameAction(GameState gameState, Board board, Pairing pairing, GameAction gameAction){
