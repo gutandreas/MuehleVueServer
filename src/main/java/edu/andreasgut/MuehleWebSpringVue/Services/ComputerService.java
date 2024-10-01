@@ -261,6 +261,9 @@ public class ComputerService {
             case KILL:
                 boardService.killStone(game.getBoard(), (Kill) action);
                 break;
+            case JUMP:
+                boardService.jumpStone(game.getBoard(), (Jump) action, currentPlayerIndex);
+                break;
         }
     }
 
