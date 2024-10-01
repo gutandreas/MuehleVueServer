@@ -125,6 +125,11 @@ public class ComputerService {
 
     private int recursiveAlphaBeta(Game game, int ownIndex, int maxLevel, int currentLevel, PHASE currentPhase, GameNode node, int alpha, int beta, boolean isMaximizingPlayer) {
         // Basisfall: Maximale Suchtiefe erreicht
+
+        if (isGameOver(game)){
+            node.setScore(gameStateService.getWinnerIndex(game.getGameState()) == ownIndex ? Integer.MAX_VALUE : Integer.MIN_VALUE);
+        }
+
         if (currentLevel == maxLevel) {
             int score = evaluateScore(game.getBoard(), ownIndex);  // Bewertungsfunktion
             node.setScore(score);  // Setze den Wert im Knoten
@@ -140,6 +145,7 @@ public class ComputerService {
         for (GameAction action : possibleActions) {
             Game clonedGame = game.clone();
             executeGameAction(clonedGame, action, currentPhase);
+
             updateGameStateAfterAction(clonedGame, action, currentPhase);
             boolean maximizing = pairingService.getCurrentPlayerIndex(clonedGame.getPairing()) == ownIndex;
             PHASE nextPhase = playerService.getPhase(pairingService.getCurrentPlayer(clonedGame.getPairing()));
@@ -175,6 +181,12 @@ public class ComputerService {
     }
 
     private void updateGameStateAfterAction(Game game, GameAction action, PHASE currentPhase) {
+
+        if (isGameOver(game)){
+            gameStateService.finishGame(game.getGameState());
+            gameStateService.setWinner(game.getGameState(), pairingService.getCurrentPlayerIndex(game.getPairing()));
+        }
+
         // Aktualisiert den Spielzustand nach einer Aktion und bereitet das Spiel für die nächste Phase vor
         Player currentPlayer = pairingService.getCurrentPlayer(game.getPairing());
         Player enemyPlayer = pairingService.getEnemyOf(game.getPairing(), currentPlayer);
@@ -206,7 +218,19 @@ public class ComputerService {
                 playerService.changeToWaitPhase(currentPlayer);
                 playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
                 break;
+            case JUMP:
+                if (!boardService.isPositionPartOfMorris(game.getBoard(), ((Jump) action).getTo())) {
+                    gameStateService.increaseRound(game.getGameState());
+                    pairingService.changeTurn(game.getPairing());
+                    playerService.changeToWaitPhase(currentPlayer);
+                    playerService.setPhase(enemyPlayer, playerService.getPhaseIfPutMoveOrJump(enemyPlayer));
+                } else {
+                    playerService.changeToKillPhase(currentPlayer);  // Spieler darf einen Stein schlagen
+                }
+                break;
         }
+
+
     }
 
     private LinkedList<? extends GameAction> getPossibleActionsForPhase(Game game, PHASE currentPhase) {
@@ -255,6 +279,14 @@ public class ComputerService {
 
         // Berechnung der Punktzahl
         return stonesWeight * (ownStones - enemyStones) + movesWeight * (ownMoves - enemyMoves);
+    }
+
+    private boolean isGameOver(Game game){
+        int numberOfEnemysStones = boardService.getNumberOfStonesOfPlayerWithIndex(game.getBoard(), game.getPairing().getCurrentPlayerIndex());
+        int round = gameStateService.getRound(game.getGameState());
+        boolean lostBeacauseOfNumberOfStones = round > 18 && numberOfEnemysStones < 3;
+        boolean lostBeacauseOfLockedIn = playerService.isPlayerInMovePhase(game.getPairing().getCurrentPlayer()) && boardService.hasPlayerNoPossibilitiesToMove(game.getBoard(), game.getPairing().getCurrentPlayerIndex());
+        return lostBeacauseOfNumberOfStones || lostBeacauseOfLockedIn;
     }
 
     private Put caclutaRandomPut(Board board){

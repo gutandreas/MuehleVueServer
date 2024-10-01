@@ -160,7 +160,6 @@ public class MainService {
         boolean lostBeacauseOfNumberOfStones = round > 18 && numberOfEnemysStones < 3;
         boolean lostBeacauseOfLockedIn = playerService.isPlayerInMovePhase(game.getPairing().getCurrentPlayer()) && boardService.hasPlayerNoPossibilitiesToMove(game.getBoard(), game.getPairing().getCurrentPlayerIndex());
         return lostBeacauseOfNumberOfStones || lostBeacauseOfLockedIn;
-
     }
 
 
