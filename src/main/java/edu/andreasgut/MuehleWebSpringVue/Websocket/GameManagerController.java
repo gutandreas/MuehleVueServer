@@ -6,6 +6,7 @@ import edu.andreasgut.MuehleWebSpringVue.DTO.GameSetupDto;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.Game;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
+import edu.andreasgut.MuehleWebSpringVue.Repositories.SpectatorRepository;
 import edu.andreasgut.MuehleWebSpringVue.Services.GameManagerService;
 import edu.andreasgut.MuehleWebSpringVue.Services.SenderService;
 import org.slf4j.Logger;
@@ -29,13 +30,15 @@ public class GameManagerController {
     private GameManagerService gameManagerService;
     private SenderService senderService;
     private GameRepository gameRepository;
+    private SpectatorRepository spectatorRepository;
 
 
     @Autowired
-    public GameManagerController(GameManagerService gameManagerService, SenderService senderService, GameRepository gameRepository) {
+    public GameManagerController(GameManagerService gameManagerService, SenderService senderService, GameRepository gameRepository, SpectatorRepository spectatorRepository) {
         this.gameManagerService = gameManagerService;
         this.senderService = senderService;
         this.gameRepository = gameRepository;
+        this.spectatorRepository = spectatorRepository;
     }
 
     @Transactional

@@ -27,12 +27,10 @@ public class ChatController {
     @MessageMapping("/chat/{gameCode}/messages")
     @SendTo("/topic/chat/{gameCode}/messages")
     public String handleMessage(@Payload String data, @DestinationVariable("gameCode") String gameCode) {
-        // Hier kannst du die Nachricht entsprechend verarbeiten
-        System.out.println(data);
         JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
         String name = jsonObject.get("name").getAsString();
         String message = jsonObject.get("message").getAsString();
-        logger.info("Nachricht von " + name + " in GameState " + gameCode + ": " + message);
+        logger.info("Nachricht von " + name + " in Game " + gameCode + ": " + message);
 
         return data;
     }
