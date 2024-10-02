@@ -2,6 +2,7 @@ package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameSetupDto;
 import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
+import edu.andreasgut.MuehleWebSpringVue.DTO.StatisticsDto;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.Player;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import org.slf4j.Logger;
@@ -54,6 +55,11 @@ public class SenderService {
         String path = "/topic/game/" + gameCode + "/secondplayer";
         System.out.println(player);
         template.convertAndSend(path, player);
+    }
+
+    public void sendStatisticUpdate(StatisticsDto statisticsDto){
+        String path = "/topic/statistics/getall";
+        template.convertAndSend(path, statisticsDto);
     }
 
 

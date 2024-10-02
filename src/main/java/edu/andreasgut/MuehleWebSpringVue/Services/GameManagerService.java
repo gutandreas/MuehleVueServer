@@ -7,7 +7,6 @@ import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.*;
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,18 +23,21 @@ public class GameManagerService {
     private GameService gameService;
     private ComputerService computerService;
     private MainService mainService;
+    private SenderService senderService;
+    private StatisticService statisticService;
 
 
-
-
-    @Autowired
-    public GameManagerService(GameRepository gameRepository, PairingService pairingService, GameService gameService, ComputerService computerService, MainService mainService) {
+    public GameManagerService(GameRepository gameRepository, PairingService pairingService, GameService gameService, ComputerService computerService, MainService mainService, SenderService senderService, StatisticService statisticService) {
         this.gameRepository = gameRepository;
         this.pairingService = pairingService;
         this.gameService = gameService;
         this.computerService = computerService;
         this.mainService = mainService;
+        this.senderService = senderService;
+        this.statisticService = statisticService;
     }
+
+
 
     public LinkedList<Game> getAllGames() {
         LinkedList<Game> games = gameRepository.findAll();
@@ -74,6 +76,7 @@ public class GameManagerService {
             throw new InvalidSetupException("Ein Game mit Gamecode " + gameCode + " existiert bereits. Wähle einen anderen Gamecode!");
         } else {
             gameRepository.save(gameStart);
+            senderService.sendStatisticUpdate(statisticService.getUpdatedStatistic());
             logger.info("Neues Logingame (start) erstellt");
             return gameStart;
         }
@@ -97,7 +100,9 @@ public class GameManagerService {
             Player humanPlayerJoin = new HumanPlayer(jsonRequest.get("name").getAsString(), playerStonecolorJoin, webSocketSessionId, phase);
             pairingService.addSecondPlayer(pairing, humanPlayerJoin);
             gameRepository.save(game);
+            senderService.sendStatisticUpdate(statisticService.getUpdatedStatistic());
             logger.info("Neues Logingame (join) erstellt");
+
             return game;
         }
     }
@@ -135,6 +140,7 @@ public class GameManagerService {
             mainService.letComputerStart(game);
         }
         gameRepository.save(game);
+        senderService.sendStatisticUpdate(statisticService.getUpdatedStatistic());
 
         return game;
 
@@ -150,6 +156,7 @@ public class GameManagerService {
 
         gameService.addSpectator(game, new Spectator(name, isRoboter, webSocketSessionId));
         gameRepository.save(game);
+
         return game;
     }
 

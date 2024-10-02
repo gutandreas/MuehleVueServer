@@ -124,6 +124,7 @@ public class GameManagerController {
             GameUpdateDto gameUpdateDto = new GameUpdateDto(gameJoin, LocalDateTime.now());
             senderService.sendUpdateGameToAdmin(gameUpdateDto);
             senderService.sendGameUpdate(gameUpdateDto);
+
             return new GameSetupDto(gameJoin, 2, true);
         } catch (Exception e) {
             logger.warn("Verschickte Fehlermeldung: " + e.getMessage());

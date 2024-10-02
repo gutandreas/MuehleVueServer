@@ -9,7 +9,6 @@ import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.StandardCompu
 import edu.andreasgut.MuehleWebSpringVue.Repositories.GameRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,9 +26,9 @@ public class MainService {
     private final GameService gameService;
     private final GameStateService gameStateService;
     private final ComputerService computerService;
+    private final StatisticService statisticService;
 
-    @Autowired
-    public MainService(GameRepository gameRepository, SenderService senderService, BoardService boardService, PairingService pairingService, PlayerService playerService, GameService gameService, GameStateService gameStateService, ComputerService computerService) {
+    public MainService(GameRepository gameRepository, SenderService senderService, BoardService boardService, PairingService pairingService, PlayerService playerService, GameService gameService, GameStateService gameStateService, ComputerService computerService, StatisticService statisticService) {
         this.gameRepository = gameRepository;
         this.senderService = senderService;
         this.boardService = boardService;
@@ -38,6 +37,7 @@ public class MainService {
         this.gameService = gameService;
         this.gameStateService = gameStateService;
         this.computerService = computerService;
+        this.statisticService = statisticService;
     }
 
     public void handleAction(JsonObject jsonObject) {
@@ -53,6 +53,7 @@ public class MainService {
         if (isGameOver(game)){
             gameStateService.finishGame(game.getGameState());
             gameStateService.setWinner(game.getGameState(), pairingService.getPlayerIndexByPlayerUuid(game.getPairing(), uuid));
+            senderService.sendStatisticUpdate(statisticService.getUpdatedStatistic());
             String winnerName = pairingService.getPlayerByIndex(game.getPairing(),gameStateService.getWinnerIndex(game.getGameState())).getName();
             logger.info("Spiel " + gameCode + " wurde gewonnen von " +  winnerName);
         }
@@ -63,8 +64,8 @@ public class MainService {
 
         while (!gameStateService.isGameFinished(game.getGameState()) && pairingService.getCurrentPlayer(game.getPairing()) instanceof StandardComputerPlayer){
             triggerComputerPlayer(game);
-
             gameRepository.save(game);
+            senderService.sendStatisticUpdate(statisticService.getUpdatedStatistic());
             senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
         }
     }
