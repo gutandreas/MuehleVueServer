@@ -62,14 +62,14 @@ public class MainService {
 
 
         while (!gameStateService.isGameFinished(game.getGameState()) && pairingService.getCurrentPlayer(game.getPairing()) instanceof StandardComputerPlayer){
-            triggerComputerPlayer(gameCode, game);
+            triggerComputerPlayer(game);
 
             gameRepository.save(game);
             senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
         }
     }
 
-    private void triggerComputerPlayer(String gameCode, Game game) {
+    private void triggerComputerPlayer(Game game) {
         StandardComputerPlayer standardComputerPlayer = (StandardComputerPlayer) pairingService.getCurrentPlayer(game.getPairing());
         int index = pairingService.getIndexOfPlayer(game.getPairing(), standardComputerPlayer);
         PHASE phase = playerService.getPhase(standardComputerPlayer);
@@ -101,8 +101,12 @@ public class MainService {
             gameStateService.finishGame(game.getGameState());
             gameStateService.setWinner(game.getGameState(), pairingService.getIndexOfPlayer(game.getPairing(), standardComputerPlayer));
             String winnerName = pairingService.getPlayerByIndex(game.getPairing(),gameStateService.getWinnerIndex(game.getGameState())).getName();
-            logger.info("Spiel " + gameCode + " wurde gewonnen von " +  winnerName);
+            logger.info("Spiel " + game.getGameCode() + " wurde gewonnen von " +  winnerName);
         }
+    }
+
+    public void letComputerStart(Game game){
+        triggerComputerPlayer(game);
     }
 
     private void executeActionIfAllowed(JsonObject jsonObject, String type, Game game, String uuid) {

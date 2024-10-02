@@ -22,15 +22,19 @@ public class GameManagerService {
     private final GameRepository gameRepository;
     private PairingService pairingService;
     private GameService gameService;
+    private ComputerService computerService;
+    private MainService mainService;
 
 
 
 
     @Autowired
-    public GameManagerService(GameRepository gameRepository, PairingService pairingService, GameService gameService) {
+    public GameManagerService(GameRepository gameRepository, PairingService pairingService, GameService gameService, ComputerService computerService, MainService mainService) {
         this.gameRepository = gameRepository;
         this.pairingService = pairingService;
         this.gameService = gameService;
+        this.computerService = computerService;
+        this.mainService = mainService;
     }
 
     public LinkedList<Game> getAllGames() {
@@ -127,6 +131,9 @@ public class GameManagerService {
         String gameCode = generateValidGameCode();
 
         Game game = new Game(gameCode, new GameState(), pairing, new Board());
+        if (computerPlayer.getCurrentPhase() == PHASE.PUT){
+            mainService.letComputerStart(game);
+        }
         gameRepository.save(game);
 
         return game;

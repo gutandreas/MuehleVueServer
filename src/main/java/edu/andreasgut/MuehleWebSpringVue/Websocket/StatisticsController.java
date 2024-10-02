@@ -37,8 +37,10 @@ public class StatisticsController {
         int numberOfHumanPlayers = humanPlayerRepository.findAll().size();
         int numberOfSpectators = spectatorRepository.findAll().size();
         LinkedList<HumanPlayer> activeHumanPlayers = humanPlayerRepository.findAllWithUnfinishedGames();
+        int numberOfFinishedGamesWithComputer = gameRepository.countFinishedGamesByStandardComputerPlayer();
+        int numberOfGamesWonByComputer = gameRepository.countGamesWonByStandardComputerPlayer();
         logger.info("Statistiken abgefragt...");
 
-        return new StatisticsDto(numberOfActiveGames, numberOfGamesTotal, numberOfHumanPlayers, activeHumanPlayers, numberOfSpectators);
+        return new StatisticsDto(numberOfActiveGames, numberOfGamesTotal, numberOfHumanPlayers, activeHumanPlayers, numberOfSpectators, numberOfFinishedGamesWithComputer, numberOfGamesWonByComputer);
     }
 }

@@ -11,14 +11,17 @@ public class StatisticsDto {
     private int numberOfHumanPlayers;
     private LinkedList<HumanPlayer> activeHumanPlayers;
     private int numberOfSpectators;
+    private int numberOfComputerGames;
+    private int numberOfGamesWonByComputer;
 
-
-    public StatisticsDto(int numberOfActiveGames, int numberOfGamesTotal, int numberOfHumanPlayers, LinkedList<HumanPlayer> humanPlayers, int numberOfSpectators) {
+    public StatisticsDto(int numberOfActiveGames, int numberOfGamesTotal, int numberOfHumanPlayers, LinkedList<HumanPlayer> activeHumanPlayers, int numberOfSpectators, int numberOfComputerGames, int numberOfGamesWonByComputer) {
         this.numberOfActiveGames = numberOfActiveGames;
         this.numberOfGamesTotal = numberOfGamesTotal;
         this.numberOfHumanPlayers = numberOfHumanPlayers;
-        this.activeHumanPlayers = humanPlayers;
+        this.activeHumanPlayers = activeHumanPlayers;
         this.numberOfSpectators = numberOfSpectators;
+        this.numberOfComputerGames = numberOfComputerGames;
+        this.numberOfGamesWonByComputer = numberOfGamesWonByComputer;
     }
 
     public int getNumberOfActiveGames() {
@@ -39,5 +42,13 @@ public class StatisticsDto {
 
     public LinkedList<HumanPlayer> getActiveHumanPlayers() {
         return activeHumanPlayers;
+    }
+
+    public int getNumberOfComputerGames() {
+        return numberOfComputerGames;
+    }
+
+    public int getNumberOfGamesWonByComputer() {
+        return numberOfGamesWonByComputer;
     }
 }
