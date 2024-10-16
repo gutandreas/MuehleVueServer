@@ -48,6 +48,8 @@ public class ComputerService {
             case 0:
                 return caclutaRandomPut(game.getBoard());
             case 1:
+                return (Put) executeAlphaBeta(game, playerIndex, 2);
+            case 2:
                 return (Put) executeAlphaBeta(game, playerIndex, 4);
             default:
                 return null;
@@ -65,6 +67,8 @@ public class ComputerService {
             case 0:
                 return calculateRandomMove(game.getBoard(), playerIndex);
             case 1:
+                return (Move) executeAlphaBeta(game, playerIndex, 2);
+            case 2:
                 return (Move) executeAlphaBeta(game, playerIndex, 4);
             default:
                 return null;
@@ -80,6 +84,8 @@ public class ComputerService {
             case 0:
                 return calculateRandomKill(game.getBoard(), playerIndex);
             case 1:
+                return (Kill) executeAlphaBeta(game, playerIndex, 2);
+            case 2:
                 return (Kill) executeAlphaBeta(game, playerIndex, 4);
             default:
                 return null;
@@ -95,13 +101,13 @@ public class ComputerService {
             case 0:
                 return calculateRandomJump(game.getBoard(), playerIndex);
             case 1:
+                return (Jump) executeAlphaBeta(game, playerIndex, 2);
+            case 2:
                 return (Jump) executeAlphaBeta(game, playerIndex, 4);
             default:
                 return null;
         }
     }
-
-
 
 
 
