@@ -43,7 +43,6 @@ public class GameManagerController {
 
     @Transactional
     @MessageMapping("/admin/games/delete")
-    //@SendTo("/topic/admin/games/delete")
     public void deleteGameByGameCode(@Payload String message) {
 
         try {
@@ -147,6 +146,19 @@ public class GameManagerController {
             e.printStackTrace();
             logger.warn("Das Spiel kann nicht beobachtet werden");
             return new GameSetupDto(null, 0, false);
+        }
+    }
+
+    @MessageMapping("/manager/setup/giveup")
+    public void giveUp(@Payload String message, SimpMessageHeaderAccessor headerAccessor) {
+        try {
+            logger.info("Request für 'Spiel aufgeben'...");
+            String sessionId = headerAccessor.getSessionId();
+            JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+            gameManagerService.giveUpGame(jsonObject, sessionId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.warn("Das Spiel kann nicht aufgegeben werden");
         }
     }
 

@@ -1,6 +1,7 @@
 package edu.andreasgut.MuehleWebSpringVue.Services;
 
 import com.google.gson.JsonObject;
+import edu.andreasgut.MuehleWebSpringVue.DTO.GameUpdateDto;
 import edu.andreasgut.MuehleWebSpringVue.Exceptions.InvalidSetupException;
 import edu.andreasgut.MuehleWebSpringVue.Models.*;
 import edu.andreasgut.MuehleWebSpringVue.Models.PlayerAndSpectator.*;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -25,9 +27,10 @@ public class GameManagerService {
     private MainService mainService;
     private SenderService senderService;
     private StatisticService statisticService;
+    private GameStateService gameStateService;
 
 
-    public GameManagerService(GameRepository gameRepository, PairingService pairingService, GameService gameService, ComputerService computerService, MainService mainService, SenderService senderService, StatisticService statisticService) {
+    public GameManagerService(GameRepository gameRepository, PairingService pairingService, GameService gameService, ComputerService computerService, MainService mainService, SenderService senderService, StatisticService statisticService, GameStateService gameStateService) {
         this.gameRepository = gameRepository;
         this.pairingService = pairingService;
         this.gameService = gameService;
@@ -35,9 +38,8 @@ public class GameManagerService {
         this.mainService = mainService;
         this.senderService = senderService;
         this.statisticService = statisticService;
+        this.gameStateService = gameStateService;
     }
-
-
 
     public LinkedList<Game> getAllGames() {
         LinkedList<Game> games = gameRepository.findAll();
@@ -160,6 +162,15 @@ public class GameManagerService {
         return game;
     }
 
+    public void giveUpGame(JsonObject jsonRequest, String webSocketSessionId) {
+        String gameCode = jsonRequest.get("gamecode").getAsString();
+        int index = jsonRequest.get("index").getAsInt();
+        Game game = gameRepository.findByGameCode(gameCode);
+        gameStateService.finishGame(game.getGameState());
+        gameStateService.setWinner(game.getGameState(), index == 1 ? 2 : 1);
+        senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
+    }
+
     private String generateValidGameCode() {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder gameCode = new StringBuilder();
@@ -174,4 +185,6 @@ public class GameManagerService {
 
         return gameCode.toString();
     }
+
+
 }
