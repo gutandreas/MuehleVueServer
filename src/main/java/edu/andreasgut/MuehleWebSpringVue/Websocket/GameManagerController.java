@@ -141,7 +141,8 @@ public class GameManagerController {
             Game game = gameManagerService.addSpectatorToGame(jsonObject, sessionId);
             GameUpdateDto gameUpdateDto = new GameUpdateDto(game, LocalDateTime.now());
             senderService.sendGameUpdate(gameUpdateDto);
-            return new GameSetupDto(game, 0, true);
+            String spectatorName = jsonObject.get("name").getAsString();
+            return new GameSetupDto(game, 0, spectatorName, true);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("Das Spiel kann nicht beobachtet werden");
