@@ -26,8 +26,6 @@ public class BoardService {
         return board.getBoardPositionsStates()[position.getRing()][position.getField()];
     }
 
-
-
     public int getNumberOfStates(Board board, POSITIONSTATE positionstate){
         int counter = 0;
         for (int i = 0; i < board.getBoardPositionsStates().length; i++) {

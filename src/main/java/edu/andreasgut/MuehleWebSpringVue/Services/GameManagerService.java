@@ -169,6 +169,7 @@ public class GameManagerService {
         gameStateService.finishGame(game.getGameState());
         gameStateService.setWinner(game.getGameState(), index == 1 ? 2 : 1);
         senderService.sendGameUpdate(new GameUpdateDto(game, LocalDateTime.now()));
+        gameRepository.save(game);
     }
 
     private String generateValidGameCode() {
